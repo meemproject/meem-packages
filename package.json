@@ -1,0 +1,15 @@
+{
+  "name": "meem-packages",
+  "scripts": {
+    "lerna": "lerna",
+    "publish": "lerna publish --log-level=silly",
+    "lint": "lerna run lint",
+		"build": "lerna run build",
+    "test": "lerna run test --parallel"
+  },
+  "devDependencies": {
+    "eslint": "^8.12.0",
+    "eslint-config-kengoldfarb": "^1.3.0",
+    "lerna": "^4.0.0"
+  }
+}
