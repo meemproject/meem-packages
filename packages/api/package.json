@@ -1,5 +1,5 @@
 {
-	"name": "@meemproject/types",
+	"name": "@meemproject/api",
 	"version": "0.0.5",
 	"main": "index.ts",
 	"scripts": {
