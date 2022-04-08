@@ -77,7 +77,7 @@ workflows:
           filters:
             branches:
               only:
-                - v7
+                - dev
       - prod_release:
           context: public_packages
           filters:
