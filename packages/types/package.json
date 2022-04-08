@@ -1,5 +1,6 @@
 {
 	"name": "@meemproject/types",
+	"version": "0.0.1",
 	"main": "index.ts",
 	"scripts": {
 		"fetchTypes": "tsnd --project tsconfig.json --transpile-only scripts/fetchTypes.ts"
