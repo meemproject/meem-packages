@@ -2,7 +2,7 @@
   "name": "meem-packages",
   "scripts": {
     "lerna": "lerna",
-    "publish": "lerna publish --log-level=silly",
+    "publish": "lerna publish",
     "lint": "lerna run lint",
 		"build": "lerna run build",
     "test": "lerna run test --parallel"
