@@ -1,5 +1,4 @@
 {
-	"debug.node.autoAttach": "off",
 	"git.ignoreLimitWarning": true,
 	"javascript.validate.enable": false,
 	"editor.formatOnSave": true,
@@ -45,19 +44,14 @@
 			".tsx"
 		]
 	},
+	"eslint.workingDirectories": [
+		"packages/api",
+		"packages/react",
+		"packages/utils"
+	],
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"typescript.preferences.importModuleSpecifier": "relative",
-	"editor.formatOnSaveTimeout": 5000,
-	"editor.codeActionsOnSaveTimeout": 5000,
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": true
-	},
-	"cSpell.ignorePaths": [
-		"**/package-lock.json",
-		"**/node_modules/**",
-		"**/build/**",
-		"**/vscode-extension/**",
-		"**/.git/objects/**",
-		".vscode"
-	]
+	}
 }

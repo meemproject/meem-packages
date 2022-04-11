@@ -1,11 +1,10 @@
 {
-	"name": "@meemproject/api",
+	"name": "@meemproject/utils",
 	"version": "0.0.3",
 	"main": "build/index.js",
 	"scripts": {
 		"clean": "rm -rf build/*",
 		"build": "npm run clean ; tsc ; echo \"Finished Building\"",
-		"fetchTypes": "tsnd --project tsconfig.json --transpile-only scripts/fetchTypes.ts",
 		"lint": "eslint --max-warnings=0 --ext=.ts,.tsx . && tsc -p . --noEmit",
 		"lint:fix": "eslint --fix --ext=.ts,.tsx ."
 	},
