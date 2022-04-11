@@ -10,18 +10,20 @@
 	  "skipLibCheck": true,
 	  "strict": true,
 	  "forceConsistentCasingInFileNames": true,
-	  "noEmit": true,
 	  "esModuleInterop": true,
 	  "module": "commonjs",
 	  "moduleResolution": "node",
 	  "resolveJsonModule": true,
 	  "isolatedModules": true,
 	  "jsx": "preserve",
-	  "incremental": true
+	  "incremental": true,
+	  "outDir": "build",
+	  "baseUrl": ".",
+	  "noImplicitAny": true,
+	  "declaration": true
 	},
 	"include": [
-	  "**/*.ts",
-	  "**/*.tsx"
+	  "src/**/*.ts"
 	],
 	"exclude": [
 	  "node_modules"

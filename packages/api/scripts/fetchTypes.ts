@@ -13,7 +13,7 @@ async function downloadTypes() {
 		}/api/1.0/types`
 	)
 
-	const filePath = path.join(__dirname, '..', 'index.ts')
+	const filePath = path.join(__dirname, '../src/api.generated.ts')
 
 	if (response.body && response.body.types) {
 		fs.writeFileSync(filePath, response.body.types)
