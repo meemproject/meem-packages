@@ -19,6 +19,7 @@ jobs:
             - '26:cc:64:22:a0:8a:08:fe:a9:26:ab:5f:7e:88:e9:2c'
       - checkout
       - run: yarn install --frozen-lockfile
+      - run: yarn bootstrap
       - run: yarn build
       - run:
           name: Authenticate with registry
@@ -33,6 +34,7 @@ jobs:
             - '26:cc:64:22:a0:8a:08:fe:a9:26:ab:5f:7e:88:e9:2c'
       - checkout
       - run: yarn install --frozen-lockfile
+      - run: yarn bootstrap
       - run: yarn build
       - run: git config --global user.email "$GIT_AUTHOR_EMAIL"
       - run: git config --global user.name "$GIT_AUTHOR_NAME"
