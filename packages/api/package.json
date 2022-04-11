@@ -6,6 +6,9 @@
 		"clean": "rm -rf build/*",
 		"build": "npm run clean ; tsc ; echo \"Finished Building\"",
 		"fetchTypes": "tsnd --project tsconfig.json --transpile-only scripts/fetchTypes.ts",
+		"generateTypes": "typechain --target=ethers-v5 'src/abis/*.json' --out-dir='src/abis'",
+		"fetchMeemABI": "tsnd --project tsconfig.scripts.json --transpile-only scripts/fetchMeemABI.ts && yarn generateTypes",
+		"fetchMeemIdABI": "tsnd --project tsconfig.scripts.json --transpile-only scripts/fetchMeemIdABI.ts && yarn generateTypes",
 		"lint": "eslint --max-warnings=0 --ext=.ts,.tsx . && tsc -p . --noEmit",
 		"lint:fix": "eslint --fix --ext=.ts,.tsx ."
 	},
@@ -24,5 +27,11 @@
 	"publishConfig": {
 		"access": "public",
 		"registry": "https://registry.npmjs.org/"
+	},
+	"dependencies": {
+		"@typechain/ethers-v5": "^10.0.0",
+		"ethers": "^5.6.2",
+		"tsnd": "^1.0.2",
+		"typechain": "^8.0.0"
 	}
 }
