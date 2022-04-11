@@ -26,6 +26,11 @@
 		"registry": "https://registry.npmjs.org/"
 	},
 	"dependencies": {
+		"@meemproject/api": "^0.0.10",
+		"@mui/material": "^5.6.1",
+		"js-cookie": "^3.0.1",
+		"luxon": "^2.3.1",
+		"mui": "^0.0.1",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
 	}

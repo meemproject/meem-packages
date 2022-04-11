@@ -1,0 +1,119 @@
+import log from '@kengoldfarb/log'
+import { AlertProps } from '@material-ui/lab'
+import React, {
+	useContext,
+	createContext,
+	useMemo,
+	useState,
+	useCallback
+} from 'react'
+import { Toast } from '../components/Toast'
+
+export interface IToastState {
+	toastMessage: string
+	toastSeverity: NonNullable<AlertProps['severity']>
+	isToastOpen: boolean
+}
+
+export interface IToastAuthContextState {
+	setToast: (state: Partial<IToastState>) => void
+	toastState: IToastState
+	setErrorToast: (msg: string) => void
+	setSuccessToast: (msg: string) => void
+	setInfoToast: (msg: string) => void
+}
+
+const ToastContext = createContext({} as IToastAuthContextState)
+ToastContext.displayName = 'ToastContext'
+
+const ToastProvider: React.FC = props => {
+	const [toastState, setToastState] = useState<IToastState>({
+		toastMessage: '',
+		toastSeverity: 'success',
+		isToastOpen: false
+	})
+
+	const setToast = React.useCallback(newState => {
+		setToastState((prevState: IToastState) => {
+			return {
+				...prevState,
+				...newState
+			}
+		})
+	}, [])
+
+	const setErrorToast = useCallback((msg: string) => {
+		log.debug('Setting Error Toast', msg)
+		return setToastState((prevState: IToastState) => {
+			return {
+				...prevState,
+				isToastOpen: true,
+				toastSeverity: 'error',
+				toastMessage: msg
+			}
+		})
+	}, [])
+
+	const setSuccessToast = useCallback((msg: string) => {
+		log.debug('Setting Success Toast', msg)
+		return setToastState((prevState: IToastState) => {
+			return {
+				...prevState,
+				isToastOpen: true,
+				toastSeverity: 'success',
+				toastMessage: msg
+			}
+		})
+	}, [])
+
+	const setInfoToast = useCallback((msg: string) => {
+		log.debug('Setting Success Toast', msg)
+		return setToastState((prevState: IToastState) => {
+			return {
+				...prevState,
+				isToastOpen: true,
+				toastSeverity: 'info',
+				toastMessage: msg
+			}
+		})
+	}, [])
+
+	const value = useMemo(
+		() => ({
+			setToast,
+			toastState,
+			setErrorToast,
+			setSuccessToast,
+			setInfoToast
+		}),
+		[setToast, toastState, setErrorToast, setSuccessToast, setInfoToast]
+	)
+
+	return <ToastContext.Provider value={value} {...props} />
+}
+
+function useToast() {
+	const context = useContext(ToastContext)
+	if (!context) {
+		throw new Error(`useToast must be used within a ToastProvider`)
+	}
+	return context
+}
+
+const ToastWrapper: React.FC = ({ children }) => {
+	const { toastState, setToast } = useToast()
+	const { isToastOpen, toastMessage, toastSeverity } = toastState
+	return (
+		<>
+			{children}
+			<Toast
+				onClose={() => setToast({ isToastOpen: false })}
+				isOpen={isToastOpen}
+				message={toastMessage}
+				severity={toastSeverity}
+			/>
+		</>
+	)
+}
+
+export { ToastProvider, useToast, ToastWrapper }
