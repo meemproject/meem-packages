@@ -5,12 +5,16 @@
     "bootstrap": "lerna bootstrap",
     "publish": "lerna publish",
     "clean": "lerna run clean",
+    "clean:modules": "lerna run clean:modules && rm -rf node_modules",
     "lint": "lerna run lint",
     "lint:fix": "lerna run lint:fix",
     "build": "lerna run build",
-    "test": "lerna run test --parallel"
+    "test": "lerna run test --parallel",
+    "watch": "lerna run watch --no-sort --stream"
   },
   "devDependencies": {
+    "chokidar-cli": "^3.0.0",
+    "concurrently": "^7.1.0",
     "conventional-changelog-kengoldfarb": "^1.0.0",
     "lerna": "^4.0.0",
     "typescript": "^4.6.3"
