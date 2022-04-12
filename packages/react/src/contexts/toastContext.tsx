@@ -5,9 +5,10 @@ import React, {
 	createContext,
 	useMemo,
 	useState,
-	useCallback
+	useCallback,
+	ReactNode
 } from 'react'
-import { Toast } from '../components/Toast'
+import { Toast } from './Toast'
 
 export interface IToastState {
 	toastMessage: string
@@ -33,7 +34,7 @@ const ToastProvider: React.FC = props => {
 		isToastOpen: false
 	})
 
-	const setToast = React.useCallback(newState => {
+	const setToast = React.useCallback((newState: any) => {
 		setToastState((prevState: IToastState) => {
 			return {
 				...prevState,
@@ -100,7 +101,7 @@ function useToast() {
 	return context
 }
 
-const ToastWrapper: React.FC = ({ children }) => {
+const ToastWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
 	const { toastState, setToast } = useToast()
 	const { isToastOpen, toastMessage, toastSeverity } = toastState
 	return (

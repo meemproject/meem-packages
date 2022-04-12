@@ -1,4 +1,16 @@
-import log from '@kengoldfarb/log'
+import {
+	AuctionHouse,
+	Meem,
+	MeemID,
+	ERC20,
+	MeemAPI,
+	MeemVite
+} from '@meemproject/api'
+import auctionABI from '@meemproject/api/build/abis/AuctionHouse.json'
+import erc20ABI from '@meemproject/api/build/abis/ERC20.json'
+import meemABI from '@meemproject/api/build/abis/Meem.json'
+import meemIdABI from '@meemproject/api/build/abis/MeemID.json'
+import meemViteABI from '@meemproject/api/build/abis/MeemVite.json'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers, Contract, BigNumber, ethers } from 'ethers'
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -13,14 +25,8 @@ import React, {
 } from 'react'
 import useSWR from 'swr'
 import Web3Modal from 'web3modal'
-import auctionABI from '@meemproject/meem-api-ts/src/abis/AuctionHouse.json'
-import erc20ABI from '@meemproject/meem-api-ts/src/abis/ERC20.json'
-import meemABI from '@meemproject/meem-api-ts/src/abis/Meem.json'
-import meemIdABI from '@meemproject/meem-api-ts/src/abis/MeemID.json'
-import meemViteABI from '@meemproject/meem-api-ts/src/abis/MeemVite.json'
 import { makeFetcher } from '../lib/fetcher'
-import { MeemTypes } from '@meemproject/meem-api-ts' 
-import { MeemAPI } from '@meemproject/meem-api-ts'
+import log from '../lib/log'
 
 // Suppress warnings
 ethers.utils.Logger.setLogLevel(ethers.utils.Logger.levels.ERROR)
@@ -64,15 +70,15 @@ interface IWalletContextState {
 	/** Whether the wallet is connected to the wrong network */
 	isConnectedToWrongNetwork: boolean
 
-	meemViteContract?: MeemTypes.MeemVite
+	meemViteContract?: MeemVite
 
-	meemContract?: MeemTypes.Meem
+	meemContract?: Meem
 
-	auctionContract?: MeemTypes.AuctionHouse
+	auctionContract?: AuctionHouse
 
-	erc20Contract?: MeemTypes.ERC20
+	erc20Contract?: ERC20
 
-	meemIdContract?: MeemTypes.MeemID
+	meemIdContract?: MeemID
 
 	meemId?: MeemAPI.IMeemId
 
@@ -101,18 +107,18 @@ WalletContext.displayName = 'WalletContext'
 export const WalletProvider: React.FC = props => {
 	const [accounts, setAccounts] = useState<string[]>([])
 	const [meemViteContract, setMeemViteContract] = useState<
-	MeemTypes.MeemVite | undefined
+		MeemVite | undefined
 	>()
-	const [meemContract, setMeemContract] = useState<MeemTypes.Meem | undefined>()
-	const [meemIdContract, setMeemIdContract] = useState<MeemTypes.MeemID | undefined>()
+	const [meemContract, setMeemContract] = useState<Meem | undefined>()
+	const [meemIdContract, setMeemIdContract] = useState<MeemID | undefined>()
 	const [signature, setSignature] = useState('')
 	const [jwt, setJwt] = useState<string>()
 	const [loginState, setLoginState] = useState<LoginState>(LoginState.Unknown)
 	const [isAdmin, setIsAdmin] = useState(false)
 	const [meemId, setMeemId] = useState<MeemAPI.IMeemId | undefined>()
-	const [erc20Contract, setERC20Contract] = useState<MeemTypes.ERC20 | undefined>()
+	const [erc20Contract, setERC20Contract] = useState<ERC20 | undefined>()
 	const [auctionContract, setAuctionContract] = useState<
-	MeemTypes.AuctionHouse | undefined
+		AuctionHouse | undefined
 	>()
 	const [isConnected, setIsConnected] = useState<boolean>(false)
 	const [isConnectedToWrongNetwork, setIsConnectedToWrongNetwork] =
@@ -383,40 +389,40 @@ export const WalletProvider: React.FC = props => {
 
 	useEffect(() => {
 		if (!process.env.NEXT_PUBLIC_MEEMVITE_CONTRACT_ADDRESS) {
-			log.crit('Invalid MeemVite contract address. Check env vars.')
+			log.debug('Invalid MeemVite contract address. Check env vars.')
 			return
 		}
 		const contract = new Contract(
 			process.env.NEXT_PUBLIC_MEEMVITE_CONTRACT_ADDRESS,
 			meemViteABI,
 			signer
-		) as MeemTypes.MeemVite
+		) as MeemVite
 		setMeemViteContract(contract)
 	}, [signer])
 
 	useEffect(() => {
 		if (!process.env.NEXT_PUBLIC_MEEM_CONTRACT_ADDRESS) {
-			log.crit('Invalid Meem contract address. Check env vars.')
+			log.debug('Invalid Meem contract address. Check env vars.')
 			return
 		}
 		const contract = new Contract(
 			process.env.NEXT_PUBLIC_MEEM_CONTRACT_ADDRESS,
 			meemABI,
 			signer
-		) as MeemTypes.Meem
+		) as Meem
 		setMeemContract(contract)
 	}, [signer])
 
 	useEffect(() => {
 		if (!process.env.NEXT_PUBLIC_MEEM_ID_CONTRACT_ADDRESS) {
-			log.crit('Invalid Meem id contract address. Check env vars.')
+			log.debug('Invalid Meem id contract address. Check env vars.')
 			return
 		}
 		const contract = new Contract(
 			process.env.NEXT_PUBLIC_MEEM_ID_CONTRACT_ADDRESS,
 			meemIdABI,
 			signer
-		) as MeemTypes.MeemID
+		) as MeemID
 		setMeemIdContract(contract)
 	}, [signer])
 
@@ -429,7 +435,7 @@ export const WalletProvider: React.FC = props => {
 			process.env.NEXT_PUBLIC_AUCTION_CONTRACT_ADDRESS,
 			auctionABI,
 			signer
-		) as MeemTypes.AuctionHouse
+		) as AuctionHouse
 		setAuctionContract(contract)
 	}, [signer])
 
@@ -442,20 +448,20 @@ export const WalletProvider: React.FC = props => {
 			process.env.NEXT_PUBLIC_AUCTION_CURRENCY_ADDRESS,
 			erc20ABI,
 			signer
-		) as MeemTypes.ERC20
+		) as ERC20
 		setERC20Contract(contract)
 	}, [signer])
 
 	useEffect(() => {
 		if (!process.env.NEXT_PUBLIC_AUCTION_CURRENCY_ADDRESS) {
-			log.crit('Invalid Auction contract address. Check env vars.')
+			log.debug('Invalid Auction contract address. Check env vars.')
 			return
 		}
 		const contract = new Contract(
 			process.env.NEXT_PUBLIC_AUCTION_CURRENCY_ADDRESS,
 			erc20ABI,
 			signer
-		) as MeemTypes.ERC20
+		) as ERC20
 		setERC20Contract(contract)
 	}, [signer])
 

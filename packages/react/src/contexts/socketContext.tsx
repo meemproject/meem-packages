@@ -1,9 +1,8 @@
 import log from '@kengoldfarb/log'
-import isEqual from 'lodash/isEqual'
-import remove from 'lodash/remove'
+import { MeemAPI } from '@meemproject/api'
+import { isEqual, remove } from 'lodash'
 import React, { useContext, createContext, useState } from 'react'
 import { MatchMutate, useMatchMutate } from '../lib/useMatchMutate'
-import { MeemAPI } from '@meemproject/meem-api-ts'
 
 export interface ISockets {
 	on(options: MeemAPI.EventListener): void
@@ -177,7 +176,7 @@ function init(options: { matchMutate: MatchMutate }): {
 					break
 
 				case 'unsubscribe':
-					remove(subscriptions, s => isEqual(s, data))
+					remove(subscriptions, (s: any) => isEqual(s, data))
 					break
 
 				default:

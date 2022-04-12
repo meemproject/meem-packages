@@ -1,6 +1,3 @@
-import * as MeemTypes from './abis/index'
-import * as MeemProject from './meemProject'
-
+export * from './abis/index'
+export * from './meemProject'
 export * from './api.generated'
-
-export { MeemTypes, MeemProject }
