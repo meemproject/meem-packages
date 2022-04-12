@@ -4,6 +4,7 @@
 		"jsx": "react",
 		"moduleResolution": "node",
 		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true,
 		"rootDir": "./src",
 		"outDir": "./build",
 		"strict": true,

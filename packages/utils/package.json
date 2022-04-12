@@ -2,6 +2,7 @@
 	"name": "@meemproject/utils",
 	"version": "0.0.12",
 	"main": "build/index.js",
+	"license": "MIT",
 	"scripts": {
 		"clean": "rm -rf build/*",
 		"clean:modules": "rm -rf node_modules",
