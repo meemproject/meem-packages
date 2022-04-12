@@ -1,15 +1,17 @@
 version: 2
 jobs:
-  # test:
-  #   docker:
-  #     - image: circleci/node:14
-  #   steps:
-  #     - add_ssh_keys:
-  #         fingerprints:
-  #           - '26:cc:64:22:a0:8a:08:fe:a9:26:ab:5f:7e:88:e9:2c'
-  #     - checkout
-  #     - run: yarn install --frozen-lockfile
-  #     - run: yarn test
+  test:
+    docker:
+      - image: circleci/node:14
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - '26:cc:64:22:a0:8a:08:fe:a9:26:ab:5f:7e:88:e9:2c'
+      - checkout
+      - run: yarn install --frozen-lockfile
+      - run: yarn bootstrap
+      - run: yarn lint
+      - run: yarn test
   pre_release:
     docker:
       - image: circleci/node:14
@@ -61,22 +63,20 @@ workflows:
   version: 2
   do_build:
     jobs:
-      # - test:
-      #     filters:
-      #       branches:
-      #         ignore:
-      #           - master
+      - test:
+          filters:
+            branches:
+              ignore:
+                - master
       - pre_release:
-          # requires:
-          #   - test
           context: public_packages
           filters:
             branches:
               only:
                 - /prerelease\/.*/
       - dev_release:
-          # requires:
-          #   - test
+          requires:
+            - test
           context: public_packages
           filters:
             branches:
