@@ -20,7 +20,8 @@ import React, {
 	useState,
 	useCallback,
 	useEffect,
-	useContext
+	useContext,
+	ReactNode
 } from 'react'
 import useSWR from 'swr'
 import Web3Modal from 'web3modal'
@@ -103,7 +104,34 @@ interface IWalletContextState {
 const WalletContext = createContext({} as IWalletContextState)
 WalletContext.displayName = 'WalletContext'
 
-export const WalletProvider: React.FC = props => {
+interface IWalletContextProps {
+	children: ReactNode
+
+	infuraId: string
+
+	networkName: string
+
+	auctionCurrencyAddress?: string
+
+	contractAddressAuction?: string
+
+	contractAddressMeemVite?: string
+
+	contractAddressMeem: string
+
+	contractAddressMeemId: string
+}
+
+export const WalletProvider: React.FC<IWalletContextProps> = ({
+	children,
+	infuraId,
+	networkName,
+	auctionCurrencyAddress,
+	contractAddressAuction,
+	contractAddressMeem,
+	contractAddressMeemId,
+	contractAddressMeemVite
+}: IWalletContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
 	const [meemViteContract, setMeemViteContract] = useState<
 		MeemVite | undefined
@@ -214,7 +242,7 @@ export const WalletProvider: React.FC = props => {
 		setNetwork(n)
 		setProvider(p)
 
-		const requiredNetworkName = process.env.NEXT_PUBLIC_NETWORK
+		const requiredNetworkName = networkName
 		const currentNetworkName = n.name
 
 		if (requiredNetworkName !== currentNetworkName) {
@@ -266,7 +294,7 @@ export const WalletProvider: React.FC = props => {
 		setWeb3Provider(w3p)
 		setIsConnected(true)
 		setIsConnectedToWrongNetwork(false)
-	}, [web3Modal])
+	}, [networkName, web3Modal])
 
 	const disconnectWallet = useCallback(async () => {
 		web3Modal?.clearCachedProvider()
@@ -288,7 +316,7 @@ export const WalletProvider: React.FC = props => {
 					walletconnect: {
 						package: WalletConnectProvider, // required
 						options: {
-							infuraId: process.env.NEXT_PUBLIC_INFURA_ID, // required
+							infuraId, // required
 							rpc: {
 								[networkChainIds.matic]: 'https://rpc-mainnet.maticvigil.com',
 								[networkChainIds.mumbai]: 'https://rpc-mumbai.matic.today'
@@ -330,9 +358,7 @@ export const WalletProvider: React.FC = props => {
 
 	const handleChainChanged = useCallback(
 		(chainId: string) => {
-			const expectedChainId =
-				process.env.NEXT_PUBLIC_NETWORK &&
-				networkChainIds[process.env.NEXT_PUBLIC_NETWORK]
+			const expectedChainId = networkName && networkChainIds[networkName]
 
 			if (!expectedChainId) {
 				log.fatal('Invalid chain set in env')
@@ -352,7 +378,7 @@ export const WalletProvider: React.FC = props => {
 				setIsConnectedToWrongNetwork(false)
 			}
 		},
-		[connectWallet, disconnectWallet]
+		[connectWallet, disconnectWallet, networkName]
 	)
 
 	// A `provider` should come with EIP-1193 events. We'll listen for those events
@@ -387,82 +413,78 @@ export const WalletProvider: React.FC = props => {
 	}, [accounts])
 
 	useEffect(() => {
-		if (!process.env.NEXT_PUBLIC_MEEMVITE_CONTRACT_ADDRESS) {
+		if (!contractAddressMeemVite) {
 			log.debug('Invalid MeemVite contract address. Check env vars.')
 			return
 		}
 		const contract = new Contract(
-			process.env.NEXT_PUBLIC_MEEMVITE_CONTRACT_ADDRESS,
+			contractAddressMeemVite,
 			meemViteABI,
 			signer
 		) as MeemVite
 		setMeemViteContract(contract)
-	}, [signer])
+	}, [contractAddressMeemVite, signer])
 
 	useEffect(() => {
-		if (!process.env.NEXT_PUBLIC_MEEM_CONTRACT_ADDRESS) {
+		if (!contractAddressMeem) {
 			log.debug('Invalid Meem contract address. Check env vars.')
 			return
 		}
-		const contract = new Contract(
-			process.env.NEXT_PUBLIC_MEEM_CONTRACT_ADDRESS,
-			meemABI,
-			signer
-		) as Meem
+		const contract = new Contract(contractAddressMeem, meemABI, signer) as Meem
 		setMeemContract(contract)
-	}, [signer])
+	}, [contractAddressMeem, signer])
 
 	useEffect(() => {
-		if (!process.env.NEXT_PUBLIC_MEEM_ID_CONTRACT_ADDRESS) {
+		if (!contractAddressMeemId) {
 			log.debug('Invalid Meem id contract address. Check env vars.')
 			return
 		}
 		const contract = new Contract(
-			process.env.NEXT_PUBLIC_MEEM_ID_CONTRACT_ADDRESS,
+			contractAddressMeemId,
 			meemIdABI,
 			signer
 		) as MeemID
 		setMeemIdContract(contract)
-	}, [signer])
+	}, [contractAddressMeemId, signer])
 
 	useEffect(() => {
-		if (!process.env.NEXT_PUBLIC_AUCTION_CONTRACT_ADDRESS) {
+		if (!contractAddressAuction) {
 			log.debug('Invalid Auction contract address. Check env vars.')
 			return
 		}
 		const contract = new Contract(
-			process.env.NEXT_PUBLIC_AUCTION_CONTRACT_ADDRESS,
+			contractAddressAuction,
 			auctionABI,
 			signer
 		) as AuctionHouse
 		setAuctionContract(contract)
-	}, [signer])
+	}, [contractAddressAuction, signer])
 
 	useEffect(() => {
-		if (!process.env.NEXT_PUBLIC_AUCTION_CURRENCY_ADDRESS) {
+		if (!auctionCurrencyAddress) {
 			log.debug('Invalid Auction contract address. Check env vars.')
 			return
 		}
 		const contract = new Contract(
-			process.env.NEXT_PUBLIC_AUCTION_CURRENCY_ADDRESS,
+			auctionCurrencyAddress,
 			erc20ABI,
 			signer
 		) as ERC20
 		setERC20Contract(contract)
-	}, [signer])
+	}, [auctionCurrencyAddress, signer])
 
 	useEffect(() => {
-		if (!process.env.NEXT_PUBLIC_AUCTION_CURRENCY_ADDRESS) {
+		if (!auctionCurrencyAddress) {
 			log.debug('Invalid Auction contract address. Check env vars.')
 			return
 		}
 		const contract = new Contract(
-			process.env.NEXT_PUBLIC_AUCTION_CURRENCY_ADDRESS,
+			auctionCurrencyAddress,
 			erc20ABI,
 			signer
 		) as ERC20
 		setERC20Contract(contract)
-	}, [signer])
+	}, [auctionCurrencyAddress, signer])
 
 	const value = useMemo(
 		() => ({
@@ -517,7 +539,7 @@ export const WalletProvider: React.FC = props => {
 		]
 	)
 
-	return <WalletContext.Provider value={value} {...props} />
+	return <WalletContext.Provider value={value} {...children} />
 }
 
 export function useWallet() {
