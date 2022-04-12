@@ -13,7 +13,6 @@ import meemIdABI from '@meemproject/api/build/abis/MeemID.json'
 import meemViteABI from '@meemproject/api/build/abis/MeemVite.json'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers, Contract, BigNumber, ethers } from 'ethers'
-// eslint-disable-next-line import/no-extraneous-dependencies
 import Cookies from 'js-cookie'
 import React, {
 	createContext,
