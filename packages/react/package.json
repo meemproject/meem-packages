@@ -1,18 +1,22 @@
 {
 	"name": "@meemproject/react",
-	"version": "0.0.11",
+	"version": "0.0.12",
 	"main": "build/index.js",
+	"license": "MIT",
 	"scripts": {
 		"clean": "rm -rf build/*",
+		"clean:modules": "rm -rf node_modules",
 		"build": "npm run clean ; tsc ; echo \"Finished Building\"",
 		"lint": "eslint --max-warnings=0 --ext=.ts,.tsx . && tsc -p . --noEmit",
-		"lint:fix": "eslint --fix --ext=.ts,.tsx ."
+		"lint:fix": "eslint --fix --ext=.ts,.tsx .",
+		"watch": "yarn run build && chokidar 'src/**/*.(js|jsx|ts|tsx)' -c 'yarn run build'"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^9.0.13",
 		"@types/node": "^17.0.23",
 		"@types/react": "^18.0.1",
 		"@types/superagent": "^4.1.15",
+		"chokidar-cli": "^3.0.0",
 		"eslint": "^7.32.0",
 		"eslint-config-kengoldfarb": "^1.3.0",
 		"fs-extra": "^10.0.1",
@@ -26,11 +30,11 @@
 		"registry": "https://registry.npmjs.org/"
 	},
 	"dependencies": {
-		"@meemproject/api": "^0.0.10",
-		"@mui/material": "^5.6.1",
+		"@kengoldfarb/log": "^1.0.5",
+		"@meemproject/api": "^0.0.12",
+		"@meemproject/utils": "^0.0.12",
 		"js-cookie": "^3.0.1",
 		"luxon": "^2.3.1",
-		"mui": "^0.0.1",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
 	}
