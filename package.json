@@ -5,6 +5,7 @@
     "bootstrap": "lerna bootstrap",
     "publish": "lerna publish",
     "clean": "lerna run clean",
+    "clean:modules": "lerna run clean:modules && rm -rf node_modules",
     "lint": "lerna run lint",
     "lint:fix": "lerna run lint:fix",
     "build": "lerna run build",
