@@ -1,4 +1,4 @@
-import { MeemAPI } from '@meemproject/meem-api-ts'
+import { MeemAPI } from '@meemproject/api'
 import Cookies from 'js-cookie'
 import superagent from 'superagent'
 
