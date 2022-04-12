@@ -1,0 +1,47 @@
+[
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "internalType": "int256",
+            "name": "childDepth",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "nonOwnerSplitAllocationAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "proxyRegistryAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "contractURI",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct InitDiamond.Args",
+        "name": "_args",
+        "type": "tuple"
+      }
+    ],
+    "name": "init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

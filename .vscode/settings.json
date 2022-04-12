@@ -47,7 +47,8 @@
 	"eslint.workingDirectories": [
 		"packages/api",
 		"packages/react",
-		"packages/utils"
+		"packages/utils",
+		"packages/meem-contracts"
 	],
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"typescript.preferences.importModuleSpecifier": "relative",
