@@ -1,4 +1,4 @@
-import { MeemAPI, MeemProject } from '@meemproject/api'
+import { getMeemProject, MeemAPI, MeemProject } from '@meemproject/api'
 import { normalizeImageUrl } from '@meemproject/utils'
 import Cookies from 'js-cookie'
 import { DateTime } from 'luxon'
