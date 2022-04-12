@@ -327,7 +327,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			})
 			setWeb3Modal(w3m)
 		}
-	}, [])
+	}, [infuraId])
 
 	// Auto connect to the cached provider
 	useEffect(() => {
