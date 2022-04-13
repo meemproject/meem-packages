@@ -10,4 +10,6 @@ export * from './lib/fetcher'
 export * from './lib/useMatchMutate'
 export * from './lib/getNodeSize'
 export * from './lib/useStateCallback'
-export * from './lib/meem/meemdata'
+
+// UI
+export * as MeemUI from './lib/MeemUI'

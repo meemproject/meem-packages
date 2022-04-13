@@ -26,6 +26,7 @@ export function useMatchMutate() {
 		// eslint-disable-next-line no-restricted-syntax
 		for (const key of cache.keys()) {
 			if (matcher.test(key)) {
+				// @ts-ignore
 				keys.push(key)
 			}
 		}

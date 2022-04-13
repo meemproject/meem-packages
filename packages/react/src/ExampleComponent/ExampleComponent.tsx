@@ -13,7 +13,6 @@ export const ExampleComponent: React.FC = () => {
 			contractAddressAuction="etc"
 			contractAddressMeemId="etc"
 			contractAddressMeem="etc"
-			contractAddressMeemVite="etc"
 		>
 			<h1>Hello Meem</h1>
 		</WalletProvider>
