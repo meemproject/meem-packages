@@ -73,25 +73,6 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "string",
-        "name": "errorCode",
-        "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "errorMessage",
-        "type": "string"
-      }
-    ],
-    "name": "Error",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "uint256",
         "name": "tokenId",
         "type": "uint256"

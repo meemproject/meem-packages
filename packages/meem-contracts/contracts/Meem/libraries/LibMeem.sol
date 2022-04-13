@@ -81,8 +81,6 @@ library LibMeem {
 
 	event DataSet(uint256 tokenId, string data);
 
-	event Error(string errorCode, string errorMessage);
-
 	function getRaribleV2Royalties(uint256 tokenId)
 		internal
 		view
@@ -133,12 +131,7 @@ library LibMeem {
 				LibStrings.substring(params.tokenURI, 0, 7)
 			)
 		) {
-			emit Error(
-				'INVALID_URI',
-				'If the URI is locked it must be an IPFS URI'
-			);
-			// revert InvalidURI();
-			revert('INVALID_URI');
+			revert InvalidURI();
 		}
 
 		uint256 tokenId = s.tokenCounter;
