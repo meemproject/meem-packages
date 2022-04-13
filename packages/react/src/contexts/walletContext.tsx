@@ -1,6 +1,6 @@
 import {
 	AuctionHouse,
-	Meem,
+	// Meem,
 	MeemID,
 	ERC20,
 	MeemAPI,
@@ -8,9 +8,10 @@ import {
 } from '@meemproject/api'
 import auctionABI from '@meemproject/api/build/abis/AuctionHouse.json'
 import erc20ABI from '@meemproject/api/build/abis/ERC20.json'
-import meemABI from '@meemproject/api/build/abis/Meem.json'
 import meemIdABI from '@meemproject/api/build/abis/MeemID.json'
 import meemViteABI from '@meemproject/api/build/abis/MeemVite.json'
+import { Meem } from '@meemproject/meem-contracts'
+import meemABI from '@meemproject/meem-contracts/types/Meem.json'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers, Contract, BigNumber, ethers } from 'ethers'
 import Cookies from 'js-cookie'
@@ -430,7 +431,11 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			log.debug('Invalid Meem contract address. Check env vars.')
 			return
 		}
-		const contract = new Contract(contractAddressMeem, meemABI, signer) as Meem
+		const contract = new Contract(
+			contractAddressMeem,
+			meemABI,
+			signer
+		) as unknown as Meem
 		setMeemContract(contract)
 	}, [contractAddressMeem, signer])
 

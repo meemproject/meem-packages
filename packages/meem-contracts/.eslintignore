@@ -1,3 +1,7 @@
 build
 node_modules
 dist
+scratch.ts
+typechain
+types
+index.ts
