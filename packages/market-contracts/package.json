@@ -32,6 +32,10 @@
     "createABI": "tsnd --transpile-only scripts/createABI.ts",
     "generateTypes": "typechain --target ethers-v5  './types/MeemMarket.json'"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "devDependencies": {
     "@float-capital/solidity-coverage": "^0.7.17",
     "@kengoldfarb/semantic-release-config": "^1.0.3",
