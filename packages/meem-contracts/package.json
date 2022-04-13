@@ -6,6 +6,15 @@
 	"homepage": "https://meem.wtf",
 	"license": "MIT",
 	"main": "./index.ts",
+	"files": [
+		"abi",
+		"typechain",
+		"types",
+		"package.json",
+		"README.md",
+		"CHANGELOG.md",
+		"index.ts"
+	],
 	"scripts": {
 		"build": "yarn build:sol",
 		"test:build": "waffle",

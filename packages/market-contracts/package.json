@@ -4,8 +4,14 @@
   "private": false,
   "main": "./index.ts",
   "files": [
-    "./dist/**/*",
-    "./dist/*"
+    "abi",
+    "addresses",
+    "typechain",
+    "types",
+    "package.json",
+    "README.md",
+    "CHANGELOG.md",
+    "index.ts"
   ],
   "scripts": {
     "build": "yarn build:sol",
