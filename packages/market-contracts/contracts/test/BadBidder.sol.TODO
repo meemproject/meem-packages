@@ -10,13 +10,13 @@ contract BadBidder {
     address auction;
     address zora;
 
-    constructor(address _auction, address _zora) public {
+    constructor(address _auction, address _zora) {
         auction = _auction;
         zora = _zora;
     }
 
     function placeBid(uint256 auctionId, uint256 amount) external payable {
-        IAuctionHouse(auction).createBid{value: amount}(auctionId, amount);
+        // IAuctionHouse(auction).createBid{value: amount}(auctionId, amount);
     }
 
     receive() external payable {}

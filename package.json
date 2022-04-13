@@ -5,13 +5,13 @@
     "lerna": "lerna",
     "bootstrap": "lerna bootstrap",
     "publish": "lerna publish",
-    "clean": "lerna run clean --parallel",
+    "clean": "lerna run clean --parallel --stream",
     "clean:modules": "lerna run clean:modules --parallel && rm -rf node_modules",
     "reset": "yarn run clean && yarn run clean:modules && yarn && yarn run bootstrap && yarn run build && yarn run bootstrap",
     "lint": "lerna run lint --parallel --stream",
-    "lint:fix": "lerna run lint:fix  --parallel",
+    "lint:fix": "lerna run lint:fix  --parallel --stream",
     "build": "lerna run build",
-    "test": "lerna run test --parallel",
+    "test": "lerna run test --parallel --stream",
     "watch": "lerna run watch --no-sort --stream"
   },
   "devDependencies": {

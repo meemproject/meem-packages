@@ -2,8 +2,7 @@
   "name": "@meemproject/market-contracts",
   "version": "0.0.12",
   "private": false,
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./index.ts",
   "files": [
     "./dist/**/*",
     "./dist/*"
@@ -14,8 +13,6 @@
     "clean:modules": "rm -rf node_modules",
     "prepublishOnly": "yarn build:contracts && yarn build:package",
     "build:sol": "hardhat compile",
-    "build:ts": "tsc -p ./tsconfig.json",
-    "#build:ts": "rm -rf ./dist && tsc && cp typechain/*.d.ts dist/typechain && cp -R addresses dist && cp -R artifacts/contracts dist/artifacts && cp -R contracts dist",
     "test": "hardhat test --network hardhat",
     "verify": "hardhat verify",
     "lint": "eslint --max-warnings=0 --ext=.ts,.tsx . && tsc -p . --noEmit",
@@ -26,8 +23,9 @@
     "upgradeFacet": "hardhat upgradeFacet",
     "network": "hardhat node",
     "console": "hardhat console",
-    "watch": "concurrently -r --kill-others \"chokidar 'contracts/**/*.sol' -c 'yarn build:contracts'\"",
-    "createABI": "tsnd --transpile-only scripts/createABI.ts"
+    "watch": "concurrently -r --kill-others \"chokidar 'contracts/**/*.sol' -c 'yarn build:sol'\"",
+    "createABI": "tsnd --transpile-only scripts/createABI.ts",
+    "generateTypes": "typechain --target ethers-v5  './types/MeemMarket.json'"
   },
   "devDependencies": {
     "@float-capital/solidity-coverage": "^0.7.17",
