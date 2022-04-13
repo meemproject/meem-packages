@@ -27,7 +27,11 @@ export interface IToastAuthContextState {
 const ToastContext = createContext({} as IToastAuthContextState)
 ToastContext.displayName = 'ToastContext'
 
-const ToastProvider: React.FC = props => {
+export interface IToastProviderProps {
+	children: ReactNode
+}
+
+const ToastProvider: React.FC<IToastProviderProps> = ({ children }) => {
 	const [toastState, setToastState] = useState<IToastState>({
 		toastMessage: '',
 		toastSeverity: 'success',
@@ -90,7 +94,7 @@ const ToastProvider: React.FC = props => {
 		[setToast, toastState, setErrorToast, setSuccessToast, setInfoToast]
 	)
 
-	return <ToastContext.Provider value={value} {...props} />
+	return <ToastContext.Provider value={value} {...children} />
 }
 
 function useToast() {
@@ -101,7 +105,11 @@ function useToast() {
 	return context
 }
 
-const ToastWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
+export interface IToastWrapperProps {
+	children: ReactNode
+}
+
+const ToastWrapper: React.FC<IToastWrapperProps> = ({ children }) => {
 	const { toastState, setToast } = useToast()
 	const { isToastOpen, toastMessage, toastSeverity } = toastState
 	return (
