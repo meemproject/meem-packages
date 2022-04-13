@@ -7,8 +7,9 @@
 		"resolveJsonModule": true,
 		"rootDir": "./src",
 		"outDir": "./build",
+		"skipLibCheck": true,
 		"strict": true,
-		"noImplicitAny": true,
+		"noImplicitAny": false,
 		"declaration": true
 	},
 	"include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.scss"],

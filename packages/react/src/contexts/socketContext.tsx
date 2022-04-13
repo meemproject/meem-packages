@@ -1,7 +1,7 @@
 import log from '@kengoldfarb/log'
 import { MeemAPI } from '@meemproject/api'
 import { isEqual, remove } from 'lodash'
-import React, { useContext, createContext, useState } from 'react'
+import React, { useContext, createContext, useState, ReactNode } from 'react'
 import { MatchMutate, useMatchMutate } from '../lib/useMatchMutate'
 
 export interface ISockets {
@@ -212,7 +212,11 @@ function init(options: { matchMutate: MatchMutate }): {
 	return { sockets, ws }
 }
 
-const SocketProvider: React.FC = props => {
+export interface ISocketProviderProps {
+	children: ReactNode
+}
+
+const SocketProvider: React.FC<ISocketProviderProps> = ({ children }) => {
 	const matchMutate = useMatchMutate()
 	const [websocket, setWebsocket] = useState<WebSocket | undefined>()
 	const [sockets, setSockets] = useState<ISockets | undefined>()
@@ -232,7 +236,7 @@ const SocketProvider: React.FC = props => {
 	return (
 		<SocketContext.Provider
 			value={{ connect, websocket, sockets, isConnected }}
-			{...props}
+			{...children}
 		/>
 	)
 }

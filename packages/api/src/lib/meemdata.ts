@@ -1,7 +1,8 @@
-import { getMeemProject, MeemAPI, MeemProject } from '@meemproject/api'
-import { normalizeImageUrl } from '@meemproject/utils'
+import { MeemAPI } from '@meemproject/meem-api-ts'
 import Cookies from 'js-cookie'
 import { DateTime } from 'luxon'
+import { normalizeImageUrl } from '../../lib/image'
+import { MeemProject, getMeemProject } from '../../lib/meemProject'
 
 export interface MeemData {
 	childMeemCount: number
@@ -36,7 +37,7 @@ export const meemDataFromApiMeem = (meemApiData: MeemAPI.IMetadataMeem) => {
 	let hasUpvotesFromMe = false
 	let hasDownvotesFromMe = false
 
-	meemApiData.addressReactions?.forEach((element: { reaction: string }) => {
+	meemApiData.addressReactions?.forEach(element => {
 		if (element.reaction === 'upvote') {
 			hasUpvotesFromMe = true
 		} else if (element.reaction === 'downvote') {

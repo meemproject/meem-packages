@@ -1,7 +1,13 @@
-import { Button, CircularProgress, TextField } from '@mui/material'
-import { alpha, createTheme, styled } from '@mui/material/styles'
+import {
+	alpha,
+	Button,
+	CircularProgress,
+	styled,
+	TextField
+} from '@material-ui/core'
+import { createTheme } from '@mui/material/styles'
 // import * as Icons from 'iconoir-react'
-import React, { useState } from 'react'
+import React, { ReactNode, useState } from 'react'
 import styles from '../styles/UI.module.scss'
 
 export enum CrossAxisAlignment {
@@ -48,15 +54,12 @@ export const MeemUITheme = createTheme({
 
 // #region Text Components
 
-interface ITextOverrides {
+interface ITextProps {
 	textColor?: string
+	children: ReactNode
 }
 
-export const THeaderXL: React.FC<ITextOverrides> = ({
-	textColor,
-	// @ts-ignore
-	children
-}) => {
+export const THeaderXL: React.FC<ITextProps> = ({ textColor, children }) => {
 	return (
 		<p className={styles.header_xl} style={{ color: textColor ?? undefined }}>
 			{children}
@@ -64,8 +67,7 @@ export const THeaderXL: React.FC<ITextOverrides> = ({
 	)
 }
 
-// @ts-ignore
-export const THeaderL: React.FC<ITextOverrides> = ({ textColor, children }) => {
+export const THeaderL: React.FC<ITextProps> = ({ textColor, children }) => {
 	return (
 		<p className={styles.header_l} style={{ color: textColor ?? undefined }}>
 			{children}
@@ -73,8 +75,7 @@ export const THeaderL: React.FC<ITextOverrides> = ({ textColor, children }) => {
 	)
 }
 
-// @ts-ignore
-export const THeaderM: React.FC<ITextOverrides> = ({ textColor, children }) => {
+export const THeaderM: React.FC<ITextProps> = ({ textColor, children }) => {
 	return (
 		<p className={styles.header_m} style={{ color: textColor ?? undefined }}>
 			{children}
@@ -82,11 +83,7 @@ export const THeaderM: React.FC<ITextOverrides> = ({ textColor, children }) => {
 	)
 }
 
-export const THeaderSBold: React.FC<ITextOverrides> = ({
-	textColor,
-	// @ts-ignore
-	children
-}) => {
+export const THeaderSBold: React.FC<ITextProps> = ({ textColor, children }) => {
 	return (
 		<p
 			className={styles.header_s_bold}
@@ -97,8 +94,7 @@ export const THeaderSBold: React.FC<ITextOverrides> = ({
 	)
 }
 
-// @ts-ignore
-export const THeaderS: React.FC<ITextOverrides> = ({ textColor, children }) => {
+export const THeaderS: React.FC<ITextProps> = ({ textColor, children }) => {
 	return (
 		<p className={styles.header_s} style={{ color: textColor ?? undefined }}>
 			{children}
@@ -106,11 +102,7 @@ export const THeaderS: React.FC<ITextOverrides> = ({ textColor, children }) => {
 	)
 }
 
-export const THeaderXS: React.FC<ITextOverrides> = ({
-	textColor,
-	// @ts-ignore
-	children
-}) => {
+export const THeaderXS: React.FC<ITextProps> = ({ textColor, children }) => {
 	return (
 		<p className={styles.header_xs} style={{ color: textColor ?? undefined }}>
 			{children}
@@ -118,8 +110,7 @@ export const THeaderXS: React.FC<ITextOverrides> = ({
 	)
 }
 
-// @ts-ignore
-export const TParaL: React.FC<ITextOverrides> = ({ textColor, children }) => {
+export const TParaL: React.FC<ITextProps> = ({ textColor, children }) => {
 	return (
 		<p className={styles.para_l} style={{ color: textColor ?? undefined }}>
 			{children}
@@ -127,8 +118,7 @@ export const TParaL: React.FC<ITextOverrides> = ({ textColor, children }) => {
 	)
 }
 
-// @ts-ignore
-export const TPara: React.FC<ITextOverrides> = ({ textColor, children }) => {
+export const TPara: React.FC<ITextProps> = ({ textColor, children }) => {
 	return (
 		<p className={styles.para_m} style={{ color: textColor ?? undefined }}>
 			{children}
@@ -136,11 +126,7 @@ export const TPara: React.FC<ITextOverrides> = ({ textColor, children }) => {
 	)
 }
 
-export const TParaLink: React.FC<ITextOverrides> = ({
-	textColor,
-	// @ts-ignore
-	children
-}) => {
+export const TParaLink: React.FC<ITextProps> = ({ textColor, children }) => {
 	return (
 		<p className={styles.para_m_link} style={{ color: textColor ?? undefined }}>
 			{children}
@@ -148,8 +134,7 @@ export const TParaLink: React.FC<ITextOverrides> = ({
 	)
 }
 
-// @ts-ignore
-export const TParaS: React.FC<ITextOverrides> = ({ textColor, children }) => {
+export const TParaS: React.FC<ITextProps> = ({ textColor, children }) => {
 	return (
 		<p className={styles.para_s} style={{ color: textColor ?? undefined }}>
 			{children}
@@ -157,11 +142,7 @@ export const TParaS: React.FC<ITextOverrides> = ({ textColor, children }) => {
 	)
 }
 
-export const TMetadata: React.FC<ITextOverrides> = ({
-	textColor,
-	// @ts-ignore
-	children
-}) => {
+export const TMetadata: React.FC<ITextProps> = ({ textColor, children }) => {
 	return (
 		<p className={styles.metadata} style={{ color: textColor ?? undefined }}>
 			{children}
@@ -169,8 +150,7 @@ export const TMetadata: React.FC<ITextOverrides> = ({
 	)
 }
 
-// @ts-ignore
-export const TLabel: React.FC<ITextOverrides> = ({ textColor, children }) => {
+export const TLabel: React.FC<ITextProps> = ({ textColor, children }) => {
 	return (
 		<p className={styles.label} style={{ color: textColor ?? undefined }}>
 			{children}
@@ -409,7 +389,6 @@ export const MeemButton: React.FC<ButtonProps> = ({
 					/>
 				)}
 				{(loading == null || !loading) && (
-					// @ts-ignore
 					<Row>
 						{icon !== undefined && (
 							<div
@@ -485,10 +464,12 @@ export const IconButton: React.FC<IconButtonProps> = ({
 interface ColumnProps {
 	crossAxisAlignment?: CrossAxisAlignment
 	mainAxisAlignment?: MainAxisAlignment
+	children: ReactNode
 }
 
-// @ts-ignore
-export const ContentContainer: React.FC = ({ children }) => {
+export const ContentContainer: React.FC<{ children: ReactNode }> = ({
+	children
+}) => {
 	return (
 		<div className={styles.page_container}>
 			<div className={styles.content_container}>{children}</div>
@@ -498,11 +479,11 @@ export const ContentContainer: React.FC = ({ children }) => {
 
 interface ContainerProps {
 	backgroundColor?: string
+	children: ReactNode
 }
 
 export const Container: React.FC<ContainerProps> = ({
 	backgroundColor,
-	// @ts-ignore
 	children
 }) => {
 	return (
@@ -522,7 +503,6 @@ export const Container: React.FC<ContainerProps> = ({
 export const Column: React.FC<ColumnProps> = ({
 	crossAxisAlignment,
 	mainAxisAlignment,
-	// @ts-ignore
 	children
 }) => {
 	let crossAlign = 'center'
@@ -576,11 +556,13 @@ export const Column: React.FC<ColumnProps> = ({
 }
 
 interface RowProps {
+	children: ReactNode
 	crossAxisAlignment?: CrossAxisAlignment
 	mainAxisAlignment?: MainAxisAlignment
 }
 
 interface PaddingProps {
+	children: ReactNode
 	all?: number
 	vertical?: number
 	horizontal?: number
@@ -598,7 +580,6 @@ export const Padding: React.FC<PaddingProps> = ({
 	right,
 	top,
 	bottom,
-	// @ts-ignore
 	children
 }) => {
 	let paddingLeft = 0
@@ -654,7 +635,6 @@ export const Padding: React.FC<PaddingProps> = ({
 export const Row: React.FC<RowProps> = ({
 	crossAxisAlignment,
 	mainAxisAlignment,
-	// @ts-ignore
 	children
 }) => {
 	let crossAlign = 'center'
@@ -729,6 +709,7 @@ export const SizedBox: React.FC<SizedBoxProps> = ({ width, height }) => {
 }
 
 interface VisibilityProps {
+	children: ReactNode
 	visible: boolean
 	height?: string
 	width?: string
@@ -738,7 +719,6 @@ export const Visibility: React.FC<VisibilityProps> = ({
 	visible,
 	height,
 	width,
-	// @ts-ignore
 	children
 }) => {
 	const v = visible ? 'block' : 'none'
