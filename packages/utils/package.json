@@ -1,6 +1,6 @@
 {
 	"name": "@meemproject/utils",
-	"version": "0.0.13",
+	"version": "0.0.14",
 	"main": "build/index.js",
 	"license": "MIT",
 	"scripts": {
