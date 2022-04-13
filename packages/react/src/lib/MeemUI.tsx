@@ -6,9 +6,8 @@ import {
 	TextField
 } from '@material-ui/core'
 import { createTheme } from '@mui/material/styles'
-// import * as Icons from 'iconoir-react'
 import React, { ReactNode, useState } from 'react'
-import styles from '../styles/UI.module.scss'
+import styles from './UI.module.scss'
 
 export enum CrossAxisAlignment {
 	Center,
