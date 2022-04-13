@@ -1,8 +1,8 @@
-import { MeemAPI } from '@meemproject/meem-api-ts'
 import Cookies from 'js-cookie'
 import { DateTime } from 'luxon'
-import { normalizeImageUrl } from '../../lib/image'
-import { MeemProject, getMeemProject } from '../../lib/meemProject'
+import { MeemAPI } from '../api.generated'
+import { getMeemProject, MeemProject } from '../meemProject'
+import { normalizeImageUrl } from './image'
 
 export interface MeemData {
 	childMeemCount: number
