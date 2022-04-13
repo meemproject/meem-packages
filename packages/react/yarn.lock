@@ -760,20 +760,6 @@
     prop-types "^15.7.2"
     react-is "^16.8.0 || ^17.0.0"
 
-"@meemproject/api@^0.0.12":
-  version "0.0.12"
-  resolved "https://registry.yarnpkg.com/@meemproject/api/-/api-0.0.12.tgz#4f13e4b8d7f7a27fb62efb78e841a2bece907ea2"
-  integrity sha512-+kLKElD8Ouwz282+9U4iKCHRS8YqiZsuWajVui50/Xc39g4WJcnBMpjyWTlAKdXWkzplt/Fr2GKDoAKHMH4eSQ==
-  dependencies:
-    "@kengoldfarb/log" "^1.0.5"
-
-"@meemproject/utils@^0.0.12":
-  version "0.0.12"
-  resolved "https://registry.yarnpkg.com/@meemproject/utils/-/utils-0.0.12.tgz#b3c2624c7e4e8d4e20a699065a5a11ed9d658e98"
-  integrity sha512-xrSp+lPNLySJpDRoy3meIe3myM80wtsK3PB5emkW/gTzxkaNzD2d41JdLtvR470MeozTldeZjS7RdJDk/3DdRg==
-  dependencies:
-    "@kengoldfarb/log" "^1.0.5"
-
 "@metamask/safe-event-emitter@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@metamask/safe-event-emitter/-/safe-event-emitter-2.0.0.tgz#af577b477c683fad17c619a78208cede06f9605c"
