@@ -1,0 +1,163 @@
+/*!*********************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!./src/lib/UI.module.scss ***!
+  \*********************************************************************************************************************************************/
+.Vv5RpcZ6_JBCdsIfCwB0 {
+  font-size: 72px;
+  font-family: "Agrandir";
+  font-weight: 400;
+  color: #15111b;
+}
+
+.DF3RAcXmov5Kz6NC6jp4 {
+  font-size: 36px;
+  font-family: "AgrandirGrandBold";
+  font-weight: 700;
+  color: #15111b;
+}
+
+.qCf3zoesavDPnTP1X2Yd {
+  font-size: 32px;
+  font-family: "Agrandir";
+  font-weight: 400;
+  color: #15111b;
+}
+
+.GABBOl0BNcf8L9bwUhZj {
+  font-size: 24px;
+  font-family: "Agrandir";
+  font-weight: 700;
+  color: #15111b;
+}
+
+.gbzwT7j3idiqW7mon4dR {
+  font-size: 24px;
+  font-family: "Agrandir";
+  font-weight: 400;
+  color: #15111b;
+}
+
+.rnsYOqZN3CjiKJcDMWCE {
+  font-size: 16px;
+  font-family: "AgrandirGrand";
+  font-weight: 400;
+  text-transform: uppercase;
+  color: #15111b;
+}
+
+.kJhwIPaQ1_THVpLl30I3 {
+  font-size: 18px;
+  font-family: "Agrandir";
+  font-weight: 400;
+  color: #15111b;
+}
+
+.YxGNRa60QAxQCPqPI90z {
+  font-size: 18px;
+  font-family: "Agrandir";
+  font-weight: 700;
+  color: #15111b;
+}
+
+.WVimq9dnxYFqaxDTImLZ {
+  font-size: 15px;
+  font-family: "Agrandir";
+  font-weight: 400;
+  color: #15111b;
+}
+
+.lMafULFJokekC7mRhyJG {
+  font-size: 15px;
+  font-family: "Agrandir";
+  font-weight: 400;
+  opacity: 0.6;
+  color: #15111b;
+}
+
+.x_dmdRNpZRWbKuXsZEmB {
+  font-size: 18px;
+  font-family: "Agrandir";
+  font-weight: 400;
+  color: #15111b;
+}
+
+.jCEqcLazweV9Xsh7Lg1g {
+  font-size: 18px;
+  font-family: "Agrandir";
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.MbeYVpBIIDuVFvtg25m1 {
+  width: 100%;
+  justify-content: center;
+  display: flex;
+}
+
+.cyJ8O8FbvWytvq5lW54u {
+  width: 1000px;
+}
+
+.I7NlEKVxEqnxy_SDgou3 {
+  margin-left: 8px;
+  margin-top: 6px;
+}
+
+.I3sKBXS0uuNbNBfJRKX0 {
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 4px;
+  padding-top: 4px;
+  background-color: #000;
+}
+
+.m0_sPMYSd7G3MGxgqowe {
+  margin-top: 4px;
+  -webkit-filter: invert(1);
+  filter: invert(1);
+}
+
+.hlJMSKp5efk_V4Q09aFW {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+}
+
+@media (max-width: 768px) {
+  .I3sKBXS0uuNbNBfJRKX0 {
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 4px;
+    padding-top: 4px;
+    background-color: #000;
+  }
+
+  .I7NlEKVxEqnxy_SDgou3 {
+    display: none;
+  }
+
+  .Vv5RpcZ6_JBCdsIfCwB0 {
+    font-size: 48px;
+    font-family: "Agrandir";
+    font-weight: 400;
+  }
+
+  .DF3RAcXmov5Kz6NC6jp4 {
+    font-size: 24px;
+    font-family: "Agrandir";
+    font-weight: 700;
+  }
+
+  .MbeYVpBIIDuVFvtg25m1 {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cyJ8O8FbvWytvq5lW54u {
+    margin-left: 32px;
+    margin-right: 32px;
+    width: 100%;
+  }
+}

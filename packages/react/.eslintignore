@@ -1,2 +1,4 @@
 build
 node_modules
+webpack.config.js
+dist/bundle.js

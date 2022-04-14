@@ -1,12 +1,12 @@
 {
 	"name": "@meemproject/react",
 	"version": "0.0.14",
-	"main": "build/index.js",
+	"main": "dist/bundle.js",
 	"license": "MIT",
 	"scripts": {
 		"clean": "rm -rf build/*",
 		"clean:modules": "rm -rf node_modules",
-		"build": "npm run clean ; tsc ; echo \"Finished Building\"",
+		"build": "npm run clean ; tsc ; webpack --config webpack.config.js ; echo \"Finished Building\"",
 		"lint": "eslint --max-warnings=0 --ext=.ts,.tsx . && tsc -p . --noEmit",
 		"lint:fix": "eslint --fix --ext=.ts,.tsx .",
 		"watch": "yarn run build && chokidar 'src/**/*.(js|jsx|ts|tsx|scss)' -c 'yarn run build'"
@@ -23,15 +23,20 @@
 		"eslint": "^7.32.0",
 		"eslint-config-kengoldfarb": "^1.3.0",
 		"fs-extra": "^10.0.1",
+		"sass": "^1.50.0",
 		"ts-node": "^10.7.0",
 		"ts-node-dev": "^1.1.8",
-		"typescript": "^4.6.3"
+		"typescript": "^4.6.3",
+		"webpack": "^5.72.0",
+		"webpack-cli": "^4.9.2"
 	},
 	"publishConfig": {
 		"access": "public",
 		"registry": "https://registry.npmjs.org/"
 	},
 	"dependencies": {
+		"@babel/core": "^7.17.9",
+		"@babel/preset-env": "^7.16.11",
 		"@emotion/react": "^11.9.0",
 		"@emotion/styled": "^11.8.1",
 		"@kengoldfarb/log": "^1.0.5",
@@ -41,17 +46,21 @@
 		"@meemproject/utils": "^0.0.14",
 		"@mui/material": "^5.6.1",
 		"@walletconnect/web3-provider": "^1.7.7",
+		"babel-loader": "^8.2.4",
 		"css-loader": "^6.7.1",
 		"ethers": "^5.6.2",
 		"js-cookie": "^3.0.1",
 		"lodash": "^4.17.21",
 		"luxon": "^2.3.1",
+		"mini-css-extract-plugin": "^2.6.0",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0",
 		"sass-loader": "^12.6.0",
 		"style-loader": "^3.3.1",
 		"superagent": "^7.1.2",
 		"swr": "^1.3.0",
-		"web3modal": "^1.9.6"
+		"ts-loader": "^9.2.8",
+		"web3modal": "^1.9.6",
+		"webpack-node-externals": "^3.0.0"
 	}
 }
