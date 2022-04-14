@@ -32,7 +32,9 @@
 		"typescript": "^4.6.3"
 	},
 	"dependencies": {
-		"@kengoldfarb/log": "^1.0.5"
+		"@kengoldfarb/log": "^1.0.5",
+		"@meemproject/meem-contracts": "^0.0.13-pre-a383e9c.0",
+		"ethers": "^5.6.3"
 	},
 	"publishConfig": {
 		"access": "public",
