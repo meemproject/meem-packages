@@ -1,5 +1,3 @@
-export * from './ExampleComponent/ExampleComponent'
-
 // Contexts
 export * from './contexts/walletContext'
 export * from './contexts/socketContext'
