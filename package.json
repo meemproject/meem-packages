@@ -10,7 +10,7 @@
     "reset": "yarn run clean && yarn run clean:modules && yarn && yarn run bootstrap && yarn run build && yarn run bootstrap",
     "lint": "lerna run lint --parallel",
     "lint:fix": "lerna run lint:fix  --parallel",
-    "build": "lerna run build --parallel",
+    "build": "lerna run build",
     "test": "lerna run test --parallel",
     "watch": "lerna run watch --no-sort --stream"
   },
