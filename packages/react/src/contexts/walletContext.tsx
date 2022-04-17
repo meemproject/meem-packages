@@ -111,13 +111,13 @@ export interface IWalletContextProps {
 }
 
 export const WalletProvider: React.FC<IWalletContextProps> = ({
-	children,
 	infuraId,
 	networkName,
 	auctionCurrencyAddress,
 	contractAddressAuction,
 	contractAddressMeem,
-	contractAddressMeemId
+	contractAddressMeemId,
+	...props
 }: IWalletContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
 	const [meemContract, setMeemContract] = useState<Meem | undefined>()
@@ -508,7 +508,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		]
 	)
 
-	return <WalletContext.Provider value={value} {...children} />
+	return <WalletContext.Provider value={value} {...props} />
 }
 
 export function useWallet() {

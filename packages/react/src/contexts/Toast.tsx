@@ -1,6 +1,6 @@
 import Snackbar from '@material-ui/core/Snackbar'
-import { AlertProps } from '@material-ui/lab'
-import MuiAlert from '@material-ui/lab/Alert'
+import { Alert as MuiAlert } from '@material-ui/lab'
+import type { AlertProps } from '@material-ui/lab'
 import React from 'react'
 
 export interface IProps {

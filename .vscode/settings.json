@@ -44,10 +44,15 @@
 			".tsx"
 		]
 	},
+	// "eslint.workingDirectories": [
+	// 	{"directory": "packages/api", "changeProcessCWD": true},
+	// 	{"directory": "packages/react", "changeProcessCWD": true},
+	// 	{"directory": "packages/utils", "changeProcessCWD": true}
+	// ],
 	"eslint.workingDirectories": [
 		"packages/api",
 		"packages/react",
-		"packages/utils"
+		"packages/utils",
 	],
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"typescript.preferences.importModuleSpecifier": "relative",

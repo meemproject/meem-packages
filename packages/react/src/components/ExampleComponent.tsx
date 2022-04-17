@@ -1,6 +1,15 @@
+import { Button } from '@material-ui/core'
 import React, { useState } from 'react'
 
-export const ExampleComponent: React.FC = () => {
-	const [s, setS] = useState(0)
-	return <h1>Testing</h1>
+export interface IExampleComponentProps {}
+
+export const ExampleComponent: React.FC<IExampleComponentProps> = () => {
+	const [count, setCount] = useState(0)
+	return (
+		<Button
+			onClick={() => {
+				setCount(count + 1)
+			}}
+		>{`Counter: ${count}`}</Button>
+	)
 }

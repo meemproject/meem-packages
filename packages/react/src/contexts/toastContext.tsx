@@ -1,5 +1,5 @@
 import log from '@kengoldfarb/log'
-import { AlertProps } from '@material-ui/lab'
+import type { AlertProps } from '@material-ui/lab'
 import React, {
 	useContext,
 	createContext,
@@ -31,7 +31,7 @@ export interface IToastProviderProps {
 	children: ReactNode
 }
 
-const ToastProvider: React.FC<IToastProviderProps> = ({ children }) => {
+const ToastProvider: React.FC<IToastProviderProps> = props => {
 	const [toastState, setToastState] = useState<IToastState>({
 		toastMessage: '',
 		toastSeverity: 'success',
@@ -94,7 +94,7 @@ const ToastProvider: React.FC<IToastProviderProps> = ({ children }) => {
 		[setToast, toastState, setErrorToast, setSuccessToast, setInfoToast]
 	)
 
-	return <ToastContext.Provider value={value} {...children} />
+	return <ToastContext.Provider value={value} {...props} />
 }
 
 function useToast() {
