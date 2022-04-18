@@ -217,7 +217,7 @@ export interface ISocketProviderProps {
 }
 
 const SocketProvider: React.FC<ISocketProviderProps> = props => {
-	console.log(React.version)
+	log.debug(React.version)
 	const matchMutate = useMatchMutate()
 	const [websocket, setWebsocket] = useState<WebSocket | undefined>()
 	const [sockets, setSockets] = useState<ISockets | undefined>()

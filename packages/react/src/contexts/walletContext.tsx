@@ -95,7 +95,7 @@ const WalletContext = createContext({} as IWalletContextState)
 WalletContext.displayName = 'WalletContext'
 
 export interface IWalletContextProps {
-	children: ReactNode
+	children?: ReactNode
 
 	infuraId: string
 
