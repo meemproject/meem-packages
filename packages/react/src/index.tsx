@@ -1,7 +1,5 @@
-export * from './contexts/toastContext'
 export * from './contexts/socketContext'
 export * from './contexts/walletContext'
-export * from './components/ExampleComponent'
 export * from './lib/fetcher'
 export * from './lib/getNodeSize'
 export * from './lib/useMatchMutate'

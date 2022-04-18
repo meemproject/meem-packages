@@ -10,7 +10,7 @@
     "reset": "yarn run clean && yarn run clean:modules && yarn && yarn run bootstrap && yarn run build && yarn run bootstrap",
     "lint": "lerna run lint --parallel",
     "lint:fix": "lerna run lint:fix  --parallel",
-    "localPackageLink": "yarn && cd packages/react/node_modules/react && yarn link && cd ../react-dom && yarn link && cd ../@material-ui/core && yarn link && cd ../lab && yarn link && cd ../styles && yarn link && cd ../system && yarn link && cd ../types && yarn link && cd ../utils && yarn link", 
+    "localPackageLink": "yarn && cd packages/react/node_modules/react && yarn link && cd ../react-dom && yarn link",
     "build": "lerna run build",
     "test": "lerna run test --parallel",
     "watch": "lerna run watch --no-sort --stream"
