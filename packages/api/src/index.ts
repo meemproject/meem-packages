@@ -1,5 +1,4 @@
-export * from './meemProject'
 export * from './api.generated'
 export * from './abis'
 export * from './lib/image'
-export * from './lib/meemdata'
+// export * from './lib/meemdata'

@@ -213,10 +213,11 @@ function init(options: { matchMutate: MatchMutate }): {
 }
 
 export interface ISocketProviderProps {
-	children: ReactNode
+	children?: ReactNode
 }
 
-const SocketProvider: React.FC<ISocketProviderProps> = ({ children }) => {
+const SocketProvider: React.FC<ISocketProviderProps> = props => {
+	console.log(React.version)
 	const matchMutate = useMatchMutate()
 	const [websocket, setWebsocket] = useState<WebSocket | undefined>()
 	const [sockets, setSockets] = useState<ISockets | undefined>()
@@ -236,7 +237,7 @@ const SocketProvider: React.FC<ISocketProviderProps> = ({ children }) => {
 	return (
 		<SocketContext.Provider
 			value={{ connect, websocket, sockets, isConnected }}
-			{...children}
+			{...props}
 		/>
 	)
 }

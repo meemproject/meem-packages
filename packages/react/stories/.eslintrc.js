@@ -2,5 +2,7 @@ require("@rushstack/eslint-patch/modern-module-resolution");
 
 module.exports = {
 	extends: ["kengoldfarb"],
-	rules: {},
+	rules: {
+		'import/no-extraneous-dependencies': 'off'
+	},
 };

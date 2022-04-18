@@ -5,3 +5,6 @@ src
 yarn.lock
 tsconfig.json
 yarn-error.log
+test
+stories
+.storybook
