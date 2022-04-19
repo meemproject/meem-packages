@@ -7,10 +7,10 @@
     "publish": "lerna publish",
     "clean": "lerna run clean --parallel --stream",
     "clean:modules": "lerna run clean:modules --parallel && rm -rf node_modules",
-    "reset": "yarn run clean && yarn run clean:modules && yarn && yarn run bootstrap && yarn run build && yarn run bootstrap",
+    "reset": "yarn run clean && yarn run clean:modules && yarn && yarn run bootstrap && yarn run build",
     "lint": "lerna run lint --parallel --stream",
     "lint:fix": "lerna run lint:fix  --parallel --stream",
-    "build": "lerna run build --parallel --stream",
+    "build": "lerna run build",
     "test": "lerna run test --parallel --stream",
     "localPackageLink": "yarn && cd packages/react/node_modules/react && yarn link && cd ../react-dom && yarn link && cd ../@material-ui/core && yarn link && cd ../lab && yarn link && cd ../styles && yarn link && cd ../system && yarn link && cd ../types && yarn link && cd ../utils && yarn link",
     "watch": "lerna run watch --no-sort --stream"
