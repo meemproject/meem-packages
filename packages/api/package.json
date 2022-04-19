@@ -1,6 +1,6 @@
 {
 	"name": "@meemproject/api",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"main": "build/index.js",
 	"license": "MIT",
 	"files": [
@@ -35,8 +35,8 @@
 		"typescript": "^4.6.3"
 	},
 	"dependencies": {
-		"@meemproject/meem-contracts": "^0.1.0",
 		"@kengoldfarb/log": "^1.0.5",
+		"@meemproject/meem-contracts": "^0.1.2",
 		"@typechain/ethers-v5": "^10.0.0",
 		"@types/js-cookie": "^3.0.1",
 		"@types/luxon": "^2.3.1",

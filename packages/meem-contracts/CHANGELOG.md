@@ -1,3 +1,16 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.1.2](https://github.com/meemproject/meem-packages/compare/v0.1.1...v0.1.2) (2022-04-19)
+
+**Note:** Version bump only for package @meemproject/meem-contracts
+
+
+
+
+
 ## [1.9.1](https://github.com/meemproject/meem-contracts/compare/v1.9.0...v1.9.1) (2022-02-03)
 
 # [1.9.0](https://github.com/meemproject/meem-contracts/compare/v1.8.1...v1.9.0) (2022-02-03)
