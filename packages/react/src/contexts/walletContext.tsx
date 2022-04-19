@@ -1,8 +1,11 @@
-import { AuctionHouse, Meem, MeemID, ERC20, MeemAPI } from '@meemproject/api'
-import auctionABI from '@meemproject/api/build/abis/AuctionHouse.json'
+import { ERC20, MeemAPI } from '@meemproject/api'
 import erc20ABI from '@meemproject/api/build/abis/ERC20.json'
-import meemABI from '@meemproject/api/build/abis/Meem.json'
-import meemIdABI from '@meemproject/api/build/abis/MeemID.json'
+import type { MeemMarket } from '@meemproject/market-contracts'
+import auctionABI from '@meemproject/market-contracts/types/MeemMarket.json'
+import type { Meem } from '@meemproject/meem-contracts'
+import meemABI from '@meemproject/meem-contracts/types/Meem.json'
+import type { MeemId } from '@meemproject/meem-id-contracts'
+import meemIdABI from '@meemproject/meem-id-contracts/types/MeemId.json'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers, Contract, BigNumber, ethers } from 'ethers'
 import Cookies from 'js-cookie'
@@ -64,11 +67,11 @@ interface IWalletContextState {
 
 	meemContract?: Meem
 
-	auctionContract?: AuctionHouse
+	auctionContract?: MeemMarket
 
 	erc20Contract?: ERC20
 
-	meemIdContract?: MeemID
+	meemIdContract?: MeemId
 
 	meemId?: MeemAPI.IMeemId
 
@@ -121,7 +124,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 }: IWalletContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
 	const [meemContract, setMeemContract] = useState<Meem | undefined>()
-	const [meemIdContract, setMeemIdContract] = useState<MeemID | undefined>()
+	const [meemIdContract, setMeemIdContract] = useState<MeemId | undefined>()
 	const [signature, setSignature] = useState('')
 	const [jwt, setJwt] = useState<string>()
 	const [loginState, setLoginState] = useState<LoginState>(LoginState.Unknown)
@@ -129,7 +132,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	const [meemId, setMeemId] = useState<MeemAPI.IMeemId | undefined>()
 	const [erc20Contract, setERC20Contract] = useState<ERC20 | undefined>()
 	const [auctionContract, setAuctionContract] = useState<
-		AuctionHouse | undefined
+		MeemMarket | undefined
 	>()
 	const [isConnected, setIsConnected] = useState<boolean>(false)
 	const [isConnectedToWrongNetwork, setIsConnectedToWrongNetwork] =
@@ -401,7 +404,11 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			log.debug('Invalid Meem contract address. Check env vars.')
 			return
 		}
-		const contract = new Contract(contractAddressMeem, meemABI, signer) as Meem
+		const contract = new Contract(
+			contractAddressMeem,
+			meemABI,
+			signer
+		) as unknown as Meem
 		setMeemContract(contract)
 	}, [contractAddressMeem, signer])
 
@@ -414,7 +421,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			contractAddressMeemId,
 			meemIdABI,
 			signer
-		) as MeemID
+		) as unknown as MeemId
 		setMeemIdContract(contract)
 	}, [contractAddressMeemId, signer])
 
@@ -427,7 +434,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			contractAddressAuction,
 			auctionABI,
 			signer
-		) as AuctionHouse
+		) as unknown as MeemMarket
 		setAuctionContract(contract)
 	}, [contractAddressAuction, signer])
 

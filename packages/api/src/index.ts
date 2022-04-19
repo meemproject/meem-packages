@@ -1,5 +1,5 @@
-export * from './abis/index'
 export * from './api.generated'
+export * from './abis'
 export * from './lib/image'
 export * from './lib/meemdata'
 export * from './lib/fetcher'

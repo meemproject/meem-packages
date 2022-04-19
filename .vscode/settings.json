@@ -53,6 +53,9 @@
 		"packages/api",
 		"packages/react",
 		"packages/utils",
+		"packages/market-contracts",
+		"packages/meem-contracts",
+		"packages/meem-id-contracts"
 	],
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"typescript.preferences.importModuleSpecifier": "relative",
