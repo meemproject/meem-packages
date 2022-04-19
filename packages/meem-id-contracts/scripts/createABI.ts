@@ -11,6 +11,6 @@ const basePath = path.join(process.cwd(), 'types')
 fs.ensureDirSync(basePath)
 
 fs.writeFileSync(
-	path.join(basePath, 'MeemID.json'),
+	path.join(basePath, 'MeemId.json'),
 	JSON.stringify(combinedABI)
 )
