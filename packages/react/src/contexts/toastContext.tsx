@@ -6,7 +6,8 @@ import React, {
 	useMemo,
 	useState,
 	useCallback,
-	ReactNode
+	ReactNode,
+	Component
 } from 'react'
 import { Toast } from './Toast'
 
@@ -28,7 +29,7 @@ const ToastContext = createContext({} as IToastAuthContextState)
 ToastContext.displayName = 'ToastContext'
 
 export interface IToastProviderProps {
-	children: ReactNode
+	children?: ReactNode
 }
 
 const ToastProvider: React.FC<IToastProviderProps> = props => {
@@ -106,15 +107,15 @@ function useToast() {
 }
 
 export interface IToastWrapperProps {
-	children: ReactNode
+	children?: ReactNode
 }
 
-const ToastWrapper: React.FC<IToastWrapperProps> = ({ children }) => {
+const ToastWrapper: React.FC<IToastWrapperProps> = children => {
 	const { toastState, setToast } = useToast()
 	const { isToastOpen, toastMessage, toastSeverity } = toastState
 	return (
 		<>
-			{children}
+			<Component {...children} />
 			<Toast
 				onClose={() => setToast({ isToastOpen: false })}
 				isOpen={isToastOpen}

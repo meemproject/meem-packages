@@ -57,7 +57,7 @@ export const meemDataFromApiMeem = (meemApiData: MeemAPI.IMetadataMeem) => {
 		createdEditionsCount: 0,
 		description: meemMetadata.description,
 		key: `${meemApiData.tokenId}-${meemApiData.mintedAt}`,
-		imageUrl: normalizeImageUrl(meemMetadata.image ?? ''),
+		imageUrl: normalizeImageUrl(meemMetadata.image ?? ' '),
 		isOwner: meemApiData.owner.toLowerCase() === walletAddress.toLowerCase(),
 		ownedBy: meemApiData.owner,
 		ownedByName:
