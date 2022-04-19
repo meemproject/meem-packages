@@ -24,7 +24,6 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn bootstrap
       - run: yarn build
-      - run: yarn bootstrap
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
