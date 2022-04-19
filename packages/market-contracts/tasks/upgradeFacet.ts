@@ -4,12 +4,12 @@ import { task, types } from 'hardhat/config'
 import { IDeployHistory } from './deploy'
 import { FacetCutAction, getSelectors } from './lib/diamond'
 
-interface Contract {
-	args?: (string | number | (() => string | undefined))[]
-	address?: string
-	libraries?: (() => Record<string, string>) | Record<string, string>
-	waitForConfirmation?: boolean
-}
+// interface Contract {
+// 	args?: (string | number | (() => string | undefined))[]
+// 	address?: string
+// 	libraries?: (() => Record<string, string>) | Record<string, string>
+// 	waitForConfirmation?: boolean
+// }
 
 interface ICut {
 	facetAddress: string

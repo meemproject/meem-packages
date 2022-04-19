@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-syntax */
-import { IDiamondCut } from '@meemproject/meem-contracts'
 import InitDiamondABI from '@meemproject/meem-contracts/abi/contracts/Meem/InitDiamond.sol/InitDiamond.json'
 import IDiamondCutABI from '@meemproject/meem-contracts/abi/contracts/Meem/interfaces/IDiamondCut.sol/IDiamondCut.json'
 import MeemDiamondABI from '@meemproject/meem-contracts/abi/contracts/MeemDiamond.sol/MeemDiamond.json'

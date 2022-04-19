@@ -26,7 +26,8 @@
   "include": [
     "./tasks",
     "./test",
-    "./scripts"
+    "./scripts",
+    "./types"
   ],
   "files": ["./hardhat.config.ts"]
 }

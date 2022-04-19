@@ -1,5 +1,5 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import chai, { assert } from 'chai'
+import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
@@ -15,7 +15,7 @@ import { meemMintData } from './helpers/meemProperties'
 import { Chain, MeemType, UriSource } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
-chai.use(chaiAsPromised)
+use(chaiAsPromised)
 
 describe('Contract Admin', function Test() {
 	let meemFacet: MeemBaseFacet

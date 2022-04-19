@@ -1,11 +1,11 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import chai, { assert } from 'chai'
+import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import { Erc721Facet } from '../typechain'
 
-chai.use(chaiAsPromised)
+use(chaiAsPromised)
 
 // const { deployContract, link } = waffle
 

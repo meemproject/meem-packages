@@ -2,6 +2,7 @@ import { AuctionHouse, MeemID, ERC20, MeemAPI } from '@meemproject/api'
 import auctionABI from '@meemproject/api/build/abis/AuctionHouse.json'
 import erc20ABI from '@meemproject/api/build/abis/ERC20.json'
 import meemIdABI from '@meemproject/api/build/abis/MeemID.json'
+// eslint-disable-next-line import/named
 import { Meem } from '@meemproject/meem-contracts'
 import meemABI from '@meemproject/meem-contracts/types/Meem.json'
 import WalletConnectProvider from '@walletconnect/web3-provider'

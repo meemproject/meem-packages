@@ -1,5 +1,5 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import chai, { assert } from 'chai'
+import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
@@ -18,7 +18,7 @@ import {
 } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
 
-chai.use(chaiAsPromised)
+use(chaiAsPromised)
 
 describe('Token Owner Permissions', function Test() {
 	let meemPermissionsFacet: MeemPermissionsFacet

@@ -8,7 +8,7 @@ export interface IVersion {
 export const versions = {
 	v1: {
 		AccessControlFacet: {
-		address: "0x586B26DF0C9a6F2C1e7661E8E189d37E2D977b8d",
+			address: '0x586B26DF0C9a6F2C1e7661E8E189d37E2D977b8d',
 			functionSelectors: [
 				'0x75b238fc',
 				'0xd5391393',
@@ -18,7 +18,7 @@ export const versions = {
 			]
 		},
 		ClippingFacet: {
-		address: "0xDBf9d0854Ea196484F214FB426aAF8d6691bf334",
+			address: '0xDBf9d0854Ea196484F214FB426aAF8d6691bf334',
 			functionSelectors: [
 				'0xe6817363',
 				'0x3f590980',
@@ -29,7 +29,7 @@ export const versions = {
 			]
 		},
 		ERC721Facet: {
-		address: "0x2315fFA39e4c1f210395a61E45BF90D83b94732B",
+			address: '0x2315fFA39e4c1f210395a61E45BF90D83b94732B',
 			functionSelectors: [
 				'0x095ea7b3',
 				'0x70a08231',
@@ -55,9 +55,8 @@ export const versions = {
 			]
 		},
 		InitDiamond: {
-		address: "0x022Ee7Ebd34e571f1d8977c3f4d5645d4470c3f3",
-		functionSelectors: [
-			"0xc6a8cfec"
+			address: '0x022Ee7Ebd34e571f1d8977c3f4d5645d4470c3f3',
+			functionSelectors: ['0xc6a8cfec']
 		},
 		MeemAdminFacet: {
 			address: '0x11f174CDD050007C69f0d355766ac428DB95EC35',
@@ -72,13 +71,10 @@ export const versions = {
 		},
 		MeemBaseFacet: {
 			address: '0x5aAF0853F319860eD0d81ca1eb4788917E492eD3',
-		functionSelectors: [
-			"0x3fd53d2a",
-			"0x9ae82538",
-			"0x2e57a69e"
+			functionSelectors: ['0x3fd53d2a', '0x9ae82538', '0x2e57a69e']
 		},
 		MeemPermissionsFacet: {
-		address: "0xA901A3D4909480F5f4ACD8CB88Dfe721460b53Bd",
+			address: '0xA901A3D4909480F5f4ACD8CB88Dfe721460b53Bd',
 			functionSelectors: [
 				'0x0e7da4d0',
 				'0xbf40b299',
@@ -100,7 +96,7 @@ export const versions = {
 			]
 		},
 		MeemQueryFacet: {
-		address: "0x10f9DcB4Eb548AC0039CAf37fDD66a63811557fb",
+			address: '0x10f9DcB4Eb548AC0039CAf37fDD66a63811557fb',
 			functionSelectors: [
 				'0x9aa1125b',
 				'0xa46d57f8',
@@ -117,7 +113,7 @@ export const versions = {
 			]
 		},
 		MeemSplitsFacet: {
-		address: "0x048DCbF361f65e3335a734a7513b1457b6d336dD",
+			address: '0x048DCbF361f65e3335a734a7513b1457b6d336dD',
 			functionSelectors: [
 				'0x81d4180a',
 				'0xcad96cca',
@@ -129,7 +125,7 @@ export const versions = {
 			]
 		},
 		ReactionFacet: {
-		address: "0x5f829b65606Eff567e3DaE640f99e2fE8eBac29a",
+			address: '0x5f829b65606Eff567e3DaE640f99e2fE8eBac29a',
 			functionSelectors: [
 				'0x25b75159',
 				'0x10f4af12',

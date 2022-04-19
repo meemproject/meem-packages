@@ -1062,10 +1062,10 @@ eslint-config-airbnb-typescript@^17.0.0:
   dependencies:
     eslint-config-airbnb-base "^15.0.0"
 
-eslint-config-kengoldfarb@1.4.1-pre-fd5625f.0:
-  version "1.4.1-pre-fd5625f.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-kengoldfarb/-/eslint-config-kengoldfarb-1.4.1-pre-fd5625f.0.tgz#21262d73de292097dfa5f6a19fd8541c4fa28365"
-  integrity sha512-OUCfJrLT6LapH2Vxq6kS5PvSmTFGTo2anjzNdmhNsFUgg8xSYj+IlSV9GhOQ7UNeNa1bVYbsDYk1OQC8Jvcxxw==
+eslint-config-kengoldfarb@1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/eslint-config-kengoldfarb/-/eslint-config-kengoldfarb-1.4.1.tgz#224873dc6d6a3d7552ddd4f4c5b940b59c85fafe"
+  integrity sha512-Ei/7hJ2aBWis+Lj6ZPd3JjCpQ5rvkDmRA2q7ecuA5ffMHxz8C3LRPyffaQjOPQfo5Yf+mWeoCq7ZiSOJh/f9GQ==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^5.19.0"
     "@typescript-eslint/parser" "^5.19.0"
@@ -1073,7 +1073,7 @@ eslint-config-kengoldfarb@1.4.1-pre-fd5625f.0:
     eslint-config-prettier "^8.5.0"
     eslint-plugin-import "^2.26.0"
     eslint-plugin-jsx-a11y "^6.3.1"
-    eslint-plugin-kengoldfarb "^1.4.1-pre-fd5625f.0"
+    eslint-plugin-kengoldfarb "^1.4.1"
     eslint-plugin-prettier "^4.0.0"
     eslint-plugin-react "^7.29.4"
     eslint-plugin-react-hooks "^4.4.0"
@@ -1137,10 +1137,10 @@ eslint-plugin-jsx-a11y@^6.3.1:
     language-tags "^1.0.5"
     minimatch "^3.0.4"
 
-eslint-plugin-kengoldfarb@^1.4.1-pre-fd5625f.0:
-  version "1.4.1-pre-fd5625f.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-kengoldfarb/-/eslint-plugin-kengoldfarb-1.4.1-pre-fd5625f.0.tgz#894f6e7ecea014040b081fe8a17739a70d75ce0d"
-  integrity sha512-qrOLA1DSDT3a7CJATyi4hR9GdPm/1hK/fJ1Ll8AruiVNbuJN6S/6bVkAITJGEPZKSX2U6CSAgrgYWNUrjy3FEg==
+eslint-plugin-kengoldfarb@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-kengoldfarb/-/eslint-plugin-kengoldfarb-1.4.1.tgz#32cfd07e98f688b28aa14ed5954c68a944662319"
+  integrity sha512-Q1hdwJKearSUc3FpFnXG7QC6Em/XEgrZ97vNYLNf2b7fw/yg1DMdI6Z2ITEQzyha1bBgh1LL9fWvGJM1QuqYUA==
   dependencies:
     pascal-case "^3"
 

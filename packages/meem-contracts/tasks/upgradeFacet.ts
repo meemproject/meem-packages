@@ -5,12 +5,12 @@ import { zeroAddress } from '../test/helpers/utils'
 import { IDeployHistory } from './deployDiamond'
 import { FacetCutAction, getSelectors } from './lib/diamond'
 
-interface Contract {
-	args?: (string | number | (() => string | undefined))[]
-	address?: string
-	libraries?: (() => Record<string, string>) | Record<string, string>
-	waitForConfirmation?: boolean
-}
+// interface Contract {
+// 	args?: (string | number | (() => string | undefined))[]
+// 	address?: string
+// 	libraries?: (() => Record<string, string>) | Record<string, string>
+// 	waitForConfirmation?: boolean
+// }
 
 interface ICut {
 	facetAddress: string
