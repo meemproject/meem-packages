@@ -14,8 +14,8 @@
     "index.ts"
   ],
   "scripts": {
-    "build": "yarn build:sol",
-    "clean": "rm -rf cache artifacts abi dist typechain",
+    "build": "yarn build:sol && yarn createABI && yarn generateTypes",
+    "clean": "rm -rf cache artifacts abi dist typechain types",
     "clean:modules": "rm -rf node_modules",
     "build:sol": "hardhat compile",
     "test": "hardhat test --network hardhat",

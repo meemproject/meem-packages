@@ -29,3 +29,6 @@ coverage.json
 .diamond/31337.json
 
 scratch.*
+
+abi/
+types/

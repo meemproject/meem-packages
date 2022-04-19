@@ -5,7 +5,11 @@ import auctionHouseABI from '../abi/contracts/facets/AuctionHouseFacet.sol/Aucti
 
 const combinedABI = [...accessControlABI, ...auctionHouseABI]
 
+const basePath = path.join(process.cwd(), 'types')
+
+fs.ensureDirSync(basePath)
+
 fs.writeFileSync(
-	path.join(process.cwd(), 'types', 'MeemMarket.json'),
+	path.join(basePath, 'MeemMarket.json'),
 	JSON.stringify(combinedABI)
 )
