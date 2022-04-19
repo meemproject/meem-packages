@@ -1,10 +1,10 @@
 {
-	"name": "@meemproject/meem-contracts",
+	"name": "@meemproject/meem-id-contracts",
+	"private": true,
 	"version": "0.1.0",
-	"description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value.",
+	"description": "Meem Ids",
 	"author": "Meem Project",
 	"homepage": "https://meem.wtf",
-	"license": "MIT",
 	"main": "./index.ts",
 	"files": [
 		"abi",
@@ -16,11 +16,12 @@
 		"index.ts"
 	],
 	"scripts": {
-		"build": "yarn build:sol",
+		"#build": "concurrently -r \"yarn build:sol\" \"yarn build:ts\"",
+		"build": "yarn build:sol && yarn build:ts",
 		"test:build": "waffle",
 		"clean": "rm -rf cache artifacts abi dist typechain",
-		"clean:modules": "rm -rf node_modules",
-		"build:sol": "hardhat compile && yarn createABI",
+		"build:ts": "tsc -p .",
+		"build:sol": "hardhat compile",
 		"hardhat": "hardhat",
 		"accounts": "hardhat accounts",
 		"deployDiamond": "hardhat deployDiamond",
@@ -30,15 +31,14 @@
 		"coverage": "hardhat coverage",
 		"network": "hardhat node",
 		"console": "hardhat console",
-		"watch": "concurrently -r --kill-others \"chokidar 'contracts/**/*.sol' -c 'yarn build:sol'\"",
+		"watch": "concurrently -r --kill-others \"chokidar 'tasks/**/*.ts' 'scripts/**/*.ts' 'hardhat.config.ts' -c 'yarn build:ts'\" \"chokidar 'contracts/**/*.sol' -c 'yarn build:sol'\"",
 		"verify": "hardhat verify",
-		"lint": "eslint --max-warnings=0 --ext=.ts,.tsx . && tsc -p ./tsconfig.json --noEmit",
+		"lint": "eslint --max-warnings=0 --ext=.ts,.tsx . && tsc -p . --noEmit",
 		"lint:fix": "eslint --fix --ext=.ts,.tsx .",
+		"release": "semantic-release",
 		"size": "hardhat size-contracts",
 		"createABI": "tsnd --transpile-only scripts/createABI.ts",
-		"generateTypes": "typechain --target ethers-v5  './types/Meem.json'",
-		"generateDocs": "solidity-docgen --solc-module solc-0.8 -i ./contracts -o ./docs",
-		"solregex": "solregex"
+		"generateTypes": "typechain --target ethers-v5  './types/MeemId.json'"
 	},
 	"publishConfig": {
 		"access": "public",
@@ -46,6 +46,7 @@
 	},
 	"devDependencies": {
 		"@float-capital/solidity-coverage": "^0.7.17",
+		"@kengoldfarb/semantic-release-config": "^1.0.3",
 		"@nomiclabs/hardhat-ethers": "^2.0.2",
 		"@nomiclabs/hardhat-etherscan": "^2.1.2",
 		"@nomiclabs/hardhat-waffle": "^2.0.1",
@@ -76,8 +77,6 @@
 		"prettier": "^2.4.1",
 		"prettier-plugin-solidity": "^1.0.0-beta.12",
 		"prompt": "^1.1.0",
-		"solidity-docgen": "^0.5.16",
-		"solregex": "^0.3.1",
 		"ts-node": "^10.0.0",
 		"ts-node-dev": "^1.1.8",
 		"typescript": "^4.4.3"
