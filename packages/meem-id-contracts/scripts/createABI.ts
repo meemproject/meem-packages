@@ -6,7 +6,11 @@ import meemDiamondABI from '../abi/contracts/MeemIdDiamond.sol/MeemIdDiamond.jso
 
 const combinedABI = [...accessControlABI, ...meemIdFacet, ...meemDiamondABI]
 
+const basePath = path.join(process.cwd(), 'types')
+
+fs.ensureDirSync(basePath)
+
 fs.writeFileSync(
-	path.join(process.cwd(), 'types', 'MeemID.json'),
+	path.join(basePath, 'MeemID.json'),
 	JSON.stringify(combinedABI)
 )
