@@ -1,8 +1,15 @@
 {
 	"name": "@meemproject/utils",
-	"version": "0.1.1",
+	"version": "0.1.4",
 	"main": "build/index.js",
 	"license": "MIT",
+	"files": [
+		"build",
+		"package.json",
+		"README.md",
+		"CHANGELOG.md",
+		"yarn.lock"
+	],
 	"scripts": {
 		"clean": "rm -rf build/*",
 		"clean:modules": "rm -rf node_modules",
@@ -17,7 +24,7 @@
 		"@types/superagent": "^4.1.15",
 		"chokidar-cli": "^3.0.0",
 		"eslint": "^8.13.0",
-		"eslint-config-kengoldfarb": "1.4.1-pre-fd5625f.0",
+		"eslint-config-kengoldfarb": "1.4.1",
 		"fs-extra": "^10.0.1",
 		"superagent": "^7.1.2",
 		"ts-node": "^10.7.0",
@@ -25,7 +32,9 @@
 		"typescript": "^4.6.3"
 	},
 	"dependencies": {
-		"@kengoldfarb/log": "^1.0.5"
+		"@kengoldfarb/log": "^1.0.5",
+		"@meemproject/meem-contracts": "^0.1.4",
+		"ethers": "^5.6.3"
 	},
 	"publishConfig": {
 		"access": "public",

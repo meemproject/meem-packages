@@ -1,6 +1,9 @@
 import { Meta, Story } from '@storybook/react'
 import React from 'react'
-import { ExampleComponent, IExampleComponentProps } from '../src'
+import {
+	ExampleComponent,
+	IExampleComponentProps
+} from '../src/components/ExampleComponent'
 
 const meta: Meta = {
 	title: 'Welcome',
