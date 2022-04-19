@@ -24,7 +24,8 @@ const combinedABI = [
 	...reactionsABI
 ]
 
-fs.writeFileSync(
-	path.join(process.cwd(), 'types', 'Meem.json'),
-	JSON.stringify(combinedABI)
-)
+const basePath = path.join(process.cwd(), 'types')
+
+fs.ensureDirSync(basePath)
+
+fs.writeFileSync(path.join(basePath, 'Meem.json'), JSON.stringify(combinedABI))
