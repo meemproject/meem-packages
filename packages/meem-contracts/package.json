@@ -20,7 +20,7 @@
 		"test:build": "waffle",
 		"clean": "rm -rf cache artifacts abi dist typechain types",
 		"clean:modules": "rm -rf node_modules",
-		"build:sol": "hardhat compile && yarn createABI",
+		"build:sol": "hardhat compile",
 		"hardhat": "hardhat",
 		"accounts": "hardhat accounts",
 		"deployDiamond": "hardhat deployDiamond",
