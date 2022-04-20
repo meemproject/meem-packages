@@ -23,8 +23,8 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 	.addParam('facet', 'The facet name', undefined, types.string, false)
 	.addParam('gwei', 'The gwei price', 31, types.int, true)
 	.setAction(async (args, { ethers }) => {
-		const facetName = args.facet
-		const proxyAddress = args.proxy
+		const facetName = args.facet as string
+		const proxyAddress = args.proxy as string
 		const network = await ethers.provider.getNetwork()
 		const { chainId } = network
 		const diamondHistoryFile = path.join(
