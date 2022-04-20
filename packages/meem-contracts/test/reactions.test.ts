@@ -5,7 +5,7 @@ import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import {
 	ClippingFacet,
-	Erc721Facet,
+	ERC721Facet,
 	MeemAdminFacet,
 	MeemBaseFacet,
 	ReactionFacet,

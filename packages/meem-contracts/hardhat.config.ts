@@ -4,7 +4,7 @@ import { HardhatUserConfig } from 'hardhat/config'
 import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-etherscan'
 import '@float-capital/solidity-coverage'
-import 'hardhat-typechain'
+import '@typechain/hardhat'
 import 'hardhat-abi-exporter'
 import 'hardhat-gas-reporter'
 import 'hardhat-contract-sizer'
@@ -13,6 +13,9 @@ import './tasks'
 dotenv.config()
 
 const config: HardhatUserConfig = {
+	typechain: {
+		outDir: './typechain'
+	},
 	solidity: {
 		version: '0.8.4',
 		settings: {

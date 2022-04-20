@@ -1,2 +1,2 @@
 export * from './types/ethers-contracts'
-export * from './typechain'
+// export * from './typechain'

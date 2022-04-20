@@ -3,7 +3,7 @@ import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { Erc721Facet, MeemBaseFacet, MeemQueryFacet } from '../typechain'
+import { ERC721Facet, MeemBaseFacet, MeemQueryFacet } from '../typechain'
 import { meemMintData } from './helpers/meemProperties'
 import { Chain, MeemType, UriSource } from './helpers/meemStandard'
 import { zeroAddress } from './helpers/utils'
@@ -13,7 +13,7 @@ use(chaiAsPromised)
 describe('Minting', function Test() {
 	let meemFacet: MeemBaseFacet
 	let queryFacet: MeemQueryFacet
-	let erc721Facet: Erc721Facet
+	let erc721Facet: ERC721Facet
 	let signers: SignerWithAddress[]
 	let contractAddress: string
 	const ipfsURL = 'ipfs://QmWEFSMku6yGLQ9TQr66HjSd9kay8ZDYKbBEfjNi4pLtrr/1'
@@ -41,7 +41,7 @@ describe('Minting', function Test() {
 			// 'ERC721Facet',
 			process.env.ERC_721_FACET_NAME ?? 'ERC721Facet',
 			DiamondAddress
-		)) as Erc721Facet
+		)) as ERC721Facet
 		queryFacet = (await ethers.getContractAt(
 			'MeemQueryFacet',
 			contractAddress

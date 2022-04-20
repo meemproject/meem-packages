@@ -3,7 +3,7 @@ import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
-import { Erc721Facet } from '../typechain'
+import { ERC721Facet } from '../typechain'
 
 use(chaiAsPromised)
 
@@ -11,7 +11,7 @@ use(chaiAsPromised)
 
 describe('General MeemFacet Tests', function Test() {
 	// let meemFacet: MeemBaseFacet
-	let erc721Facet: Erc721Facet
+	let erc721Facet: ERC721Facet
 	let signers: SignerWithAddress[]
 
 	beforeEach(async () => {
@@ -29,7 +29,7 @@ describe('General MeemFacet Tests', function Test() {
 			// 'ERC721Facet',
 			process.env.ERC_721_FACET_NAME ?? 'ERC721Facet',
 			DiamondAddress
-		)) as Erc721Facet
+		)) as ERC721Facet
 	})
 
 	it('Can get contractURI', async () => {

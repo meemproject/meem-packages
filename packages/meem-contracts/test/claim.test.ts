@@ -4,7 +4,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import { deployDiamond } from '../tasks'
 import {
-	Erc721Facet,
+	ERC721Facet,
 	MeemAdminFacet,
 	MeemBaseFacet,
 	MeemPermissionsFacet,
@@ -26,7 +26,7 @@ use(chaiAsPromised)
 describe('Facilitate Claim', function Test() {
 	let meemFacet: MeemBaseFacet
 	let meemAdminFacet: MeemAdminFacet
-	let erc721Facet: Erc721Facet
+	let erc721Facet: ERC721Facet
 	let meemPermissionsFacet: MeemPermissionsFacet
 	let queryFacet: MeemQueryFacet
 	let signers: SignerWithAddress[]
@@ -61,7 +61,7 @@ describe('Facilitate Claim', function Test() {
 		erc721Facet = (await ethers.getContractAt(
 			'ERC721Facet',
 			contractAddress
-		)) as Erc721Facet
+		)) as ERC721Facet
 
 		meemPermissionsFacet = (await ethers.getContractAt(
 			'MeemPermissionsFacet',
