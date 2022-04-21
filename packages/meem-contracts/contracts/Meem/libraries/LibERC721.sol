@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
-import {LibArray} from '../libraries/LibArray.sol';
+import {Array} from '../utils/Array.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Meem, MeemType, URISource} from '../interfaces/MeemStandard.sol';
@@ -56,10 +56,7 @@ library LibERC721 {
 
 		// Make zero address new owner
 		uint256 index = s.ownerTokenIdIndexes[owner][tokenId];
-		s.ownerTokenIds[owner] = LibArray.removeAt(
-			s.ownerTokenIds[owner],
-			index
-		);
+		s.ownerTokenIds[owner] = Array.removeAt(s.ownerTokenIds[owner], index);
 		delete s.ownerTokenIdIndexes[owner][tokenId];
 
 		s.ownerTokenIds[address(0)].push(tokenId);
@@ -462,7 +459,7 @@ library LibERC721 {
 		_approve(address(0), tokenId);
 
 		uint256 index = s.ownerTokenIdIndexes[from][tokenId];
-		LibArray.removeAt(s.ownerTokenIds[from], index);
+		Array.removeAt(s.ownerTokenIds[from], index);
 		s.ownerTokenIds[to].push(tokenId);
 		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length - 1;
 		s.meems[tokenId].owner = to;

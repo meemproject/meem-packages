@@ -42,7 +42,7 @@ contract MeemAdminFacet is IMeemAdminStandard {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
 
-		s.meemID = meemID;
+		s.meemIDContractAddress = meemID;
 	}
 
 	function setTokenRoot(

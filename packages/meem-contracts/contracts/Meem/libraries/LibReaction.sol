@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from './LibERC721.sol';
-import {LibArray} from './LibArray.sol';
+import {Array} from '../utils/Array.sol';
 import {Reaction} from '../interfaces/MeemStandard.sol';
 import {AlreadyReacted, ReactionNotFound} from './Errors.sol';
 
@@ -53,7 +53,7 @@ library LibReaction {
 			revert ReactionNotFound();
 		}
 
-		LibArray.removeAt(
+		Array.removeAt(
 			s.addressReactions[msg.sender][tokenId],
 			s.addressReactionsIndex[msg.sender][tokenId][reaction]
 		);

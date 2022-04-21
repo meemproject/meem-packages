@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-library LibArray {
+library Array {
 	function removeAt(uint256[] storage array, uint256 index)
 		internal
 		returns (uint256[] memory)
@@ -45,5 +45,23 @@ library LibArray {
 		}
 		array.pop();
 		return array;
+	}
+
+	function isEqual(address[] memory arr1, address[] memory arr2)
+		internal
+		pure
+		returns (bool)
+	{
+		if (arr1.length != arr2.length) {
+			return false;
+		}
+
+		for (uint256 i = 0; i < arr1.length; i++) {
+			if (arr1[i] != arr2[i]) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

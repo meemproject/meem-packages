@@ -4,8 +4,9 @@ pragma experimental ABIEncoderV2;
 
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
-import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
+import {LibPermissions} from '../libraries/LibPermissions.sol';
+import {LibProperties} from '../libraries/LibProperties.sol';
 import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemPermissionsStandard, URISource} from '../interfaces/MeemStandard.sol';
 import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
@@ -16,14 +17,14 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		PropertyType propertyType,
 		int256 newTotalCopies
 	) external override {
-		LibMeem.setTotalCopies(tokenId, propertyType, newTotalCopies);
+		LibProperties.setTotalCopies(tokenId, propertyType, newTotalCopies);
 	}
 
 	function lockTotalCopies(uint256 tokenId, PropertyType propertyType)
 		external
 		override
 	{
-		LibMeem.lockTotalCopies(tokenId, propertyType);
+		LibProperties.lockTotalCopies(tokenId, propertyType);
 	}
 
 	function setCopiesPerWallet(
@@ -31,14 +32,14 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		PropertyType propertyType,
 		int256 newTotalCopies
 	) external override {
-		LibMeem.setCopiesPerWallet(tokenId, propertyType, newTotalCopies);
+		LibProperties.setCopiesPerWallet(tokenId, propertyType, newTotalCopies);
 	}
 
 	function lockCopiesPerWallet(uint256 tokenId, PropertyType propertyType)
 		external
 		override
 	{
-		LibMeem.lockCopiesPerWallet(tokenId, propertyType);
+		LibProperties.lockCopiesPerWallet(tokenId, propertyType);
 	}
 
 	function setTotalRemixes(
@@ -46,14 +47,14 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		PropertyType propertyType,
 		int256 newTotalRemixes
 	) external override {
-		LibMeem.setTotalRemixes(tokenId, propertyType, newTotalRemixes);
+		LibProperties.setTotalRemixes(tokenId, propertyType, newTotalRemixes);
 	}
 
 	function lockTotalRemixes(uint256 tokenId, PropertyType propertyType)
 		external
 		override
 	{
-		LibMeem.lockTotalRemixes(tokenId, propertyType);
+		LibProperties.lockTotalRemixes(tokenId, propertyType);
 	}
 
 	function setRemixesPerWallet(
@@ -61,14 +62,18 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		PropertyType propertyType,
 		int256 newTotalRemixes
 	) external override {
-		LibMeem.setRemixesPerWallet(tokenId, propertyType, newTotalRemixes);
+		LibProperties.setRemixesPerWallet(
+			tokenId,
+			propertyType,
+			newTotalRemixes
+		);
 	}
 
 	function lockRemixesPerWallet(uint256 tokenId, PropertyType propertyType)
 		external
 		override
 	{
-		LibMeem.lockRemixesPerWallet(tokenId, propertyType);
+		LibProperties.lockRemixesPerWallet(tokenId, propertyType);
 	}
 
 	function lockPermissions(
@@ -76,7 +81,7 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		PropertyType propertyType,
 		PermissionType permissionType
 	) external override {
-		LibMeem.lockPermissions(tokenId, propertyType, permissionType);
+		LibPermissions.lockPermissions(tokenId, propertyType, permissionType);
 	}
 
 	function setPermissions(
@@ -85,7 +90,7 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		PermissionType permissionType,
 		MeemPermission[] memory permissions
 	) external override {
-		LibMeem.setPermissions(
+		LibPermissions.setPermissions(
 			tokenId,
 			propertyType,
 			permissionType,
@@ -99,7 +104,7 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		PermissionType permissionType,
 		MeemPermission memory permission
 	) external override {
-		LibMeem.addPermission(
+		LibPermissions.addPermission(
 			tokenId,
 			propertyType,
 			permissionType,
@@ -113,7 +118,12 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		PermissionType permissionType,
 		uint256 idx
 	) external override {
-		LibMeem.removePermissionAt(tokenId, propertyType, permissionType, idx);
+		LibPermissions.removePermissionAt(
+			tokenId,
+			propertyType,
+			permissionType,
+			idx
+		);
 	}
 
 	function updatePermissionAt(
@@ -123,7 +133,7 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 		uint256 idx,
 		MeemPermission memory permission
 	) external override {
-		LibMeem.updatePermissionAt(
+		LibPermissions.updatePermissionAt(
 			tokenId,
 			propertyType,
 			permissionType,
@@ -133,21 +143,21 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 	}
 
 	function setData(uint256 tokenId, string memory data) external override {
-		LibMeem.setData(tokenId, data);
+		LibProperties.setData(tokenId, data);
 	}
 
 	function lockUri(uint256 tokenId) external override {
-		LibMeem.lockUri(tokenId);
+		LibProperties.lockUri(tokenId);
 	}
 
 	function setURISource(uint256 tokenId, URISource uriSource)
 		external
 		override
 	{
-		LibMeem.setURISource(tokenId, uriSource);
+		LibProperties.setURISource(tokenId, uriSource);
 	}
 
 	function setTokenUri(uint256 tokenId, string memory uri) external override {
-		LibMeem.setTokenUri(tokenId, uri);
+		LibProperties.setTokenUri(tokenId, uri);
 	}
 }

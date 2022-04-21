@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
-import {LibMeem} from '../libraries/LibMeem.sol';
+import {LibSplits} from '../libraries/LibSplits.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemSplitsStandard} from '../interfaces/MeemStandard.sol';
 import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
@@ -18,7 +18,7 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 		override
 		returns (LibPart.Part[] memory)
 	{
-		return LibMeem.getRaribleV2Royalties(tokenId);
+		return LibSplits.getRaribleV2Royalties(tokenId);
 	}
 
 	function nonOwnerSplitAllocationAmount()
@@ -35,7 +35,7 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 		external
 		override
 	{
-		LibMeem.lockSplits(tokenId, propertyType);
+		LibSplits.lockSplits(tokenId, propertyType);
 	}
 
 	function setSplits(
@@ -43,7 +43,7 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 		PropertyType propertyType,
 		Split[] memory splits
 	) external override {
-		LibMeem.setSplits(tokenId, propertyType, splits);
+		LibSplits.setSplits(tokenId, propertyType, splits);
 	}
 
 	function addSplit(
@@ -51,7 +51,7 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 		PropertyType propertyType,
 		Split memory split
 	) external override {
-		LibMeem.addSplit(tokenId, propertyType, split);
+		LibSplits.addSplit(tokenId, propertyType, split);
 	}
 
 	function removeSplitAt(
@@ -59,7 +59,7 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 		PropertyType propertyType,
 		uint256 idx
 	) external override {
-		LibMeem.removeSplitAt(tokenId, propertyType, idx);
+		LibSplits.removeSplitAt(tokenId, propertyType, idx);
 	}
 
 	function updateSplitAt(
@@ -68,6 +68,6 @@ contract MeemSplitsFacet is RoyaltiesV2, IMeemSplitsStandard {
 		uint256 idx,
 		Split memory split
 	) external override {
-		LibMeem.updateSplitAt(tokenId, propertyType, idx, split);
+		LibSplits.updateSplitAt(tokenId, propertyType, idx, split);
 	}
 }
