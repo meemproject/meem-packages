@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 import {LibAccessControl} from './LibAccessControl.sol';
-import {InvalidPropertyType} from './Errors.sol';
+import {Error} from './Errors.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {BasePropertiesInit, PropertyType, MeemProperties} from '../interfaces/MeemStandard.sol';
 
@@ -57,34 +57,5 @@ library LibContract {
 				s.baseProperties.mintDatesLockedBy = msg.sender;
 			}
 		}
-	}
-
-	function setDefaultProperties(
-		PropertyType propertyType,
-		MeemProperties memory props
-	) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-
-		MeemProperties storage defaultProps = getDefaultProperties(
-			propertyType
-		);
-
-		// defaultProps.
-	}
-
-	function getDefaultProperties(PropertyType propertyType)
-		internal
-		view
-		returns (MeemProperties storage)
-	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-
-		if (propertyType == PropertyType.Meem) {
-			return s.defaultProperties;
-		} else if (propertyType == PropertyType.Child) {
-			return s.defaultChildProperties;
-		}
-
-		revert InvalidPropertyType();
 	}
 }

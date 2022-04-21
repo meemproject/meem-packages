@@ -7,7 +7,7 @@ import {LibERC721} from './LibERC721.sol';
 import {LibPermissions} from './LibPermissions.sol';
 import {LibSplits} from './LibSplits.sol';
 import {Strings} from '../utils/Strings.sol';
-import {InvalidPropertyType, PropertyLocked, InvalidTotalCopies, InvalidTotalRemixes, InvalidURI, URILocked} from './Errors.sol';
+import {Error} from './Errors.sol';
 
 library LibProperties {
 	event PropertiesSet(
@@ -76,13 +76,13 @@ library LibProperties {
 			return s.meemProperties[tokenId];
 		} else if (propertyType == PropertyType.Child) {
 			return s.meemChildProperties[tokenId];
-		} else if (propertyType == PropertyType.Meem) {
+		} else if (propertyType == PropertyType.DefaultMeem) {
 			return s.defaultProperties;
-		} else if (propertyType == PropertyType.Child) {
+		} else if (propertyType == PropertyType.DefaultChild) {
 			return s.defaultChildProperties;
 		}
 
-		revert InvalidPropertyType();
+		revert(Error.InvalidPropertyType);
 	}
 
 	function setProperties(
@@ -98,7 +98,24 @@ library LibProperties {
 		PropertyType propertyType,
 		MeemProperties memory mProperties,
 		uint256 parentTokenId,
-		bool mergeParent
+		bool shouldMergeParent
+	) internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		setProperties(
+			tokenId,
+			propertyType,
+			mProperties,
+			s.meemChildProperties[parentTokenId],
+			shouldMergeParent
+		);
+	}
+
+	function setProperties(
+		uint256 tokenId,
+		PropertyType propertyType,
+		MeemProperties memory mProperties,
+		MeemProperties memory parentProperties,
+		bool shouldMergeParent
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		MeemProperties storage props = LibProperties.getProperties(
@@ -106,11 +123,8 @@ library LibProperties {
 			propertyType
 		);
 		MeemProperties memory newProps = mProperties;
-		if (mergeParent) {
-			newProps = mergeProperties(
-				mProperties,
-				s.meemChildProperties[parentTokenId]
-			);
+		if (shouldMergeParent) {
+			newProps = mergeProperties(mProperties, parentProperties);
 		}
 
 		for (uint256 i = 0; i < newProps.copyPermissions.length; i++) {
@@ -246,12 +260,12 @@ library LibProperties {
 				propertyType == PropertyType.Meem &&
 				uint256(newTotalCopies) < s.copies[tokenId].length
 			) {
-				revert InvalidTotalCopies(s.copies[tokenId].length);
+				revert(Error.InvalidTotalCopies);
 			}
 		}
 
 		if (props.totalCopiesLockedBy != address(0)) {
-			revert PropertyLocked(props.totalCopiesLockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		props.totalCopies = newTotalCopies;
@@ -268,7 +282,7 @@ library LibProperties {
 		);
 
 		if (props.totalCopiesLockedBy != address(0)) {
-			revert PropertyLocked(props.totalCopiesLockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		props.totalCopiesLockedBy = msg.sender;
@@ -287,7 +301,7 @@ library LibProperties {
 		);
 
 		if (props.copiesPerWalletLockedBy != address(0)) {
-			revert PropertyLocked(props.copiesPerWalletLockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		props.copiesPerWallet = newTotalCopies;
@@ -304,7 +318,7 @@ library LibProperties {
 		);
 
 		if (props.copiesPerWalletLockedBy != address(0)) {
-			revert PropertyLocked(props.copiesPerWalletLockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		props.copiesPerWalletLockedBy = msg.sender;
@@ -328,12 +342,12 @@ library LibProperties {
 				propertyType == PropertyType.Meem &&
 				uint256(newTotalRemixes) < s.remixes[tokenId].length
 			) {
-				revert InvalidTotalRemixes(s.remixes[tokenId].length);
+				revert(Error.InvalidTotalRemixes);
 			}
 		}
 
 		if (props.totalRemixesLockedBy != address(0)) {
-			revert PropertyLocked(props.totalRemixesLockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		props.totalRemixes = newTotalRemixes;
@@ -350,7 +364,7 @@ library LibProperties {
 		);
 
 		if (props.totalRemixesLockedBy != address(0)) {
-			revert PropertyLocked(props.totalRemixesLockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		props.totalRemixesLockedBy = msg.sender;
@@ -369,7 +383,7 @@ library LibProperties {
 		);
 
 		if (props.remixesPerWalletLockedBy != address(0)) {
-			revert PropertyLocked(props.remixesPerWalletLockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		props.remixesPerWallet = newTotalRemixes;
@@ -386,7 +400,7 @@ library LibProperties {
 		);
 
 		if (props.remixesPerWalletLockedBy != address(0)) {
-			revert PropertyLocked(props.remixesPerWalletLockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		props.remixesPerWalletLockedBy = msg.sender;
@@ -397,7 +411,7 @@ library LibProperties {
 		LibERC721.requireOwnsToken(tokenId);
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		if (s.meems[tokenId].uriLockedBy != address(0)) {
-			revert URILocked();
+			revert(Error.URILocked);
 		}
 
 		s.meems[tokenId].data = data;
@@ -408,7 +422,7 @@ library LibProperties {
 		LibERC721.requireOwnsToken(tokenId);
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		if (s.meems[tokenId].uriLockedBy != address(0)) {
-			revert URILocked();
+			revert(Error.URILocked);
 		}
 
 		// Require IPFS uri or URI type to be data
@@ -419,7 +433,7 @@ library LibProperties {
 				Strings.substring(s.tokenURIs[tokenId], 0, 7)
 			)
 		) {
-			revert InvalidURI();
+			revert(Error.InvalidURI);
 		}
 
 		s.meems[tokenId].uriLockedBy = msg.sender;
@@ -431,7 +445,7 @@ library LibProperties {
 		LibERC721.requireOwnsToken(tokenId);
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		if (s.meems[tokenId].uriLockedBy != address(0)) {
-			revert URILocked();
+			revert(Error.URILocked);
 		}
 
 		s.meems[tokenId].uriSource = uriSource;
@@ -442,11 +456,32 @@ library LibProperties {
 		LibERC721.requireOwnsToken(tokenId);
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		if (s.meems[tokenId].uriLockedBy != address(0)) {
-			revert URILocked();
+			revert(Error.URILocked);
 		}
 
 		s.tokenURIs[tokenId] = uri;
 
 		emit URISet(tokenId, uri);
 	}
+
+	// function requirePropertiesAccess(uint256 tokenId, PropertyType propertyType)
+	// 	internal
+	// 	view
+	// {
+	// 	LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+
+	// 	if (
+	// 		propertyType == PropertyType.Meem ||
+	// 		propertyType == PropertyType.Child
+	// 	) {
+	// 		LibERC721.requireOwnsToken(tokenId);
+	// 	} else if (
+	// 		propertyType == PropertyType.Meem ||
+	// 		propertyType == PropertyType.Child
+	// 	) {
+	// 		LibAccessControl.requireRole(s.ADMIN_ROLE);
+	// 	} else {
+	// 		revert(Error.InvalidPropertyType);
+	// 	}
+	// }
 }

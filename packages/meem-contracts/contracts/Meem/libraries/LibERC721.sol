@@ -6,7 +6,7 @@ import {Array} from '../utils/Array.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Meem, MeemType, URISource} from '../interfaces/MeemStandard.sol';
-import {NotTokenOwner, InvalidZeroAddressQuery, IndexOutOfRange, TokenNotFound, NotApproved, NoApproveSelf, ERC721ReceiverNotImplemented, TokenAlreadyExists, ToAddressInvalid, NoTransferWrappedNFT, MeemNotVerified, NotTokenAdmin} from '../libraries/Errors.sol';
+import {Error} from '../libraries/Errors.sol';
 import '../interfaces/IERC721TokenReceiver.sol';
 
 library LibERC721 {
@@ -41,28 +41,19 @@ library LibERC721 {
 
 	function requireOwnsToken(uint256 tokenId) internal view {
 		if (ownerOf(tokenId) != msg.sender) {
-			revert NotTokenOwner(tokenId);
+			revert(Error.NotTokenOwner);
 		}
 	}
 
 	function burn(uint256 tokenId) internal {
 		requireOwnsToken(tokenId);
 
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		address owner = ownerOf(tokenId);
 
 		// Clear approvals
 		_approve(address(0), tokenId);
 
-		// Make zero address new owner
-		uint256 index = s.ownerTokenIdIndexes[owner][tokenId];
-		s.ownerTokenIds[owner] = Array.removeAt(s.ownerTokenIds[owner], index);
-		delete s.ownerTokenIdIndexes[owner][tokenId];
-
-		s.ownerTokenIds[address(0)].push(tokenId);
-		s.ownerTokenIdIndexes[address(0)][tokenId] =
-			s.ownerTokenIds[address(0)].length -
-			1;
+		updateStorageMappingsForTokenTransfer(owner, address(0), tokenId);
 
 		emit Transfer(owner, address(0), tokenId);
 	}
@@ -80,7 +71,7 @@ library LibERC721 {
 	function balanceOf(address owner) internal view returns (uint256) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		if (owner == address(0)) {
-			revert InvalidZeroAddressQuery();
+			revert(Error.InvalidZeroAddressQuery);
 		}
 		return s.ownerTokenIds[owner].length;
 	}
@@ -97,7 +88,7 @@ library LibERC721 {
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		if (_index >= s.allTokens.length) {
-			revert IndexOutOfRange(_index, s.allTokens.length - 1);
+			revert(Error.IndexOutOfRange);
 		}
 		tokenId_ = s.allTokens[_index];
 	}
@@ -116,7 +107,7 @@ library LibERC721 {
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		if (_index >= s.ownerTokenIds[_owner].length) {
-			revert IndexOutOfRange(_index, s.ownerTokenIds[_owner].length - 1);
+			revert(Error.IndexOutOfRange);
 		}
 		tokenId_ = s.ownerTokenIds[_owner][_index];
 	}
@@ -128,7 +119,7 @@ library LibERC721 {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		address owner = s.meems[tokenId].owner;
 		if (owner == address(0)) {
-			revert TokenNotFound(tokenId);
+			revert(Error.TokenNotFound);
 		}
 		return owner;
 	}
@@ -153,7 +144,7 @@ library LibERC721 {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		if (!_exists(tokenId)) {
-			revert TokenNotFound(tokenId);
+			revert(Error.TokenNotFound);
 		}
 
 		if (s.meems[tokenId].uriSource == URISource.Data) {
@@ -183,11 +174,11 @@ library LibERC721 {
 		address owner = ownerOf(tokenId);
 
 		if (to == owner) {
-			revert NoApproveSelf();
+			revert(Error.NoApproveSelf);
 		}
 
 		if (_msgSender() != owner && !isApprovedForAll(owner, _msgSender())) {
-			revert NotApproved();
+			revert(Error.NotApproved);
 		}
 
 		_approve(to, tokenId);
@@ -200,7 +191,7 @@ library LibERC721 {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		if (!_exists(tokenId)) {
-			revert TokenNotFound(tokenId);
+			revert(Error.TokenNotFound);
 		}
 
 		return s.tokenApprovals[tokenId];
@@ -213,7 +204,7 @@ library LibERC721 {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		if (operator == _msgSender()) {
-			revert NoApproveSelf();
+			revert(Error.NoApproveSelf);
 		}
 
 		s.operatorApprovals[_msgSender()][operator] = approved;
@@ -244,7 +235,7 @@ library LibERC721 {
 	// 		// !_isApprovedOrOwner(_msgSender(), tokenId) &&
 	// 		!_canFacilitateClaim(_msgSender(), tokenId)
 	// 	) {
-	// 		revert NotApproved();
+	// 		revert(Error.NotApproved);
 	// 	}
 
 	// 	_transfer(from, to, tokenId);
@@ -271,7 +262,7 @@ library LibERC721 {
 	// 	bytes memory _data
 	// ) internal {
 	// 	if (!_isApprovedOrOwner(_msgSender(), tokenId)) {
-	// 		revert NotApproved();
+	// 		revert(Error.NotApproved);
 	// 	}
 
 	// 	_safeTransfer(from, to, tokenId, _data);
@@ -312,7 +303,7 @@ library LibERC721 {
 		transfer(from, to, tokenId);
 
 		if (!_checkOnERC721Received(from, to, tokenId, _data)) {
-			revert ERC721ReceiverNotImplemented();
+			revert(Error.ERC721ReceiverNotImplemented);
 		}
 	}
 
@@ -342,7 +333,7 @@ library LibERC721 {
 		returns (bool)
 	{
 		if (!_exists(tokenId)) {
-			revert TokenNotFound(tokenId);
+			revert(Error.TokenNotFound);
 		}
 		address _owner = ownerOf(tokenId);
 		return (spender == _owner ||
@@ -376,7 +367,7 @@ library LibERC721 {
 		_mint(to, tokenId);
 
 		if (!_checkOnERC721Received(address(0), to, tokenId, _data)) {
-			revert ERC721ReceiverNotImplemented();
+			revert(Error.ERC721ReceiverNotImplemented);
 		}
 	}
 
@@ -396,11 +387,11 @@ library LibERC721 {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		if (to == address(0)) {
-			revert ToAddressInvalid(to);
+			revert(Error.ToAddressInvalid);
 		}
 
 		if (_exists(tokenId)) {
-			revert TokenAlreadyExists(tokenId);
+			revert(Error.TokenAlreadyExists);
 		}
 
 		s.allTokens.push(tokenId);
@@ -438,33 +429,70 @@ library LibERC721 {
 		if (
 			s.meems[tokenId].meemType == MeemType.Wrapped && !canFacilitateClaim
 		) {
-			revert NotTokenAdmin(tokenId);
+			revert(Error.NotTokenAdmin);
 		} else if (
 			s.meems[tokenId].owner == address(this) && !canFacilitateClaim
 		) {
-			revert NotTokenAdmin(tokenId);
+			revert(Error.NotTokenAdmin);
 		} else if (ownerOf(tokenId) != from) {
-			revert NotTokenOwner(tokenId);
+			revert(Error.NotTokenOwner);
 		}
 
 		if (to == address(0)) {
-			revert ToAddressInvalid(address(0));
+			revert(Error.ToAddressInvalid);
 		}
-
-		// if (s.meems[tokenId].verifiedBy == address(0)) {
-		// 	revert MeemNotVerified();
-		// }
 
 		// Clear approvals from the previous owner
 		_approve(address(0), tokenId);
 
-		uint256 index = s.ownerTokenIdIndexes[from][tokenId];
-		Array.removeAt(s.ownerTokenIds[from], index);
-		s.ownerTokenIds[to].push(tokenId);
-		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length - 1;
-		s.meems[tokenId].owner = to;
+		updateStorageMappingsForTokenTransfer(from, to, tokenId);
 
 		emit Transfer(from, to, tokenId);
+	}
+
+	function updateStorageMappingsForTokenTransfer(
+		address from,
+		address to,
+		uint256 tokenId
+	) internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+
+		uint256 index = s.ownerTokenIdIndexes[from][tokenId];
+		s.ownerTokenIds[from] = Array.removeAt(s.ownerTokenIds[from], index);
+		delete s.ownerTokenIdIndexes[from][tokenId];
+		s.ownerTokenIds[to].push(tokenId);
+		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length - 1;
+
+		if (s.meems[tokenId].meemType == MeemType.Original) {
+			s.originalOwnerTokens[from][tokenId] = false;
+			s.originalOwnerTokens[to][tokenId] = true;
+			s.originalOwnerCount[from]--;
+			s.originalOwnerCount[to]++;
+		} else if (s.meems[tokenId].meemType == MeemType.Wrapped) {
+			uint256 idx = s.copiesOwnerTokenIndexes[from][tokenId];
+			s.copiesOwnerTokens[tokenId][from] = Array.removeAt(
+				s.copiesOwnerTokens[tokenId][from],
+				idx
+			);
+			delete s.copiesOwnerTokenIndexes[from][tokenId];
+			s.copiesOwnerTokens[tokenId][to].push(tokenId);
+			s.copiesOwnerTokenIndexes[to][tokenId] =
+				s.copiesOwnerTokens[tokenId][to].length -
+				1;
+		} else if (s.meems[tokenId].meemType == MeemType.Copy) {} else if (
+			s.meems[tokenId].meemType == MeemType.Remix
+		) {
+			uint256 idx = s.remixesOwnerTokenIndexes[from][tokenId];
+			s.remixesOwnerTokens[tokenId][from] = Array.removeAt(
+				s.remixesOwnerTokens[tokenId][from],
+				idx
+			);
+			delete s.remixesOwnerTokenIndexes[from][tokenId];
+			s.remixesOwnerTokens[tokenId][to].push(tokenId);
+			s.remixesOwnerTokenIndexes[to][tokenId] =
+				s.remixesOwnerTokens[tokenId][to].length -
+				1;
+		}
 	}
 
 	/**
@@ -506,7 +534,7 @@ library LibERC721 {
 				return retval == IERC721TokenReceiver.onERC721Received.selector;
 			} catch (bytes memory reason) {
 				if (reason.length == 0) {
-					revert ERC721ReceiverNotImplemented();
+					revert(Error.ERC721ReceiverNotImplemented);
 				} else {
 					assembly {
 						revert(add(32, reason), mload(reason))

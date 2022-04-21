@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {PropertyType, Split, MeemProperties, MeemType} from '../interfaces/MeemStandard.sol';
 import {LibERC721} from './LibERC721.sol';
-import {PropertyLocked, InvalidNonOwnerSplitAllocationAmount, MissingRequiredSplits, IndexOutOfRange} from './Errors.sol';
+import {Error} from './Errors.sol';
 import {LibProperties} from './LibProperties.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
@@ -21,7 +21,7 @@ library LibSplits {
 		);
 
 		if (props.splitsLockedBy != address(0)) {
-			revert PropertyLocked(props.splitsLockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		props.splitsLockedBy = msg.sender;
@@ -40,7 +40,7 @@ library LibSplits {
 		);
 
 		if (props.splitsLockedBy != address(0)) {
-			revert PropertyLocked(props.splitsLockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		validateOverrideSplits(splits, props.splits);
@@ -74,7 +74,7 @@ library LibSplits {
 		);
 
 		if (props.splitsLockedBy != address(0)) {
-			revert PropertyLocked(props.splitsLockedBy);
+			revert(Error.PropertyLocked);
 		}
 		props.splits.push(split);
 		validateSplits(
@@ -97,15 +97,15 @@ library LibSplits {
 			propertyType
 		);
 		if (props.splitsLockedBy != address(0)) {
-			revert PropertyLocked(props.splitsLockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		if (props.splits[idx].lockedBy != address(0)) {
-			revert PropertyLocked(props.splits[idx].lockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		if (idx >= props.splits.length) {
-			revert IndexOutOfRange(idx, props.splits.length - 1);
+			revert(Error.IndexOutOfRange);
 		}
 
 		for (uint256 i = idx; i < props.splits.length - 1; i++) {
@@ -130,11 +130,11 @@ library LibSplits {
 			propertyType
 		);
 		if (props.splitsLockedBy != address(0)) {
-			revert PropertyLocked(props.splitsLockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		if (props.splits[idx].lockedBy != address(0)) {
-			revert PropertyLocked(props.splits[idx].lockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		props.splits[idx] = split;
@@ -178,10 +178,7 @@ library LibSplits {
 			totalAmount > 10000 ||
 			totalAmountOfNonOwner < nonOwnerSplitAllocationAmount
 		) {
-			revert InvalidNonOwnerSplitAllocationAmount(
-				nonOwnerSplitAllocationAmount,
-				10000
-			);
+			revert(Error.InvalidNonOwnerSplitAllocationAmount);
 		}
 	}
 
@@ -204,7 +201,7 @@ library LibSplits {
 					}
 				}
 				if (!wasFound) {
-					revert MissingRequiredSplits();
+					revert(Error.MissingRequiredSplits);
 				}
 			}
 		}

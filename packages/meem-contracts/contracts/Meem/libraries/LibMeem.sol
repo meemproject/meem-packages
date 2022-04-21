@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
-import {WrappedItem, PropertyType, PermissionType, MeemPermission, MeemProperties, URISource, MeemMintParameters, Meem, Chain, MeemType, MeemBase, Permission} from '../interfaces/MeemStandard.sol';
+import {WrappedItem, PropertyType, PermissionType, MeemPermission, MeemProperties, URISource, MeemMintParameters, Meem, Chain, MeemType, MeemBase, Permission, BaseProperties} from '../interfaces/MeemStandard.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from './LibERC721.sol';
 import {LibAccessControl} from './LibAccessControl.sol';
@@ -10,7 +10,7 @@ import {Array} from '../utils/Array.sol';
 import {LibProperties} from './LibProperties.sol';
 import {LibPermissions} from './LibPermissions.sol';
 import {Strings} from '../utils/Strings.sol';
-import {ERC721ReceiverNotImplemented, PropertyLocked, IndexOutOfRange, InvalidPropertyType, InvalidPermissionType, NFTAlreadyWrapped, TotalCopiesExceeded, CopiesPerWalletExceeded, NoPermission, ChildDepthExceeded, TokenNotFound, NoChildOfCopy, InvalidURI, InvalidMeemType, NoCopyUnverified, TotalRemixesExceeded, RemixesPerWalletExceeded, AlreadyClipped, NotClipped, IncorrectMsgValue} from '../libraries/Errors.sol';
+import {Error} from '../libraries/Errors.sol';
 
 library LibMeem {
 	event TokenClipped(uint256 tokenId, address addy);
@@ -38,7 +38,7 @@ library LibMeem {
 				Strings.substring(params.tokenURI, 0, 7)
 			)
 		) {
-			revert InvalidURI();
+			// revert(Error.InvalidURI);
 		}
 
 		uint256 tokenId = s.tokenCounter;
@@ -73,7 +73,7 @@ library LibMeem {
 		if (params.parent == address(this)) {
 			// Verify token exists
 			if (s.meems[params.parentTokenId].owner == address(0)) {
-				revert TokenNotFound(params.parentTokenId);
+				revert(Error.TokenNotFound);
 			}
 			// Verify we can mint based on permissions
 			requireCanMintChildOf(
@@ -90,7 +90,7 @@ library LibMeem {
 
 			if (params.meemType == MeemType.Copy) {
 				// if (s.meems[params.parentTokenId].verifiedBy == address(0)) {
-				// 	revert NoCopyUnverified();
+				// 	revert(Error.NoCopyUnverified);
 				// }
 				s.tokenURIs[tokenId] = s.tokenURIs[params.parentTokenId];
 				s.meems[tokenId].meemType = MeemType.Copy;
@@ -140,26 +140,30 @@ library LibMeem {
 			s.tokenURIs[tokenId] = params.tokenURI;
 			if (params.parent == address(0)) {
 				if (params.meemType != MeemType.Original) {
-					revert InvalidMeemType();
+					revert(Error.InvalidMeemType);
 				}
 				s.meems[tokenId].meemType = MeemType.Original;
 			} else {
 				// Only trusted minter can mint a wNFT
 				LibAccessControl.requireRole(s.MINTER_ROLE);
 				if (params.meemType != MeemType.Wrapped) {
-					revert InvalidMeemType();
+					revert(Error.InvalidMeemType);
 				}
 				s.meems[tokenId].meemType = MeemType.Wrapped;
 			}
 			LibProperties.setProperties(
 				tokenId,
 				PropertyType.Meem,
-				mProperties
+				mProperties,
+				s.defaultProperties,
+				true
 			);
 			LibProperties.setProperties(
 				tokenId,
 				PropertyType.Child,
-				mChildProperties
+				mChildProperties,
+				s.defaultChildProperties,
+				true
 			);
 		}
 
@@ -167,7 +171,7 @@ library LibMeem {
 			s.childDepth > -1 &&
 			s.meems[tokenId].generation > uint256(s.childDepth)
 		) {
-			revert ChildDepthExceeded();
+			revert(Error.ChildDepthExceeded);
 		}
 
 		// Keep track of children Meems
@@ -191,6 +195,8 @@ library LibMeem {
 		} else if (params.parent == address(0)) {
 			s.originalMeemTokensIndex[tokenId] = s.originalMeemTokens.length;
 			s.originalMeemTokens.push(tokenId);
+			s.originalOwnerTokens[params.to][tokenId] = true;
+			s.originalOwnerCount[params.to]++;
 		}
 
 		if (s.meems[tokenId].root == address(this)) {
@@ -207,7 +213,7 @@ library LibMeem {
 				''
 			)
 		) {
-			revert ERC721ReceiverNotImplemented();
+			revert(Error.ERC721ReceiverNotImplemented);
 		}
 
 		return tokenId;
@@ -280,7 +286,7 @@ library LibMeem {
 		// Meem must be unique address(0) or not have a corresponding parent / tokenId already minted
 		if (parent != address(0) && parent != address(this)) {
 			if (s.chainWrappedNFTs[chain][parent][tokenId] != 0) {
-				revert NFTAlreadyWrapped(parent, tokenId);
+				revert(Error.NFTAlreadyWrapped);
 				// revert('NFT_ALREADY_WRAPPED');
 			}
 		}
@@ -323,7 +329,7 @@ library LibMeem {
 		uint256 tokenId
 	) internal view {
 		if (meemType != MeemType.Copy && meemType != MeemType.Remix) {
-			revert NoPermission();
+			revert(Error.NoPermission);
 		}
 
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
@@ -331,7 +337,7 @@ library LibMeem {
 
 		// Only allow copies if the parent is an original or remix (i.e. no copies of a copy)
 		if (parent.meemType == MeemType.Copy) {
-			revert NoChildOfCopy();
+			revert(Error.NoChildOfCopy);
 		}
 
 		MeemProperties storage parentProperties = s.meemProperties[tokenId];
@@ -343,14 +349,14 @@ library LibMeem {
 			parentProperties.totalCopies >= 0 &&
 			s.copies[tokenId].length + 1 > uint256(parentProperties.totalCopies)
 		) {
-			revert TotalCopiesExceeded();
+			revert(Error.TotalCopiesExceeded);
 		} else if (
 			meemType == MeemType.Remix &&
 			parentProperties.totalRemixes >= 0 &&
 			s.remixes[tokenId].length + 1 >
 			uint256(parentProperties.totalRemixes)
 		) {
-			revert TotalRemixesExceeded();
+			revert(Error.TotalRemixesExceeded);
 		}
 
 		if (
@@ -359,14 +365,14 @@ library LibMeem {
 			s.copiesOwnerTokens[tokenId][to].length + 1 >
 			uint256(parentProperties.copiesPerWallet)
 		) {
-			revert CopiesPerWalletExceeded();
+			revert(Error.CopiesPerWalletExceeded);
 		} else if (
 			meemType == MeemType.Remix &&
 			parentProperties.remixesPerWallet >= 0 &&
 			s.remixesOwnerTokens[tokenId][to].length + 1 >
 			uint256(parentProperties.remixesPerWallet)
 		) {
-			revert RemixesPerWalletExceeded();
+			revert(Error.RemixesPerWalletExceeded);
 		}
 
 		// Check permissions
@@ -412,11 +418,76 @@ library LibMeem {
 		}
 
 		if (!hasPermission) {
-			revert NoPermission();
+			revert(Error.NoPermission);
 		}
 
 		if (costWei != msg.value) {
-			revert IncorrectMsgValue();
+			revert(Error.IncorrectMsgValue);
+		}
+	}
+
+	// Checks if "to" can mint a child of tokenId
+	function requireCanMintOriginal(address to) internal view {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+
+		BaseProperties storage baseProperties = s.baseProperties;
+
+		// Check total supply
+		if (
+			baseProperties.totalSupply >= 0 &&
+			s.originalMeemTokens.length + 1 >
+			uint256(baseProperties.totalSupply)
+		) {
+			revert(Error.TotalSupplyExceeded);
+		}
+
+		if (
+			baseProperties.tokensPerWallet >= 0 &&
+			s.originalOwnerCount[to] + 1 >
+			uint256(baseProperties.tokensPerWallet)
+		) {
+			revert(Error.TokensPerWalletExceeded);
+		}
+
+		bool hasPermission = false;
+		bool hasCostBeenSet = false;
+		uint256 costWei = 0;
+
+		for (uint256 i = 0; i < baseProperties.mintPermissions.length; i++) {
+			MeemPermission storage perm = baseProperties.mintPermissions[i];
+			if (
+				// Allowed if permission is anyone
+				perm.permission == Permission.Anyone
+			) {
+				hasPermission = true;
+			}
+
+			if (perm.permission == Permission.Addresses) {
+				// Allowed if to is in the list of approved addresses
+				for (uint256 j = 0; j < perm.addresses.length; j++) {
+					if (perm.addresses[j] == msg.sender) {
+						hasPermission = true;
+						break;
+					}
+				}
+			}
+
+			if (
+				hasPermission &&
+				(!hasCostBeenSet || (hasCostBeenSet && costWei > perm.costWei))
+			) {
+				costWei = perm.costWei;
+				hasCostBeenSet = true;
+			}
+			// TODO: Check external token holders on same network
+		}
+
+		if (!hasPermission) {
+			revert(Error.NoPermission);
+		}
+
+		if (costWei != msg.value) {
+			revert(Error.IncorrectMsgValue);
 		}
 	}
 
@@ -431,7 +502,7 @@ library LibMeem {
 			return MeemType.Remix;
 		}
 
-		revert NoPermission();
+		revert(Error.NoPermission);
 	}
 
 	function meemTypeToPermissionType(MeemType meemType)
@@ -445,14 +516,14 @@ library LibMeem {
 			return PermissionType.Remix;
 		}
 
-		revert NoPermission();
+		revert(Error.NoPermission);
 	}
 
 	function clip(uint256 tokenId) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		if (s.hasAddressClipped[msg.sender][tokenId]) {
-			revert AlreadyClipped();
+			revert(Error.AlreadyClipped);
 		}
 
 		s.clippings[tokenId].push(msg.sender);
@@ -470,7 +541,7 @@ library LibMeem {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		if (!s.hasAddressClipped[msg.sender][tokenId]) {
-			revert NotClipped();
+			revert(Error.NotClipped);
 		}
 
 		Array.removeAt(

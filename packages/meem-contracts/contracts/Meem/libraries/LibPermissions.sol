@@ -7,7 +7,7 @@ import {LibERC721} from './LibERC721.sol';
 import {LibProperties} from './LibProperties.sol';
 import {LibSplits} from './LibSplits.sol';
 import {Array} from '../utils/Array.sol';
-import {InvalidPermissionType, PropertyLocked, IndexOutOfRange, MissingRequiredPermissions} from './Errors.sol';
+import {Error} from './Errors.sol';
 
 library LibPermissions {
 	event PermissionsSet(
@@ -36,7 +36,7 @@ library LibPermissions {
 		} else if (permissionType == PermissionType.Read) {
 			props.readPermissionsLockedBy = msg.sender;
 		} else {
-			revert InvalidPermissionType();
+			revert(Error.InvalidPermissionType);
 		}
 	}
 
@@ -65,7 +65,7 @@ library LibPermissions {
 		} else if (permissionType == PermissionType.Read) {
 			delete props.readPermissions;
 		} else {
-			revert InvalidPermissionType();
+			revert(Error.InvalidPermissionType);
 		}
 
 		for (uint256 i = 0; i < permissions.length; i++) {
@@ -110,11 +110,11 @@ library LibPermissions {
 
 		MeemPermission[] storage perms = getPermissions(props, permissionType);
 		if (perms[idx].lockedBy != address(0)) {
-			revert PropertyLocked(perms[idx].lockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		if (idx >= perms.length) {
-			revert IndexOutOfRange(idx, perms.length - 1);
+			revert(Error.IndexOutOfRange);
 		}
 
 		for (uint256 i = idx; i < perms.length - 1; i++) {
@@ -142,7 +142,7 @@ library LibPermissions {
 		MeemPermission[] storage perms = getPermissions(props, permissionType);
 
 		if (perms[idx].lockedBy != address(0)) {
-			revert PropertyLocked(perms[idx].lockedBy);
+			revert(Error.PropertyLocked);
 		}
 
 		perms[idx] = permission;
@@ -175,7 +175,7 @@ library LibPermissions {
 					}
 				}
 				if (!wasFound) {
-					revert MissingRequiredPermissions();
+					revert(Error.MissingRequiredPermissions);
 				}
 			}
 		}
@@ -187,15 +187,15 @@ library LibPermissions {
 	) internal view {
 		if (permissionType == PermissionType.Copy) {
 			if (self.copyPermissionsLockedBy != address(0)) {
-				revert PropertyLocked(self.copyPermissionsLockedBy);
+				revert(Error.PropertyLocked);
 			}
 		} else if (permissionType == PermissionType.Remix) {
 			if (self.remixPermissionsLockedBy != address(0)) {
-				revert PropertyLocked(self.remixPermissionsLockedBy);
+				revert(Error.PropertyLocked);
 			}
 		} else if (permissionType == PermissionType.Read) {
 			if (self.readPermissionsLockedBy != address(0)) {
-				revert PropertyLocked(self.readPermissionsLockedBy);
+				revert(Error.PropertyLocked);
 			}
 		}
 	}
@@ -212,6 +212,6 @@ library LibPermissions {
 			return self.readPermissions;
 		}
 
-		revert InvalidPermissionType();
+		revert(Error.InvalidPermissionType);
 	}
 }

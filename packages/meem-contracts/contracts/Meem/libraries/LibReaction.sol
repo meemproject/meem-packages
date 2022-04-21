@@ -5,7 +5,7 @@ import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from './LibERC721.sol';
 import {Array} from '../utils/Array.sol';
 import {Reaction} from '../interfaces/MeemStandard.sol';
-import {AlreadyReacted, ReactionNotFound} from './Errors.sol';
+import {Error} from './Errors.sol';
 
 library LibReaction {
 	event TokenReactionAdded(
@@ -28,7 +28,7 @@ library LibReaction {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		if (s.addressReactionsAt[tokenId][reaction][msg.sender] != 0) {
-			revert AlreadyReacted();
+			revert(Error.AlreadyReacted);
 		}
 
 		s.addressReactions[msg.sender][tokenId].push(reaction);
@@ -50,7 +50,7 @@ library LibReaction {
 	function removeReaction(uint256 tokenId, string memory reaction) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		if (s.addressReactionsAt[tokenId][reaction][msg.sender] == 0) {
-			revert ReactionNotFound();
+			revert(Error.ReactionNotFound);
 		}
 
 		Array.removeAt(
@@ -78,7 +78,7 @@ library LibReaction {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		if (s.addressReactionsAt[tokenId][reaction][addy] == 0) {
-			revert ReactionNotFound();
+			revert(Error.ReactionNotFound);
 		}
 
 		return s.addressReactionsAt[tokenId][reaction][addy];

@@ -99,6 +99,12 @@ library LibAppStorage {
 		BaseProperties baseProperties;
 		MeemProperties defaultProperties;
 		MeemProperties defaultChildProperties;
+		/** Keeping track of  */
+		mapping(address => mapping(uint256 => bool)) originalOwnerTokens;
+		/** Number of original tokens held by a wallet */
+		mapping(address => uint256) originalOwnerCount;
+		mapping(address => mapping(uint256 => uint256)) copiesOwnerTokenIndexes;
+		mapping(address => mapping(uint256 => uint256)) remixesOwnerTokenIndexes;
 	}
 
 	function diamondStorage() internal pure returns (AppStorage storage ds) {

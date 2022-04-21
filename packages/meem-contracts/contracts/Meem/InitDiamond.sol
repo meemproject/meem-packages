@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 import {LibAppStorage} from './storage/LibAppStorage.sol';
 import {LibAccessControl} from './libraries/LibAccessControl.sol';
 import {LibContract} from './libraries/LibContract.sol';
+import {LibProperties} from './libraries/LibProperties.sol';
 import {IDiamondCut} from './interfaces/IDiamondCut.sol';
 import {IDiamondLoupe} from './interfaces/IDiamondLoupe.sol';
 import {IRoyaltiesProvider} from '../royalties/IRoyaltiesProvider.sol';
@@ -16,17 +17,7 @@ import '@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol';
 import '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
 
 contract InitDiamond is IInitDiamondStandard {
-	// event MeemContractInitialized(address contractAddress);
-
 	using ERC165Storage for ERC165Storage.Layout;
-
-	// struct Args {
-	// 	string name;
-	// 	string symbol;
-	// 	int256 childDepth;
-	// 	uint256 nonOwnerSplitAllocationAmount;
-	// 	string contractURI;
-	// }
 
 	function init(InitParams memory params) external override {
 		ERC721MetadataStorage.Layout storage erc721 = ERC721MetadataStorage
@@ -64,17 +55,28 @@ contract InitDiamond is IInitDiamondStandard {
 		s.ADMIN_ROLE = keccak256('ADMIN_ROLE');
 		s.MINTER_ROLE = keccak256('MINTER_ROLE');
 		s.contractURI = params.contractURI;
+		if (params.tokenCounterStart < 1) {
+			revert('tokenCounter must be greater than 0');
+		}
+		s.tokenCounter = params.tokenCounterStart;
 
 		LibAccessControl._grantRole(s.ADMIN_ROLE, msg.sender);
 		LibAccessControl._grantRole(s.MINTER_ROLE, msg.sender);
 
+		for (uint256 i = 0; i < params.admins.length; i++) {
+			LibAccessControl._grantRole(s.ADMIN_ROLE, params.admins[i]);
+			LibAccessControl._grantRole(s.MINTER_ROLE, params.admins[i]);
+		}
+
 		LibContract.setBaseProperties(params.baseProperties);
-		LibContract.setDefaultProperties(
-			PropertyType.Meem,
+		LibProperties.setProperties(
+			0,
+			PropertyType.DefaultMeem,
 			params.defaultProperties
 		);
-		LibContract.setDefaultProperties(
-			PropertyType.Child,
+		LibProperties.setProperties(
+			0,
+			PropertyType.DefaultChild,
 			params.defaultChildProperties
 		);
 
