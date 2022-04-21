@@ -48,8 +48,12 @@ library Error {
 	string constant AlreadyReacted = 'ALREADY_REACTED';
 	string constant ReactionNotFound = 'REACTION_NOT_FOUND';
 	string constant IncorrectMsgValue = 'INCORRECT_MSG_VALUE';
-	string constant TotalSupplyExceeded = 'TOTAL_SUPPLY_EXCEEDED';
-	string constant TokensPerWalletExceeded = 'TOKENS_PER_WALLET_EXCEEDED';
+	string constant TotalOriginalsSupplyExceeded =
+		'TOTAL_ORIGINALS_SUPPLY_EXCEEDED';
+	string constant OriginalsPerWalletExceeded =
+		'ORIGINALS_PER_WALLET_EXCEEDED';
+	string constant MintingNotStarted = 'MINTING_NOT_STARTED';
+	string constant MintingFinished = 'MINTING_FINISHED';
 }
 
 // TODO: Use custom errors when more widely supported

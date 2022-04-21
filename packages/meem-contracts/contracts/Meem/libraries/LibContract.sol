@@ -11,10 +11,10 @@ library LibContract {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
 
-		if (s.baseProperties.totalSupplyLockedBy == address(0)) {
-			s.baseProperties.totalSupply = props.totalSupply;
-			if (props.isTotalSupplyLocked) {
-				s.baseProperties.totalSupplyLockedBy = msg.sender;
+		if (s.baseProperties.totalOriginalsSupplyLockedBy == address(0)) {
+			s.baseProperties.totalOriginalsSupply = props.totalOriginalsSupply;
+			if (props.isTotalOriginalsSupplyLocked) {
+				s.baseProperties.totalOriginalsSupplyLockedBy = msg.sender;
 			}
 		}
 
@@ -36,10 +36,10 @@ library LibContract {
 			}
 		}
 
-		if (s.baseProperties.tokensPerWalletLockedBy == address(0)) {
-			s.baseProperties.tokensPerWallet = props.tokensPerWallet;
-			if (props.isTokensPerWalletLocked) {
-				s.baseProperties.tokensPerWalletLockedBy = msg.sender;
+		if (s.baseProperties.originalsPerWalletLockedBy == address(0)) {
+			s.baseProperties.originalsPerWallet = props.originalsPerWallet;
+			if (props.isOriginalsPerWalletLocked) {
+				s.baseProperties.originalsPerWalletLockedBy = msg.sender;
 			}
 		}
 

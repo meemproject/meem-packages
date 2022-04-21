@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
-import {WrappedItem, PropertyType, PermissionType, MeemPermission, MeemProperties, URISource, MeemMintParameters, Meem, Chain, MeemType, MeemBase, Permission, BaseProperties} from '../interfaces/MeemStandard.sol';
+import {WrappedItem, PropertyType, PermissionType, MeemPermission, MeemProperties, URISource, MeemMintParameters, Meem, Chain, MeemType, MeemBase, Permission, BaseProperties, Split} from '../interfaces/MeemStandard.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from './LibERC721.sol';
 import {LibAccessControl} from './LibAccessControl.sol';
@@ -38,7 +38,7 @@ library LibMeem {
 				Strings.substring(params.tokenURI, 0, 7)
 			)
 		) {
-			// revert(Error.InvalidURI);
+			revert(Error.InvalidURI);
 		}
 
 		uint256 tokenId = s.tokenCounter;
@@ -83,15 +83,7 @@ library LibMeem {
 			);
 			handleSaleDistribution(params.parentTokenId);
 
-			// If parent is verified, this child is also verified
-			// if (s.meems[params.parentTokenId].verifiedBy != address(0)) {
-			// 	s.meems[tokenId].verifiedBy = address(this);
-			// }
-
 			if (params.meemType == MeemType.Copy) {
-				// if (s.meems[params.parentTokenId].verifiedBy == address(0)) {
-				// 	revert(Error.NoCopyUnverified);
-				// }
 				s.tokenURIs[tokenId] = s.tokenURIs[params.parentTokenId];
 				s.meems[tokenId].meemType = MeemType.Copy;
 			} else {
@@ -133,6 +125,8 @@ library LibMeem {
 				true
 			);
 		} else {
+			requireCanMintOriginal(params.to);
+			handleSaleDistribution(0);
 			s.meems[tokenId].generation = 0;
 			s.meems[tokenId].root = params.parent;
 			s.meems[tokenId].rootTokenId = params.parentTokenId;
@@ -258,21 +252,22 @@ library LibMeem {
 		}
 
 		uint256 leftover = msg.value;
-
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		for (uint256 i = 0; i < s.meemProperties[tokenId].splits.length; i++) {
-			uint256 amt = (msg.value *
-				s.meemProperties[tokenId].splits[i].amount) / 10000;
 
-			address payable receiver = payable(
-				s.meemProperties[tokenId].splits[i].toAddress
-			);
+		Split[] storage splits = tokenId == 0
+			? s.baseProperties.splits
+			: s.meemProperties[tokenId].splits;
+
+		for (uint256 i = 0; i < splits.length; i++) {
+			uint256 amt = (msg.value * splits[i].amount) / 10000;
+
+			address payable receiver = payable(splits[i].toAddress);
 
 			receiver.transfer(amt);
 			leftover = leftover - amt;
 		}
 
-		if (leftover > 0) {
+		if (leftover > 0 && tokenId > 0) {
 			payable(s.meems[tokenId].owner).transfer(leftover);
 		}
 	}
@@ -432,21 +427,35 @@ library LibMeem {
 
 		BaseProperties storage baseProperties = s.baseProperties;
 
-		// Check total supply
 		if (
-			baseProperties.totalSupply >= 0 &&
-			s.originalMeemTokens.length + 1 >
-			uint256(baseProperties.totalSupply)
+			baseProperties.mintStartTimestamp > 0 &&
+			block.timestamp < uint256(baseProperties.mintStartTimestamp)
 		) {
-			revert(Error.TotalSupplyExceeded);
+			revert(Error.MintingNotStarted);
 		}
 
 		if (
-			baseProperties.tokensPerWallet >= 0 &&
-			s.originalOwnerCount[to] + 1 >
-			uint256(baseProperties.tokensPerWallet)
+			baseProperties.mintEndTimestamp > 0 &&
+			block.timestamp > uint256(baseProperties.mintEndTimestamp)
 		) {
-			revert(Error.TokensPerWalletExceeded);
+			revert(Error.MintingFinished);
+		}
+
+		// Check total supply
+		if (
+			baseProperties.totalOriginalsSupply >= 0 &&
+			s.originalMeemTokens.length + 1 >
+			uint256(baseProperties.totalOriginalsSupply)
+		) {
+			revert(Error.TotalOriginalsSupplyExceeded);
+		}
+
+		if (
+			baseProperties.originalsPerWallet >= 0 &&
+			s.originalOwnerCount[to] + 1 >
+			uint256(baseProperties.originalsPerWallet)
+		) {
+			revert(Error.OriginalsPerWalletExceeded);
 		}
 
 		bool hasPermission = false;

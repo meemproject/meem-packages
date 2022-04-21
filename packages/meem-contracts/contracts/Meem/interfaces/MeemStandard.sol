@@ -80,14 +80,14 @@ struct MeemProperties {
 }
 
 struct BaseProperties {
-	int256 totalSupply;
-	address totalSupplyLockedBy;
+	int256 totalOriginalsSupply;
+	address totalOriginalsSupplyLockedBy;
 	MeemPermission[] mintPermissions;
 	address mintPermissionsLockedBy;
 	Split[] splits;
 	address splitsLockedBy;
-	int256 tokensPerWallet;
-	address tokensPerWalletLockedBy;
+	int256 originalsPerWallet;
+	address originalsPerWalletLockedBy;
 	bool isTransferrable;
 	address isTransferrableLockedBy;
 	int256 mintStartTimestamp;
@@ -96,14 +96,14 @@ struct BaseProperties {
 }
 
 struct BasePropertiesInit {
-	int256 totalSupply;
-	bool isTotalSupplyLocked;
+	int256 totalOriginalsSupply;
+	bool isTotalOriginalsSupplyLocked;
 	MeemPermission[] mintPermissions;
 	bool isMintPermissionsLocked;
 	Split[] splits;
 	bool isSplitsLocked;
-	int256 tokensPerWallet;
-	bool isTokensPerWalletLocked;
+	int256 originalsPerWallet;
+	bool isOriginalsPerWalletLocked;
 	bool isTransferrable;
 	bool isIsTransferrableLocked;
 	int256 mintStartTimestamp;
