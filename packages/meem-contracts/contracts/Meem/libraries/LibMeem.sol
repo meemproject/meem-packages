@@ -376,49 +376,7 @@ library LibMeem {
 			meemTypeToPermissionType(meemType)
 		);
 
-		bool hasPermission = false;
-		bool hasCostBeenSet = false;
-		uint256 costWei = 0;
-
-		for (uint256 i = 0; i < perms.length; i++) {
-			MeemPermission storage perm = perms[i];
-			if (
-				// Allowed if permission is anyone
-				perm.permission == Permission.Anyone ||
-				// Allowed if permission is owner and the minter is the owner
-				(perm.permission == Permission.Owner &&
-					parent.owner == msg.sender)
-			) {
-				hasPermission = true;
-			}
-
-			if (perm.permission == Permission.Addresses) {
-				// Allowed if to is in the list of approved addresses
-				for (uint256 j = 0; j < perm.addresses.length; j++) {
-					if (perm.addresses[j] == msg.sender) {
-						hasPermission = true;
-						break;
-					}
-				}
-			}
-
-			if (
-				hasPermission &&
-				(!hasCostBeenSet || (hasCostBeenSet && costWei > perm.costWei))
-			) {
-				costWei = perm.costWei;
-				hasCostBeenSet = true;
-			}
-			// TODO: Check external token holders on same network
-		}
-
-		if (!hasPermission) {
-			revert(Error.NoPermission);
-		}
-
-		if (costWei != msg.value) {
-			revert(Error.IncorrectMsgValue);
-		}
+		requireProperPermissions(perms);
 	}
 
 	// Checks if "to" can mint a child of tokenId
@@ -458,12 +416,19 @@ library LibMeem {
 			revert(Error.OriginalsPerWalletExceeded);
 		}
 
+		requireProperPermissions(baseProperties.mintPermissions);
+	}
+
+	function requireProperPermissions(MeemPermission[] storage permissions)
+		internal
+		view
+	{
 		bool hasPermission = false;
 		bool hasCostBeenSet = false;
 		uint256 costWei = 0;
 
-		for (uint256 i = 0; i < baseProperties.mintPermissions.length; i++) {
-			MeemPermission storage perm = baseProperties.mintPermissions[i];
+		for (uint256 i = 0; i < permissions.length; i++) {
+			MeemPermission storage perm = permissions[i];
 			if (
 				// Allowed if permission is anyone
 				perm.permission == Permission.Anyone

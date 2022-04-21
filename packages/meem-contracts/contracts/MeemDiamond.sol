@@ -13,10 +13,10 @@ M::::::M     MMMMM     M::::::M  E:::::E       EEEEEEEEEEEE       E:::::E  M::::
 M::::::M               M::::::MEE::::::EEEEEEEE:::::EE::::EEEEEEEEE::::::EEM::::::M               M::::::M
 M::::::M               M::::::ME::::::::::::::::::::EE::::::::::::::::::::EM::::::M               M::::::M
 M::::::M               M::::::ME::::::::::::::::::::EE::::::::::::::::::::EM::::::M               M::::::M
-MMMMMMMM               MMMMMMMMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEMMMMMMMM               MMMMMM*/
+MMMMMMMM               MMMMMMMMEEEEEEEEEEEE https://meem.wtf EEEEEEEEEEEEEEMMMMMMMM               MMMMMM*/
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import '@solidstate/contracts/proxy/diamond/Diamond.sol';
 import '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
