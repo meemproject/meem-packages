@@ -4,6 +4,8 @@ import { ethers as Ethers } from 'ethers'
 import fs from 'fs-extra'
 import { task, types } from 'hardhat/config'
 import { HardhatArguments } from 'hardhat/types'
+import { meemMintData } from '../test/helpers/meemProperties'
+import { Permission } from '../test/helpers/meemStandard'
 import {
 	FacetCutAction,
 	getSelectors,
@@ -122,7 +124,7 @@ export async function deployDiamond(options: {
 	console.log('Diamond Cut:', cuts)
 	const diamondCut = await ethers.getContractAt('IDiamondCut', diamond.address)
 
-	let proxyRegistryAddress = ''
+	// let proxyRegistryAddress = ''
 	let walletAddress = ''
 	const basisPoints = 100
 
@@ -130,22 +132,22 @@ export async function deployDiamond(options: {
 		case 'matic':
 		case 'polygon':
 			walletAddress = '0x9C5ceC7a99D19a9f1754C202aBA01BBFEDECC561'
-			proxyRegistryAddress = '0x58807baD0B376efc12F5AD86aAc70E78ed67deaE'
+			// proxyRegistryAddress = '0x58807baD0B376efc12F5AD86aAc70E78ed67deaE'
 			break
 
 		case 'rinkeby':
-			proxyRegistryAddress = '0xf57b2c51ded3a29e6891aba85459d600256cf317'
+			// proxyRegistryAddress = '0xf57b2c51ded3a29e6891aba85459d600256cf317'
 			walletAddress = '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5'
 			break
 
 		case 'mainnet':
-			proxyRegistryAddress = '0xa5409ec958c83c3f309868babaca7c86dcb077c1'
+			// proxyRegistryAddress = '0xa5409ec958c83c3f309868babaca7c86dcb077c1'
 			walletAddress = '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5'
 			break
 
 		case 'local':
 		default:
-			proxyRegistryAddress = '0x0000000000000000000000000000000000000000'
+			// proxyRegistryAddress = '0x0000000000000000000000000000000000000000'
 			walletAddress = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'
 			break
 	}
@@ -159,8 +161,34 @@ export async function deployDiamond(options: {
 				symbol: 'MEEM',
 				childDepth: -1,
 				nonOwnerSplitAllocationAmount: 0,
-				proxyRegistryAddress,
-				contractURI: `{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/VTsnW6jUgE","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": ${basisPoints}, "fee_recipient": "${walletAddress}"}`
+				contractURI: `{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/VTsnW6jUgE","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": ${basisPoints}, "fee_recipient": "${walletAddress}"}`,
+				baseProperties: {
+					totalOriginalsSupply: -1,
+					isTotalOriginalsSupplyLocked: false,
+					mintPermissions: [
+						{
+							permission: Permission.Anyone,
+							addresses: [],
+							numTokens: 0,
+							lockedBy: '0x0000000000000000000000000000000000000000',
+							costWei: 0
+						}
+					],
+					isMintPermissionsLocked: false,
+					splits: [],
+					isSplitsLocked: false,
+					originalsPerWallet: -1,
+					isOriginalsPerWalletLocked: false,
+					isTransferrable: true,
+					isIsTransferrableLocked: false,
+					mintStartTimestamp: -1,
+					mintEndTimestamp: -1,
+					isMintDatesLocked: false
+				},
+				defaultProperties: meemMintData,
+				defaultChildProperties: meemMintData,
+				admins: [],
+				tokenCounterStart: 100000
 			}
 		]
 	)

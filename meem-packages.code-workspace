@@ -1,0 +1,78 @@
+{
+	"folders": [
+		{
+			"name": "ROOT",
+			"path": "./"
+		},
+		{
+			"name": "@meemproject/api",
+			"path": "./packages/api"
+		},
+		{
+			"name": "@meemproject/market-contracts",
+			"path": "./packages/market-contracts"
+		},
+		{
+			"name": "@meemproject/meem-contracts",
+			"path": "./packages/meem-contracts"
+		},
+		{
+			"name": "@meemproject/meem-id-contracts",
+			"path": "./packages/meem-id-contracts"
+		},
+		{
+			"name": "@meemproject/react",
+			"path": "./packages/react"
+		},
+		{
+			"name": "@meemproject/utils",
+			"path": "./packages/utils"
+		},
+	],
+	"settings": {
+		"eslint.workingDirectories": [
+			"packages/api",
+			"packages/react",
+			"packages/utils",
+			"packages/market-contracts",
+			"packages/meem-contracts",
+			"packages/meem-id-contracts"
+		],
+		"typescript.tsdk": "node_modules/typescript/lib",
+		"typescript.preferences.importModuleSpecifier": "relative",
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": true
+		},
+		"eslint.options": {
+			"extensions": [
+				".js",
+				".jsx",
+				".ts",
+				".tsx"
+			]
+		},
+		"eslint.enable": true,
+		"eslint.validate": [
+			"javascript",
+			"javascriptreact",
+			"typescript",
+			"typescriptreact"
+		],
+		"[javascript]": {
+			"editor.formatOnSave": false
+		},
+		"[javascriptreact]": {
+			"editor.formatOnSave": false
+		},
+		"[typescript]": {
+			"editor.formatOnSave": false
+		},
+		"[typescriptreact]": {
+			"editor.formatOnSave": false
+		},
+		"[handlebars]": {
+			"editor.formatOnSave": false
+		},
+		"solidity.packageDefaultDependenciesDirectory": "packages/meem-contracts/node_modules"
+	}
+}

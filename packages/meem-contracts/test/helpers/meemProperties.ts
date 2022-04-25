@@ -46,5 +46,10 @@ export const meemMintData = {
 	remixesPerWallet: -1,
 	remixesPerWalletLockedBy: '0x0000000000000000000000000000000000000000',
 	totalRemixes: -1,
-	totalRemixesLockedBy: '0x0000000000000000000000000000000000000000'
+	totalRemixesLockedBy: '0x0000000000000000000000000000000000000000',
+	isTransferrable: true,
+	isTransferrableLockedBy: '0x0000000000000000000000000000000000000000',
+	mintStartTimestamp: -1,
+	mintEndTimestamp: -1,
+	mintDatesLockedBy: '0x0000000000000000000000000000000000000000'
 }

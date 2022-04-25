@@ -4,56 +4,61 @@ import {LibMeta} from '../libraries/LibMeta.sol';
 import {MeemBase, MeemProperties, Chain, BaseProperties} from '../interfaces/MeemStandard.sol';
 
 library Error {
-	string constant MissingRequiredRole = 'MISSING_REQUIRED_ROLE';
-	string constant NotTokenOwner = 'NOT_TOKEN_OWNER';
-	string constant NotTokenAdmin = 'NOT_TOKEN_ADMIN';
-	string constant InvalidNonOwnerSplitAllocationAmount =
+	string public constant MissingRequiredRole = 'MISSING_REQUIRED_ROLE';
+	string public constant NotTokenOwner = 'NOT_TOKEN_OWNER';
+	string public constant NotTokenAdmin = 'NOT_TOKEN_ADMIN';
+	string public constant InvalidNonOwnerSplitAllocationAmount =
 		'INVALID_NON_OWNER_SPLIT_ALLOCATION_AMOUNT';
-	string constant NoRenounceOthers = 'NO_RENOUNCE_OTHERS';
-	string constant InvalidZeroAddressQuery = 'INVALID_ZERO_ADDRESS_QUERY';
-	string constant IndexOutOfRange = 'INDEX_OUT_OF_RANGE';
-	string constant TokenNotFound = 'TOKEN_NOT_FOUND';
-	string constant TokenAlreadyExists = 'TOKEN_ALREADY_EXISTS';
-	string constant NoApproveSelf = 'NO_APPROVE_SELF';
-	string constant NotApproved = 'NOT_APPROVED';
-	string constant ERC721ReceiverNotImplemented =
+	string public constant NoRenounceOthers = 'NO_RENOUNCE_OTHERS';
+	string public constant InvalidZeroAddressQuery =
+		'INVALID_ZERO_ADDRESS_QUERY';
+	string public constant IndexOutOfRange = 'INDEX_OUT_OF_RANGE';
+	string public constant TokenNotFound = 'TOKEN_NOT_FOUND';
+	string public constant TokenAlreadyExists = 'TOKEN_ALREADY_EXISTS';
+	string public constant NoApproveSelf = 'NO_APPROVE_SELF';
+	string public constant NotApproved = 'NOT_APPROVED';
+	string public constant ERC721ReceiverNotImplemented =
 		'ERC721_RECEIVER_NOT_IMPLEMENTED';
-	string constant ToAddressInvalid = 'TO_ADDRESS_INVALID';
-	string constant NoTransferWrappedNFT = 'NO_TRANSFER_WRAPPED_NFT';
-	string constant NFTAlreadyWrapped = 'NFT_ALREADY_WRAPPED';
-	string constant PropertyLocked = 'PROPERTY_LOCKED';
-	string constant InvalidPropertyType = 'INVALID_PROPERTY_TYPE';
-	string constant InvalidPermissionType = 'INVALID_PERMISSION_TYPE';
-	string constant InvalidTotalCopies = 'INVALID_TOTAL_COPIES';
-	string constant TotalCopiesExceeded = 'TOTAL_COPIES_EXCEEDED';
-	string constant InvalidTotalRemixes = 'INVALID_TOTAL_REMIXES';
-	string constant TotalRemixesExceeded = 'TOTAL_REMIXES_EXCEEDED';
-	string constant CopiesPerWalletExceeded = 'COPIES_PER_WALLET_EXCEEDED';
-	string constant RemixesPerWalletExceeded = 'REMIXES_PER_WALLET_EXCEEDED';
-	string constant NoPermission = 'NO_PERMISSION';
-	string constant InvalidChildGeneration = 'INVALID_CHILD_GENERATION';
-	string constant InvalidParent = 'INVALID_PARENT';
-	string constant ChildDepthExceeded = 'CHILD_DEPTH_EXCEEDED';
-	string constant MissingRequiredPermissions = 'MISSING_REQUIRED_PERMISSIONS';
-	string constant MissingRequiredSplits = 'MISSING_REQUIRED_SPLITS';
-	string constant NoChildOfCopy = 'NO_CHILD_OF_COPY';
-	string constant NoCopyUnverified = 'NO_COPY_UNVERIFIED';
-	string constant MeemNotVerified = 'MEEM_NOT_VERIFIED';
-	string constant InvalidURI = 'INVALID_URI';
-	string constant InvalidMeemType = 'INVALID_MEEM_TYPE';
-	string constant InvalidToken = 'INVALID_TOKEN';
-	string constant AlreadyClipped = 'ALREADY_CLIPPED';
-	string constant NotClipped = 'NOT_CLIPPED';
-	string constant URILocked = 'URI_LOCKED';
-	string constant AlreadyReacted = 'ALREADY_REACTED';
-	string constant ReactionNotFound = 'REACTION_NOT_FOUND';
-	string constant IncorrectMsgValue = 'INCORRECT_MSG_VALUE';
-	string constant TotalOriginalsSupplyExceeded =
+	string public constant ToAddressInvalid = 'TO_ADDRESS_INVALID';
+	string public constant NoTransferWrappedNFT = 'NO_TRANSFER_WRAPPED_NFT';
+	string public constant NFTAlreadyWrapped = 'NFT_ALREADY_WRAPPED';
+	string public constant PropertyLocked = 'PROPERTY_LOCKED';
+	string public constant InvalidPropertyType = 'INVALID_PROPERTY_TYPE';
+	string public constant InvalidPermissionType = 'INVALID_PERMISSION_TYPE';
+	string public constant InvalidTotalCopies = 'INVALID_TOTAL_COPIES';
+	string public constant TotalCopiesExceeded = 'TOTAL_COPIES_EXCEEDED';
+	string public constant InvalidTotalRemixes = 'INVALID_TOTAL_REMIXES';
+	string public constant TotalRemixesExceeded = 'TOTAL_REMIXES_EXCEEDED';
+	string public constant CopiesPerWalletExceeded =
+		'COPIES_PER_WALLET_EXCEEDED';
+	string public constant RemixesPerWalletExceeded =
+		'REMIXES_PER_WALLET_EXCEEDED';
+	string public constant NoPermission = 'NO_PERMISSION';
+	string public constant InvalidChildGeneration = 'INVALID_CHILD_GENERATION';
+	string public constant InvalidParent = 'INVALID_PARENT';
+	string public constant ChildDepthExceeded = 'CHILD_DEPTH_EXCEEDED';
+	string public constant MissingRequiredPermissions =
+		'MISSING_REQUIRED_PERMISSIONS';
+	string public constant MissingRequiredSplits = 'MISSING_REQUIRED_SPLITS';
+	string public constant NoChildOfCopy = 'NO_CHILD_OF_COPY';
+	string public constant NoCopyUnverified = 'NO_COPY_UNVERIFIED';
+	string public constant MeemNotVerified = 'MEEM_NOT_VERIFIED';
+	string public constant InvalidURI = 'INVALID_URI';
+	string public constant InvalidMeemType = 'INVALID_MEEM_TYPE';
+	string public constant InvalidToken = 'INVALID_TOKEN';
+	string public constant AlreadyClipped = 'ALREADY_CLIPPED';
+	string public constant NotClipped = 'NOT_CLIPPED';
+	string public constant URILocked = 'URI_LOCKED';
+	string public constant AlreadyReacted = 'ALREADY_REACTED';
+	string public constant ReactionNotFound = 'REACTION_NOT_FOUND';
+	string public constant IncorrectMsgValue = 'INCORRECT_MSG_VALUE';
+	string public constant TotalOriginalsSupplyExceeded =
 		'TOTAL_ORIGINALS_SUPPLY_EXCEEDED';
-	string constant OriginalsPerWalletExceeded =
+	string public constant OriginalsPerWalletExceeded =
 		'ORIGINALS_PER_WALLET_EXCEEDED';
-	string constant MintingNotStarted = 'MINTING_NOT_STARTED';
-	string constant MintingFinished = 'MINTING_FINISHED';
+	string public constant MintingNotStarted = 'MINTING_NOT_STARTED';
+	string public constant MintingFinished = 'MINTING_FINISHED';
+	string public constant InvalidTokenCounter = 'INVALID_TOKEN_COUNTER';
 }
 
 // TODO: Use custom errors when more widely supported

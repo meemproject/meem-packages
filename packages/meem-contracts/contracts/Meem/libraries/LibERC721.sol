@@ -457,9 +457,11 @@ library LibERC721 {
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
-		uint256 index = s.ownerTokenIdIndexes[from][tokenId];
-		s.ownerTokenIds[from] = Array.removeAt(s.ownerTokenIds[from], index);
-		delete s.ownerTokenIdIndexes[from][tokenId];
+		if (from != address(0)) {
+			uint256 idx = s.ownerTokenIdIndexes[from][tokenId];
+			s.ownerTokenIds[from] = Array.removeAt(s.ownerTokenIds[from], idx);
+			delete s.ownerTokenIdIndexes[from][tokenId];
+		}
 		s.ownerTokenIds[to].push(tokenId);
 		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length - 1;
 
@@ -468,26 +470,30 @@ library LibERC721 {
 			s.originalOwnerTokens[to][tokenId] = true;
 			s.originalOwnerCount[from]--;
 			s.originalOwnerCount[to]++;
-		} else if (s.meems[tokenId].meemType == MeemType.Wrapped) {
-			uint256 idx = s.copiesOwnerTokenIndexes[from][tokenId];
-			s.copiesOwnerTokens[tokenId][from] = Array.removeAt(
-				s.copiesOwnerTokens[tokenId][from],
-				idx
-			);
-			delete s.copiesOwnerTokenIndexes[from][tokenId];
+		} else if (s.meems[tokenId].meemType == MeemType.Copy) {
+			if (from != address(0)) {
+				uint256 idx = s.copiesOwnerTokenIndexes[from][tokenId];
+				s.copiesOwnerTokens[tokenId][from] = Array.removeAt(
+					s.copiesOwnerTokens[tokenId][from],
+					idx
+				);
+				delete s.copiesOwnerTokenIndexes[from][tokenId];
+			}
 			s.copiesOwnerTokens[tokenId][to].push(tokenId);
 			s.copiesOwnerTokenIndexes[to][tokenId] =
 				s.copiesOwnerTokens[tokenId][to].length -
 				1;
-		} else if (s.meems[tokenId].meemType == MeemType.Copy) {} else if (
-			s.meems[tokenId].meemType == MeemType.Remix
-		) {
-			uint256 idx = s.remixesOwnerTokenIndexes[from][tokenId];
-			s.remixesOwnerTokens[tokenId][from] = Array.removeAt(
-				s.remixesOwnerTokens[tokenId][from],
-				idx
-			);
-			delete s.remixesOwnerTokenIndexes[from][tokenId];
+		} else if (s.meems[tokenId].meemType == MeemType.Wrapped) {
+			// TODO: keep track of wrapped
+		} else if (s.meems[tokenId].meemType == MeemType.Remix) {
+			if (from != address(0)) {
+				uint256 idx = s.remixesOwnerTokenIndexes[from][tokenId];
+				s.remixesOwnerTokens[tokenId][from] = Array.removeAt(
+					s.remixesOwnerTokens[tokenId][from],
+					idx
+				);
+				delete s.remixesOwnerTokenIndexes[from][tokenId];
+			}
 			s.remixesOwnerTokens[tokenId][to].push(tokenId);
 			s.remixesOwnerTokenIndexes[to][tokenId] =
 				s.remixesOwnerTokens[tokenId][to].length -

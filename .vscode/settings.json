@@ -62,5 +62,5 @@
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": true
 	},
-	"solidity.packageDefaultDependenciesDirectory": "packages/meem-contracts/node_modules"
+	// "solidity.packageDefaultDependenciesDirectory": "packages/meem-contracts/node_modules"
 }

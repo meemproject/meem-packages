@@ -175,11 +175,20 @@ library LibMeem {
 				s.copiesOwnerTokens[params.parentTokenId][params.to].push(
 					tokenId
 				);
+				s.copiesOwnerTokenIndexes[params.to][tokenId] =
+					s
+					.copiesOwnerTokens[params.parentTokenId][params.to].length -
+					1;
 			} else if (s.meems[tokenId].meemType == MeemType.Remix) {
 				s.remixes[params.parentTokenId].push(tokenId);
 				s.remixesOwnerTokens[params.parentTokenId][params.to].push(
 					tokenId
 				);
+				s.remixesOwnerTokenIndexes[params.to][tokenId] =
+					s
+					.remixesOwnerTokens[params.parentTokenId][params.to]
+						.length -
+					1;
 			}
 		} else if (params.parent != address(0)) {
 			// Keep track of wrapped NFTs

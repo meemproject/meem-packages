@@ -156,11 +156,16 @@ library LibProperties {
 		props.readPermissionsLockedBy = newProps.readPermissionsLockedBy;
 		props.splitsLockedBy = newProps.splitsLockedBy;
 
-		LibSplits.validateSplits(
-			props,
-			LibERC721.ownerOf(tokenId),
-			s.nonOwnerSplitAllocationAmount
-		);
+		if (
+			propertyType == PropertyType.Meem ||
+			propertyType == PropertyType.Child
+		) {
+			LibSplits.validateSplits(
+				props,
+				LibERC721.ownerOf(tokenId),
+				s.nonOwnerSplitAllocationAmount
+			);
+		}
 
 		emit PropertiesSet(tokenId, propertyType, props);
 	}

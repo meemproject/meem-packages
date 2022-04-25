@@ -9,7 +9,7 @@ import {IDiamondCut} from './interfaces/IDiamondCut.sol';
 import {IDiamondLoupe} from './interfaces/IDiamondLoupe.sol';
 import {IRoyaltiesProvider} from '../royalties/IRoyaltiesProvider.sol';
 import {IMeemBaseStandard, IMeemSplitsStandard, IMeemPermissionsStandard, IInitDiamondStandard, InitParams, PropertyType} from './interfaces/MeemStandard.sol';
-
+import {Error} from './libraries/Errors.sol';
 import '@solidstate/contracts/introspection/ERC165.sol';
 import '@solidstate/contracts/token/ERC721/IERC721.sol';
 import '@solidstate/contracts/token/ERC721/enumerable/IERC721Enumerable.sol';
@@ -56,7 +56,7 @@ contract InitDiamond is IInitDiamondStandard {
 		s.MINTER_ROLE = keccak256('MINTER_ROLE');
 		s.contractURI = params.contractURI;
 		if (params.tokenCounterStart < 1) {
-			revert('tokenCounter must be greater than 0');
+			revert(Error.InvalidTokenCounter);
 		}
 		s.tokenCounter = params.tokenCounterStart;
 
