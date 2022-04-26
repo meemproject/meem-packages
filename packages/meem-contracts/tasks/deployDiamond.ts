@@ -7,6 +7,8 @@ import { HardhatArguments } from 'hardhat/types'
 import packageJson from '../package.json'
 import { defaultMeemProperties } from '../src/lib/meemProperties'
 import { Permission } from '../src/lib/meemStandard'
+import { zeroAddress } from '../src/lib/utils'
+import { InitParamsStruct } from '../types/Meem'
 import {
 	FacetCutAction,
 	getSelectors,
@@ -155,45 +157,45 @@ export async function deployDiamond(options: {
 			break
 	}
 
+	const params: InitParamsStruct = {
+		name: 'Meem',
+		symbol: 'MEEM',
+		childDepth: -1,
+		nonOwnerSplitAllocationAmount: 0,
+		contractURI: `{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/VTsnW6jUgE","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": ${basisPoints}, "fee_recipient": "${walletAddress}"}`,
+		baseProperties: {
+			totalOriginalsSupply: -1,
+			totalOriginalsSupplyLockedBy: zeroAddress,
+			mintPermissions: [
+				{
+					permission: Permission.Anyone,
+					addresses: [],
+					numTokens: 0,
+					lockedBy: '0x0000000000000000000000000000000000000000',
+					costWei: 0
+				}
+			],
+			mintPermissionsLockedBy: zeroAddress,
+			splits: [],
+			splitsLockedBy: zeroAddress,
+			originalsPerWallet: -1,
+			originalsPerWalletLockedBy: zeroAddress,
+			isTransferrable: true,
+			isTransferrableLockedBy: zeroAddress,
+			mintStartTimestamp: -1,
+			mintEndTimestamp: -1,
+			mintDatesLockedBy: zeroAddress
+		},
+		defaultProperties: defaultMeemProperties,
+		defaultChildProperties: defaultMeemProperties,
+		admins: [],
+		tokenCounterStart: 100000
+	}
+
 	// call to init function
 	const functionCall = facets.InitDiamond?.interface.encodeFunctionData(
 		'init',
-		[
-			{
-				name: 'Meem',
-				symbol: 'MEEM',
-				childDepth: -1,
-				nonOwnerSplitAllocationAmount: 0,
-				contractURI: `{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/VTsnW6jUgE","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": ${basisPoints}, "fee_recipient": "${walletAddress}"}`,
-				baseProperties: {
-					totalOriginalsSupply: -1,
-					isTotalOriginalsSupplyLocked: false,
-					mintPermissions: [
-						{
-							permission: Permission.Anyone,
-							addresses: [],
-							numTokens: 0,
-							lockedBy: '0x0000000000000000000000000000000000000000',
-							costWei: 0
-						}
-					],
-					isMintPermissionsLocked: false,
-					splits: [],
-					isSplitsLocked: false,
-					originalsPerWallet: -1,
-					isOriginalsPerWalletLocked: false,
-					isTransferrable: true,
-					isIsTransferrableLocked: false,
-					mintStartTimestamp: -1,
-					mintEndTimestamp: -1,
-					isMintDatesLocked: false
-				},
-				defaultProperties: defaultMeemProperties,
-				defaultChildProperties: defaultMeemProperties,
-				admins: [],
-				tokenCounterStart: 100000
-			}
-		]
+		[params]
 	)
 
 	const tx = await diamondCut.diamondCut(cuts, diamond.address, functionCall, {

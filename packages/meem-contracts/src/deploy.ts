@@ -1,4 +1,5 @@
 import { Contract, ethers, providers } from 'ethers'
+import type { Transaction } from 'ethers'
 import InitDiamondABI from '../abi/contracts/Meem/InitDiamond.sol/InitDiamond.json'
 import IDiamondCutABI from '../abi/contracts/Meem/interfaces/IDiamondCut.sol/IDiamondCut.json'
 import MeemDiamondABI from '../abi/contracts/MeemDiamond.sol/MeemDiamond.json'
@@ -48,7 +49,7 @@ export async function initProxy(options: {
 	version?: number
 	customVersion?: IVersion
 	cuts?: IFacetCut[]
-}) {
+}): Promise<Transaction> {
 	const {
 		provider,
 		proxyContractAddress,
@@ -83,15 +84,6 @@ export async function initProxy(options: {
 	const diamondCut = new Contract(proxyContractAddress, IDiamondCutABI, signer)
 	const initDiamond = new Contract(proxyContractAddress, InitDiamondABI, signer)
 
-	console.log({
-		diamondCut,
-		name,
-		symbol,
-		contractURI,
-		initDiamond,
-		interface: initDiamond.interface
-	})
-
 	const initParams: InitParamsStruct = {
 		name,
 		symbol,
@@ -109,12 +101,6 @@ export async function initProxy(options: {
 		initParams
 	])
 
-	console.log({
-		cuts,
-		proxyContractAddress,
-		functionCall
-	})
-
 	const tx = await diamondCut.diamondCut(
 		cuts,
 		proxyContractAddress,
@@ -124,3 +110,5 @@ export async function initProxy(options: {
 	await tx.wait()
 	return tx
 }
+
+// export function upgradeProxy(options: {}) {}
