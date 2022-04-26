@@ -1,6 +1,6 @@
 {
   "name": "@meemproject/market-contracts",
-  "version": "0.1.7",
+  "version": "0.1.9",
   "private": false,
   "main": "./index.ts",
   "files": [
