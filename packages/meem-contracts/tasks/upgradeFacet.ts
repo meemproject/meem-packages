@@ -1,6 +1,7 @@
 import path from 'path'
 import fs from 'fs-extra'
 import { task, types } from 'hardhat/config'
+import packageJson from '../package.json'
 import { zeroAddress } from '../test/helpers/utils'
 import { IDeployHistory } from './deployDiamond'
 import { FacetCutAction, getSelectors } from './lib/diamond'
@@ -132,6 +133,7 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 				? [
 						...history[proxyAddress][facetName].previousDeploys,
 						{
+							version: packageJson.version,
 							address: history[proxyAddress][facetName].address,
 							functionSelectors:
 								history[proxyAddress][facetName].functionSelectors
@@ -144,6 +146,7 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 		}
 
 		history[proxyAddress][facetName] = {
+			version: packageJson.version,
 			address: facet.address,
 			functionSelectors: [...replaceSelectors, ...addSelectors],
 			previousDeploys

@@ -37,7 +37,8 @@
 		"release": "semantic-release",
 		"size": "hardhat size-contracts",
 		"createABI": "tsnd --transpile-only scripts/createABI.ts",
-		"generateTypes": "typechain --target ethers-v5  './types/MeemId.json'"
+		"generateTypes": "typechain --target ethers-v5  './types/MeemId.json'",
+		"link": "yarn link"
 	},
 	"publishConfig": {
 		"access": "public",

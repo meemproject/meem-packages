@@ -41,7 +41,8 @@
 		"createABI": "tsnd --transpile-only scripts/createABI.ts",
 		"generateTypes": "typechain --target ethers-v5  './types/Meem.json'",
 		"generateDocs": "solidity-docgen --solc-module solc-0.8 -i ./contracts -o ./docs",
-		"solregex": "solregex"
+		"solregex": "solregex",
+		"link": "yarn link"
 	},
 	"publishConfig": {
 		"access": "public",

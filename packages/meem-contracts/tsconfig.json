@@ -29,5 +29,5 @@
     "./scripts",
     "./types"
   ],
-  "files": ["./hardhat.config.ts"]
+  "files": ["./hardhat.config.ts", "index.ts"]
 }

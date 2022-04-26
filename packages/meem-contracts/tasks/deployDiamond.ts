@@ -4,6 +4,7 @@ import { ethers as Ethers } from 'ethers'
 import fs from 'fs-extra'
 import { task, types } from 'hardhat/config'
 import { HardhatArguments } from 'hardhat/types'
+import packageJson from '../package.json'
 import { meemMintData } from '../test/helpers/meemProperties'
 import { Permission } from '../test/helpers/meemStandard'
 import {
@@ -105,6 +106,7 @@ export async function deployDiamond(options: {
 			? [
 					...history[diamond.address][facetName].previousDeploys,
 					{
+						version: history[diamond.address][facetName].version ?? 'unknown',
 						address: history[diamond.address][facetName].address,
 						functionSelectors:
 							history[diamond.address][facetName].functionSelectors
@@ -113,6 +115,7 @@ export async function deployDiamond(options: {
 			: []
 
 		history[diamond.address][facetName] = {
+			version: packageJson.version,
 			address: facet.address,
 			functionSelectors,
 			previousDeploys

@@ -1,8 +1,12 @@
-/* eslint-disable no-restricted-syntax */
 import InitDiamondABI from '@meemproject/meem-contracts/abi/contracts/Meem/InitDiamond.sol/InitDiamond.json'
 import IDiamondCutABI from '@meemproject/meem-contracts/abi/contracts/Meem/interfaces/IDiamondCut.sol/IDiamondCut.json'
 import MeemDiamondABI from '@meemproject/meem-contracts/abi/contracts/MeemDiamond.sol/MeemDiamond.json'
 import aft from '@meemproject/meem-contracts/artifacts/contracts/MeemDiamond.sol/MeemDiamond.json'
+import type {
+	InitParamsStruct,
+	BasePropertiesInitStruct
+} from '@meemproject/meem-contracts/typechain/contracts/Meem/interfaces/MeemStandard.sol/IInitDiamondStandard'
+import type { MeemPropertiesStruct } from '@meemproject/meem-contracts/typechain/contracts/Meem/interfaces/MeemStandard.sol/IMeemBaseStandard'
 import { Contract, ethers, providers } from 'ethers'
 import { FacetCutAction, IFacetCut } from '../lib/diamond'
 import log from '../lib/log'
@@ -12,13 +16,9 @@ export async function getCuts() {}
 
 export async function deployMeemProxy(options: {
 	provider: providers.JsonRpcProvider | providers.Web3Provider
-	referenceContractAddress: string
 }) {
-	const { provider, referenceContractAddress } = options
-	const code = await provider.getCode(referenceContractAddress)
-	console.log({ code })
+	const { provider } = options
 	const signer = await provider.getSigner()
-	console.log({ bytecode: aft.bytecode })
 	const proxy = new ethers.ContractFactory(MeemDiamondABI, aft.bytecode, signer)
 	const deployedProxy = await proxy.deploy()
 	await deployedProxy.deployed()
@@ -26,16 +26,30 @@ export async function deployMeemProxy(options: {
 	return deployedProxy
 }
 
-export async function initProxy(options: {
+export async function initMeemProxy(options: {
 	provider: providers.JsonRpcProvider | providers.Web3Provider
 	proxyContractAddress: string
 	name: string
 	symbol: string
 	contractURI: string
+	baseProperties: BasePropertiesInitStruct
+	defaultProperties: MeemPropertiesStruct
+	defaultChildProperties: MeemPropertiesStruct
+	admins?: string[]
+	childDepth?: number
+	nonOwnerSplitAllocationAmount?: number
+
 	version?: IVersion
 	cuts?: IFacetCut[]
 }) {
-	const { provider, proxyContractAddress, name, symbol, contractURI } = options
+	const {
+		provider,
+		proxyContractAddress,
+		name,
+		symbol,
+		contractURI,
+		childDepth
+	} = options
 
 	const version = options.version ?? versions.v1
 	const cuts =
@@ -60,15 +74,16 @@ export async function initProxy(options: {
 		interface: initDiamond.interface
 	})
 
+	const initParams: InitParamsStruct = {
+		name,
+		symbol,
+		childDepth: ethers.BigNumber.from(childDepth),
+		nonOwnerSplitAllocationAmount: 0,
+		contractURI
+	}
+
 	const functionCall = initDiamond.interface.encodeFunctionData('init', [
-		{
-			name,
-			symbol,
-			childDepth: -1,
-			nonOwnerSplitAllocationAmount: 0,
-			proxyRegistryAddress: '0xf57b2c51ded3a29e6891aba85459d600256cf317',
-			contractURI
-		}
+		initParams
 	])
 
 	console.log({

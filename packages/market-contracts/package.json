@@ -30,7 +30,8 @@
     "console": "hardhat console",
     "watch": "concurrently -r --kill-others \"chokidar 'contracts/**/*.sol' -c 'yarn build:sol'\"",
     "createABI": "tsnd --transpile-only scripts/createABI.ts",
-    "generateTypes": "typechain --target ethers-v5  './types/MeemMarket.json'"
+    "generateTypes": "typechain --target ethers-v5  './types/MeemMarket.json'",
+    "link": "yarn link"
   },
   "publishConfig": {
     "access": "public",
