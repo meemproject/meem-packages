@@ -95,21 +95,21 @@ struct BaseProperties {
 	address mintDatesLockedBy;
 }
 
-struct BasePropertiesInit {
-	int256 totalOriginalsSupply;
-	bool isTotalOriginalsSupplyLocked;
-	MeemPermission[] mintPermissions;
-	bool isMintPermissionsLocked;
-	Split[] splits;
-	bool isSplitsLocked;
-	int256 originalsPerWallet;
-	bool isOriginalsPerWalletLocked;
-	bool isTransferrable;
-	bool isIsTransferrableLocked;
-	int256 mintStartTimestamp;
-	int256 mintEndTimestamp;
-	bool isMintDatesLocked;
-}
+// struct BasePropertiesInit {
+// 	int256 totalOriginalsSupply;
+// 	bool isTotalOriginalsSupplyLocked;
+// 	MeemPermission[] mintPermissions;
+// 	bool isMintPermissionsLocked;
+// 	Split[] splits;
+// 	bool isSplitsLocked;
+// 	int256 originalsPerWallet;
+// 	bool isOriginalsPerWalletLocked;
+// 	bool isTransferrable;
+// 	bool isIsTransferrableLocked;
+// 	int256 mintStartTimestamp;
+// 	int256 mintEndTimestamp;
+// 	bool isMintDatesLocked;
+// }
 
 struct MeemBase {
 	address owner;
@@ -178,7 +178,7 @@ struct InitParams {
 	string symbol;
 	string name;
 	string contractURI;
-	BasePropertiesInit baseProperties;
+	BaseProperties baseProperties;
 	MeemProperties defaultProperties;
 	MeemProperties defaultChildProperties;
 	address[] admins;

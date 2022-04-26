@@ -1,1 +1,2 @@
-export * from './types/ethers-contracts'
+/* eslint-disable import/export */
+export * from './src'

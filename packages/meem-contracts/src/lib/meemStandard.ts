@@ -1,7 +1,9 @@
 export enum Chain {
 	Ethereum,
 	Polygon,
-	Cardano
+	Cardano,
+	Solana,
+	Rinkeby
 }
 
 export enum PermissionType {

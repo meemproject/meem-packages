@@ -4,17 +4,18 @@ pragma solidity ^0.8.4;
 import {LibAccessControl} from './LibAccessControl.sol';
 import {Error} from './Errors.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
-import {BasePropertiesInit, PropertyType, MeemProperties} from '../interfaces/MeemStandard.sol';
+import {BaseProperties, PropertyType, MeemProperties} from '../interfaces/MeemStandard.sol';
 
 library LibContract {
-	function setBaseProperties(BasePropertiesInit memory props) internal {
+	function setBaseProperties(BaseProperties memory props) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
 
 		if (s.baseProperties.totalOriginalsSupplyLockedBy == address(0)) {
 			s.baseProperties.totalOriginalsSupply = props.totalOriginalsSupply;
-			if (props.isTotalOriginalsSupplyLocked) {
-				s.baseProperties.totalOriginalsSupplyLockedBy = msg.sender;
+			if (props.totalOriginalsSupplyLockedBy != address(0)) {
+				s.baseProperties.totalOriginalsSupplyLockedBy = props
+					.totalOriginalsSupplyLockedBy;
 			}
 		}
 
@@ -22,8 +23,9 @@ library LibContract {
 			for (uint256 i = 0; i < props.mintPermissions.length; i++) {
 				s.baseProperties.mintPermissions.push(props.mintPermissions[i]);
 			}
-			if (props.isMintPermissionsLocked) {
-				s.baseProperties.mintPermissionsLockedBy = msg.sender;
+			if (props.mintPermissionsLockedBy != address(0)) {
+				s.baseProperties.mintPermissionsLockedBy = props
+					.mintPermissionsLockedBy;
 			}
 		}
 
@@ -31,30 +33,32 @@ library LibContract {
 			for (uint256 i = 0; i < props.splits.length; i++) {
 				s.baseProperties.splits.push(props.splits[i]);
 			}
-			if (props.isSplitsLocked) {
-				s.baseProperties.splitsLockedBy = msg.sender;
+			if (props.splitsLockedBy != address(0)) {
+				s.baseProperties.splitsLockedBy = props.splitsLockedBy;
 			}
 		}
 
 		if (s.baseProperties.originalsPerWalletLockedBy == address(0)) {
 			s.baseProperties.originalsPerWallet = props.originalsPerWallet;
-			if (props.isOriginalsPerWalletLocked) {
-				s.baseProperties.originalsPerWalletLockedBy = msg.sender;
+			if (props.originalsPerWalletLockedBy != address(0)) {
+				s.baseProperties.originalsPerWalletLockedBy = props
+					.originalsPerWalletLockedBy;
 			}
 		}
 
 		if (s.baseProperties.isTransferrableLockedBy == address(0)) {
 			s.baseProperties.isTransferrable = props.isTransferrable;
-			if (props.isIsTransferrableLocked) {
-				s.baseProperties.isTransferrableLockedBy = msg.sender;
+			if (props.isTransferrableLockedBy != address(0)) {
+				s.baseProperties.isTransferrableLockedBy = props
+					.isTransferrableLockedBy;
 			}
 		}
 
 		if (s.baseProperties.mintDatesLockedBy == address(0)) {
 			s.baseProperties.mintStartTimestamp = props.mintStartTimestamp;
 			s.baseProperties.mintEndTimestamp = props.mintEndTimestamp;
-			if (props.isMintDatesLocked) {
-				s.baseProperties.mintDatesLockedBy = msg.sender;
+			if (props.mintDatesLockedBy != address(0)) {
+				s.baseProperties.mintDatesLockedBy = props.mintDatesLockedBy;
 			}
 		}
 	}

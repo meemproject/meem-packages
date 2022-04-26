@@ -2,6 +2,16 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
+import { meemMintData } from '../src/lib/meemProperties'
+import {
+	Chain,
+	MeemType,
+	Permission,
+	PermissionType,
+	PropertyType,
+	UriSource
+} from '../src/lib/meemStandard'
+import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
 import {
 	ERC721Facet,
@@ -10,16 +20,6 @@ import {
 	MeemPermissionsFacet,
 	MeemQueryFacet
 } from '../typechain'
-import { meemMintData } from './helpers/meemProperties'
-import {
-	Chain,
-	MeemType,
-	Permission,
-	PermissionType,
-	PropertyType,
-	UriSource
-} from './helpers/meemStandard'
-import { zeroAddress } from './helpers/utils'
 
 use(chaiAsPromised)
 

@@ -1,20 +1,25 @@
-import InitDiamondABI from '@meemproject/meem-contracts/abi/contracts/Meem/InitDiamond.sol/InitDiamond.json'
-import IDiamondCutABI from '@meemproject/meem-contracts/abi/contracts/Meem/interfaces/IDiamondCut.sol/IDiamondCut.json'
-import MeemDiamondABI from '@meemproject/meem-contracts/abi/contracts/MeemDiamond.sol/MeemDiamond.json'
-import aft from '@meemproject/meem-contracts/artifacts/contracts/MeemDiamond.sol/MeemDiamond.json'
+import { Contract, ethers, providers } from 'ethers'
+import InitDiamondABI from '../abi/contracts/Meem/InitDiamond.sol/InitDiamond.json'
+import IDiamondCutABI from '../abi/contracts/Meem/interfaces/IDiamondCut.sol/IDiamondCut.json'
+import MeemDiamondABI from '../abi/contracts/MeemDiamond.sol/MeemDiamond.json'
+import aft from '../artifacts/contracts/MeemDiamond.sol/MeemDiamond.json'
 import type {
 	InitParamsStruct,
-	BasePropertiesInitStruct
-} from '@meemproject/meem-contracts/typechain/contracts/Meem/interfaces/MeemStandard.sol/IInitDiamondStandard'
-import type { MeemPropertiesStruct } from '@meemproject/meem-contracts/typechain/contracts/Meem/interfaces/MeemStandard.sol/IMeemBaseStandard'
-import { Contract, ethers, providers } from 'ethers'
-import { FacetCutAction, IFacetCut } from '../lib/diamond'
-import log from '../lib/log'
+	BasePropertiesStruct
+} from '../typechain/contracts/Meem/interfaces/MeemStandard.sol/IInitDiamondStandard'
+import type { MeemPropertiesStruct } from '../typechain/contracts/Meem/interfaces/MeemStandard.sol/IMeemBaseStandard'
+import { FacetCutAction, IFacetCut } from './lib/diamond'
+import log from './lib/log'
+import {
+	defaultBaseProperties,
+	defaultMeemProperties
+} from './lib/meemProperties'
+import { Chain } from './lib/meemStandard'
 import { IVersion, versions } from './versions'
 
 export async function getCuts() {}
 
-export async function deployMeemProxy(options: {
+export async function deployProxy(options: {
 	provider: providers.JsonRpcProvider | providers.Web3Provider
 }) {
 	const { provider } = options
@@ -26,20 +31,22 @@ export async function deployMeemProxy(options: {
 	return deployedProxy
 }
 
-export async function initMeemProxy(options: {
+export async function initProxy(options: {
 	provider: providers.JsonRpcProvider | providers.Web3Provider
 	proxyContractAddress: string
+	chain: Chain.Rinkeby | Chain.Polygon
 	name: string
 	symbol: string
 	contractURI: string
-	baseProperties?: BasePropertiesInitStruct
+	baseProperties?: BasePropertiesStruct
 	defaultProperties?: MeemPropertiesStruct
 	defaultChildProperties?: MeemPropertiesStruct
 	admins?: string[]
 	childDepth?: number
 	nonOwnerSplitAllocationAmount?: number
-
-	version?: IVersion
+	tokenCounterStart?: number
+	version?: number
+	customVersion?: IVersion
 	cuts?: IFacetCut[]
 }) {
 	const {
@@ -48,10 +55,21 @@ export async function initMeemProxy(options: {
 		name,
 		symbol,
 		contractURI,
-		childDepth
+		childDepth,
+		chain,
+		admins,
+		tokenCounterStart
 	} = options
 
-	const version = options.version ?? versions.v1
+	const baseProperties = options.baseProperties ?? defaultBaseProperties
+	const defaultProperties = options.defaultProperties ?? defaultMeemProperties
+	const defaultChildProperties =
+		options.defaultChildProperties ?? defaultMeemProperties
+
+	const version = options.version
+		? versions[chain][options.version]
+		: versions[chain][versions[chain].latest]
+
 	const cuts =
 		options.cuts ??
 		Object.values(version).map(f => ({
@@ -77,9 +95,14 @@ export async function initMeemProxy(options: {
 	const initParams: InitParamsStruct = {
 		name,
 		symbol,
-		childDepth: ethers.BigNumber.from(childDepth),
+		childDepth: ethers.BigNumber.from(childDepth ?? 0),
 		nonOwnerSplitAllocationAmount: 0,
-		contractURI
+		contractURI,
+		admins: admins ?? [],
+		baseProperties,
+		defaultProperties,
+		defaultChildProperties,
+		tokenCounterStart: tokenCounterStart ?? 1
 	}
 
 	const functionCall = initDiamond.interface.encodeFunctionData('init', [

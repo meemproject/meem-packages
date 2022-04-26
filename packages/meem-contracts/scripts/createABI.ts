@@ -9,6 +9,7 @@ import meemPermissionsABI from '../abi/contracts/Meem/facets/MeemPermissionsFace
 import meemQueryABI from '../abi/contracts/Meem/facets/MeemQueryFacet.sol/MeemQueryFacet.json'
 import meemSplitsABI from '../abi/contracts/Meem/facets/MeemSplitsFacet.sol/MeemSplitsFacet.json'
 import reactionsABI from '../abi/contracts/Meem/facets/ReactionFacet.sol/ReactionFacet.json'
+import initFacet from '../abi/contracts/Meem/InitDiamond.sol/InitDiamond.json'
 import meemDiamondABI from '../abi/contracts/MeemDiamond.sol/MeemDiamond.json'
 
 const combinedABI = [
@@ -21,7 +22,8 @@ const combinedABI = [
 	...meemQueryABI,
 	...meemSplitsABI,
 	...meemDiamondABI,
-	...reactionsABI
+	...reactionsABI,
+	...initFacet
 ]
 
 const basePath = path.join(process.cwd(), 'types')

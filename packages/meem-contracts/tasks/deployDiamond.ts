@@ -5,8 +5,8 @@ import fs from 'fs-extra'
 import { task, types } from 'hardhat/config'
 import { HardhatArguments } from 'hardhat/types'
 import packageJson from '../package.json'
-import { meemMintData } from '../test/helpers/meemProperties'
-import { Permission } from '../test/helpers/meemStandard'
+import { defaultMeemProperties } from '../src/lib/meemProperties'
+import { Permission } from '../src/lib/meemStandard'
 import {
 	FacetCutAction,
 	getSelectors,
@@ -188,8 +188,8 @@ export async function deployDiamond(options: {
 					mintEndTimestamp: -1,
 					isMintDatesLocked: false
 				},
-				defaultProperties: meemMintData,
-				defaultChildProperties: meemMintData,
+				defaultProperties: defaultMeemProperties,
+				defaultChildProperties: defaultMeemProperties,
 				admins: [],
 				tokenCounterStart: 100000
 			}
