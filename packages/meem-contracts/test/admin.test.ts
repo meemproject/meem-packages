@@ -98,6 +98,10 @@ describe('Contract Admin', function Test() {
 			.connect(signers[0])
 			.nonOwnerSplitAllocationAmount()
 		assert.equal(splitAmount.toNumber(), 100)
+
+		await (
+			await adminFacet.connect(signers[0]).setNonOwnerSplitAllocationAmount(0)
+		).wait()
 	})
 
 	it('Can not set split amount as non-admin', async () => {

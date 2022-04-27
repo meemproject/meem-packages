@@ -26,6 +26,7 @@ export interface IDeployHistory {
 export async function deployDiamond(options: {
 	args?: {
 		gwei: number
+		deployProxy: boolean
 	}
 	ethers: HardhatEthersHelpers
 	hardhatArguments?: HardhatArguments
@@ -48,6 +49,7 @@ export async function deployDiamond(options: {
 	}
 
 	const wei = args?.gwei ? args.gwei * 1000000000 : undefined
+	const shouldDeployProxy = !!args?.deployProxy
 
 	const accounts = await ethers.getSigners()
 	const contractOwner = accounts[0]
@@ -55,17 +57,22 @@ export async function deployDiamond(options: {
 
 	console.log('Account balance:', (await contractOwner.getBalance()).toString())
 
-	// deploy Diamond
-	const Diamond = await ethers.getContractFactory('MeemDiamond')
+	let diamondAddress = zeroAddress
 
-	const diamond = await Diamond.deploy({
-		gasPrice: wei
-	})
+	if (shouldDeployProxy) {
+		// deploy Diamond
+		const Diamond = await ethers.getContractFactory('MeemDiamond')
 
-	await diamond.deployed()
-	deployedContracts.DiamondProxy = diamond.address
+		const diamond = await Diamond.deploy({
+			gasPrice: wei
+		})
 
-	history[diamond.address] = {}
+		await diamond.deployed()
+		diamondAddress = diamond.address
+	}
+	deployedContracts.DiamondProxy = diamondAddress
+
+	history[diamondAddress] = {}
 
 	// deploy facets
 	console.log('')
@@ -104,19 +111,19 @@ export async function deployDiamond(options: {
 			functionSelectors
 		})
 
-		const previousDeploys = history[diamond.address][facetName]
+		const previousDeploys = history[diamondAddress][facetName]
 			? [
-					...history[diamond.address][facetName].previousDeploys,
+					...history[diamondAddress][facetName].previousDeploys,
 					{
-						version: history[diamond.address][facetName].version ?? 'unknown',
-						address: history[diamond.address][facetName].address,
+						version: history[diamondAddress][facetName].version ?? 'unknown',
+						address: history[diamondAddress][facetName].address,
 						functionSelectors:
-							history[diamond.address][facetName].functionSelectors
+							history[diamondAddress][facetName].functionSelectors
 					}
 			  ]
 			: []
 
-		history[diamond.address][facetName] = {
+		history[diamondAddress][facetName] = {
 			version: packageJson.version,
 			address: facet.address,
 			functionSelectors,
@@ -124,87 +131,89 @@ export async function deployDiamond(options: {
 		}
 	}
 
-	// upgrade diamond with facets
-	console.log('')
-	console.log('Diamond Cut:', cuts)
-	const diamondCut = await ethers.getContractAt('IDiamondCut', diamond.address)
+	if (shouldDeployProxy) {
+		// upgrade diamond with facets
+		console.log('')
+		console.log('Diamond Cut:', cuts)
+		const diamondCut = await ethers.getContractAt('IDiamondCut', diamondAddress)
 
-	// let proxyRegistryAddress = ''
-	let walletAddress = ''
-	const basisPoints = 100
+		// let proxyRegistryAddress = ''
+		let walletAddress = ''
+		const basisPoints = 100
 
-	switch (hardhatArguments?.network) {
-		case 'matic':
-		case 'polygon':
-			walletAddress = '0x9C5ceC7a99D19a9f1754C202aBA01BBFEDECC561'
-			// proxyRegistryAddress = '0x58807baD0B376efc12F5AD86aAc70E78ed67deaE'
-			break
+		switch (hardhatArguments?.network) {
+			case 'matic':
+			case 'polygon':
+				walletAddress = '0x9C5ceC7a99D19a9f1754C202aBA01BBFEDECC561'
+				// proxyRegistryAddress = '0x58807baD0B376efc12F5AD86aAc70E78ed67deaE'
+				break
 
-		case 'rinkeby':
-			// proxyRegistryAddress = '0xf57b2c51ded3a29e6891aba85459d600256cf317'
-			walletAddress = '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5'
-			break
+			case 'rinkeby':
+				// proxyRegistryAddress = '0xf57b2c51ded3a29e6891aba85459d600256cf317'
+				walletAddress = '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5'
+				break
 
-		case 'mainnet':
-			// proxyRegistryAddress = '0xa5409ec958c83c3f309868babaca7c86dcb077c1'
-			walletAddress = '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5'
-			break
+			case 'mainnet':
+				// proxyRegistryAddress = '0xa5409ec958c83c3f309868babaca7c86dcb077c1'
+				walletAddress = '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5'
+				break
 
-		case 'local':
-		default:
-			// proxyRegistryAddress = '0x0000000000000000000000000000000000000000'
-			walletAddress = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'
-			break
-	}
+			case 'local':
+			default:
+				// proxyRegistryAddress = '0x0000000000000000000000000000000000000000'
+				walletAddress = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'
+				break
+		}
 
-	const params: InitParamsStruct = {
-		name: 'Meem',
-		symbol: 'MEEM',
-		childDepth: -1,
-		nonOwnerSplitAllocationAmount: 0,
-		contractURI: `{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/VTsnW6jUgE","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": ${basisPoints}, "fee_recipient": "${walletAddress}"}`,
-		baseProperties: {
-			totalOriginalsSupply: -1,
-			totalOriginalsSupplyLockedBy: zeroAddress,
-			mintPermissions: [
-				{
-					permission: Permission.Anyone,
-					addresses: [],
-					numTokens: 0,
-					lockedBy: '0x0000000000000000000000000000000000000000',
-					costWei: 0
-				}
-			],
-			mintPermissionsLockedBy: zeroAddress,
-			splits: [],
-			splitsLockedBy: zeroAddress,
-			originalsPerWallet: -1,
-			originalsPerWalletLockedBy: zeroAddress,
-			isTransferrable: true,
-			isTransferrableLockedBy: zeroAddress,
-			mintStartTimestamp: -1,
-			mintEndTimestamp: -1,
-			mintDatesLockedBy: zeroAddress
-		},
-		defaultProperties: defaultMeemProperties,
-		defaultChildProperties: defaultMeemProperties,
-		admins: [],
-		tokenCounterStart: 100000
-	}
+		const params: InitParamsStruct = {
+			name: 'Meem',
+			symbol: 'MEEM',
+			childDepth: -1,
+			nonOwnerSplitAllocationAmount: 0,
+			contractURI: `{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/VTsnW6jUgE","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": ${basisPoints}, "fee_recipient": "${walletAddress}"}`,
+			baseProperties: {
+				totalOriginalsSupply: -1,
+				totalOriginalsSupplyLockedBy: zeroAddress,
+				mintPermissions: [
+					{
+						permission: Permission.Anyone,
+						addresses: [],
+						numTokens: 0,
+						lockedBy: '0x0000000000000000000000000000000000000000',
+						costWei: 0
+					}
+				],
+				mintPermissionsLockedBy: zeroAddress,
+				splits: [],
+				splitsLockedBy: zeroAddress,
+				originalsPerWallet: -1,
+				originalsPerWalletLockedBy: zeroAddress,
+				isTransferrable: true,
+				isTransferrableLockedBy: zeroAddress,
+				mintStartTimestamp: -1,
+				mintEndTimestamp: -1,
+				mintDatesLockedBy: zeroAddress
+			},
+			defaultProperties: defaultMeemProperties,
+			defaultChildProperties: defaultMeemProperties,
+			admins: [],
+			tokenCounterStart: 100000
+		}
 
-	// call to init function
-	const functionCall = facets.InitDiamond?.interface.encodeFunctionData(
-		'init',
-		[params]
-	)
+		// call to init function
+		const functionCall = facets.InitDiamond?.interface.encodeFunctionData(
+			'init',
+			[params]
+		)
 
-	const tx = await diamondCut.diamondCut(cuts, diamond.address, functionCall, {
-		gasPrice: wei
-	})
-	console.log('Diamond cut tx: ', tx.hash)
-	const receipt = await tx.wait()
-	if (!receipt.status) {
-		throw Error(`Diamond upgrade failed: ${tx.hash}`)
+		const tx = await diamondCut.diamondCut(cuts, diamondAddress, functionCall, {
+			gasPrice: wei
+		})
+		console.log('Diamond cut tx: ', tx.hash)
+		const receipt = await tx.wait()
+		if (!receipt.status) {
+			throw Error(`Diamond upgrade failed: ${tx.hash}`)
+		}
 	}
 
 	await fs.ensureDir(diamondHistoryPath)
@@ -221,6 +230,13 @@ export async function deployDiamond(options: {
 
 task('deployDiamond', 'Deploys Meem')
 	.addParam('gwei', 'The gwei price', 31, types.int, true)
+	.addParam(
+		'deployProxy',
+		'Deploy a proxy contract with the facets',
+		false,
+		types.boolean,
+		true
+	)
 	.setAction(async (args, { ethers, hardhatArguments }) => {
 		const result = await deployDiamond({ args, ethers, hardhatArguments })
 		return result

@@ -736,10 +736,10 @@ describe('Minting Permissions', function Test() {
 					copyPermissionsLockedBy: signers[2].address,
 					remixPermissionsLockedBy: signers[2].address,
 					readPermissionsLockedBy: signers[2].address
-				},
-				{
-					value: ethers.utils.parseEther('0.01')
 				}
+				// {
+				// 	value: ethers.utils.parseEther('0.01')
+				// }
 			)
 		).wait()
 		const m0 = await queryFacet.getMeem(token0)

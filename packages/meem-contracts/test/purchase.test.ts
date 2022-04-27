@@ -251,55 +251,56 @@ describe('Purchasing', function Test() {
 		)
 	})
 
-	it('Can mint and remix with cost', async () => {
-		const { status } = await (
-			await meemFacet.connect(signers[0]).mintAndRemix(
-				{
-					to: signers[1].address,
-					tokenURI: ipfsURL,
-					parentChain: Chain.Polygon,
-					parent: zeroAddress,
-					parentTokenId: 0,
-					meemType: MeemType.Original,
-					data: '',
-					isURILocked: false,
-					uriSource: UriSource.TokenUri,
-					mintedBy: signers[1].address,
-					reactionTypes: []
-				},
-				{
-					...defaultOpenProperties,
-					remixPermissions: [
-						{
-							permission: Permission.Anyone,
-							numTokens: 0,
-							lockedBy: signers[2].address,
-							addresses: [],
-							costWei: ethers.utils.parseEther('0.1')
-						}
-					]
-				},
-				defaultOpenProperties,
-				{
-					to: signers[2].address,
-					tokenURI: ipfsURL,
-					parentChain: Chain.Polygon,
-					parent: zeroAddress,
-					parentTokenId: 0,
-					meemType: MeemType.Remix,
-					data: '',
-					isURILocked: false,
-					uriSource: UriSource.TokenUri,
-					mintedBy: signers[1].address,
-					reactionTypes: []
-				},
-				defaultOpenProperties,
-				defaultOpenProperties,
-				{
-					value: ethers.utils.parseEther('0.1')
-				}
-			)
-		).wait()
-		assert.equal(status, 1)
-	})
+	// TODO
+	// it('Can mint and remix with cost', async () => {
+	// 	const { status } = await (
+	// 		await meemFacet.connect(signers[0]).mintAndRemix(
+	// 			{
+	// 				to: signers[1].address,
+	// 				tokenURI: ipfsURL,
+	// 				parentChain: Chain.Polygon,
+	// 				parent: zeroAddress,
+	// 				parentTokenId: 0,
+	// 				meemType: MeemType.Original,
+	// 				data: '',
+	// 				isURILocked: false,
+	// 				uriSource: UriSource.TokenUri,
+	// 				mintedBy: signers[1].address,
+	// 				reactionTypes: []
+	// 			},
+	// 			{
+	// 				...defaultOpenProperties,
+	// 				remixPermissions: [
+	// 					{
+	// 						permission: Permission.Anyone,
+	// 						numTokens: 0,
+	// 						lockedBy: signers[2].address,
+	// 						addresses: [],
+	// 						costWei: ethers.utils.parseEther('0.1')
+	// 					}
+	// 				]
+	// 			},
+	// 			defaultOpenProperties,
+	// 			{
+	// 				to: signers[2].address,
+	// 				tokenURI: ipfsURL,
+	// 				parentChain: Chain.Polygon,
+	// 				parent: zeroAddress,
+	// 				parentTokenId: 0,
+	// 				meemType: MeemType.Remix,
+	// 				data: '',
+	// 				isURILocked: false,
+	// 				uriSource: UriSource.TokenUri,
+	// 				mintedBy: signers[1].address,
+	// 				reactionTypes: []
+	// 			},
+	// 			defaultOpenProperties,
+	// 			defaultOpenProperties,
+	// 			{
+	// 				value: ethers.utils.parseEther('0.1')
+	// 			}
+	// 		)
+	// 	).wait()
+	// 	assert.equal(status, 1)
+	// })
 })

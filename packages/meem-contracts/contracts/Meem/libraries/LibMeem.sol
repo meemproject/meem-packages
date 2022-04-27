@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
+import 'hardhat/console.sol';
 import {WrappedItem, PropertyType, PermissionType, MeemPermission, MeemProperties, URISource, MeemMintParameters, Meem, Chain, MeemType, MeemBase, Permission, BaseProperties, Split} from '../interfaces/MeemStandard.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from './LibERC721.sol';
@@ -385,7 +386,7 @@ library LibMeem {
 			meemTypeToPermissionType(meemType)
 		);
 
-		requireProperPermissions(perms);
+		requireProperPermissions(perms, parent.owner);
 	}
 
 	// Checks if "to" can mint a child of tokenId
@@ -425,13 +426,13 @@ library LibMeem {
 			revert(Error.OriginalsPerWalletExceeded);
 		}
 
-		requireProperPermissions(baseProperties.mintPermissions);
+		requireProperPermissions(baseProperties.mintPermissions, address(0));
 	}
 
-	function requireProperPermissions(MeemPermission[] storage permissions)
-		internal
-		view
-	{
+	function requireProperPermissions(
+		MeemPermission[] storage permissions,
+		address tokenOwner
+	) internal view {
 		bool hasPermission = false;
 		bool hasCostBeenSet = false;
 		uint256 costWei = 0;
@@ -455,10 +456,27 @@ library LibMeem {
 				}
 			}
 
+			if (perm.permission == Permission.Owner) {
+				// Allowed if to is in the list of approved addresses
+				if (tokenOwner == msg.sender) {
+					hasPermission = true;
+					break;
+				}
+			}
+
 			if (
 				hasPermission &&
 				(!hasCostBeenSet || (hasCostBeenSet && costWei > perm.costWei))
 			) {
+				console.log('SET COST');
+				console.log(
+					perm.permission == Permission.Anyone
+						? 'anyone'
+						: 'not anyone'
+				);
+				// console.log(perm.permission);
+				// console.log(perm.addresses);
+				console.log(perm.costWei);
 				costWei = perm.costWei;
 				hasCostBeenSet = true;
 			}
@@ -468,6 +486,10 @@ library LibMeem {
 		if (!hasPermission) {
 			revert(Error.NoPermission);
 		}
+
+		console.log('Cost:');
+		console.log(costWei);
+		console.log(msg.value);
 
 		if (costWei != msg.value) {
 			revert(Error.IncorrectMsgValue);

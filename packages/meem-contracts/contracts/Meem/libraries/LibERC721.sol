@@ -464,6 +464,7 @@ library LibERC721 {
 		}
 		s.ownerTokenIds[to].push(tokenId);
 		s.ownerTokenIdIndexes[to][tokenId] = s.ownerTokenIds[to].length - 1;
+		s.meems[tokenId].owner = to;
 
 		if (s.meems[tokenId].meemType == MeemType.Original) {
 			s.originalOwnerTokens[from][tokenId] = false;
@@ -471,32 +472,34 @@ library LibERC721 {
 			s.originalOwnerCount[from]--;
 			s.originalOwnerCount[to]++;
 		} else if (s.meems[tokenId].meemType == MeemType.Copy) {
+			uint256 parentTokenId = s.meems[tokenId].parentTokenId;
 			if (from != address(0)) {
-				uint256 idx = s.copiesOwnerTokenIndexes[from][tokenId];
-				s.copiesOwnerTokens[tokenId][from] = Array.removeAt(
-					s.copiesOwnerTokens[tokenId][from],
+				uint256 idx = s.copiesOwnerTokenIndexes[from][parentTokenId];
+				s.copiesOwnerTokens[parentTokenId][from] = Array.removeAt(
+					s.copiesOwnerTokens[parentTokenId][from],
 					idx
 				);
-				delete s.copiesOwnerTokenIndexes[from][tokenId];
+				delete s.copiesOwnerTokenIndexes[from][parentTokenId];
 			}
-			s.copiesOwnerTokens[tokenId][to].push(tokenId);
-			s.copiesOwnerTokenIndexes[to][tokenId] =
-				s.copiesOwnerTokens[tokenId][to].length -
+			s.copiesOwnerTokens[parentTokenId][to].push(tokenId);
+			s.copiesOwnerTokenIndexes[to][parentTokenId] =
+				s.copiesOwnerTokens[parentTokenId][to].length -
 				1;
 		} else if (s.meems[tokenId].meemType == MeemType.Wrapped) {
 			// TODO: keep track of wrapped
 		} else if (s.meems[tokenId].meemType == MeemType.Remix) {
+			uint256 parentTokenId = s.meems[tokenId].parentTokenId;
 			if (from != address(0)) {
-				uint256 idx = s.remixesOwnerTokenIndexes[from][tokenId];
-				s.remixesOwnerTokens[tokenId][from] = Array.removeAt(
-					s.remixesOwnerTokens[tokenId][from],
+				uint256 idx = s.remixesOwnerTokenIndexes[from][parentTokenId];
+				s.remixesOwnerTokens[parentTokenId][from] = Array.removeAt(
+					s.remixesOwnerTokens[parentTokenId][from],
 					idx
 				);
-				delete s.remixesOwnerTokenIndexes[from][tokenId];
+				delete s.remixesOwnerTokenIndexes[from][parentTokenId];
 			}
-			s.remixesOwnerTokens[tokenId][to].push(tokenId);
-			s.remixesOwnerTokenIndexes[to][tokenId] =
-				s.remixesOwnerTokens[tokenId][to].length -
+			s.remixesOwnerTokens[parentTokenId][to].push(tokenId);
+			s.remixesOwnerTokenIndexes[to][parentTokenId] =
+				s.remixesOwnerTokens[parentTokenId][to].length -
 				1;
 		}
 	}
