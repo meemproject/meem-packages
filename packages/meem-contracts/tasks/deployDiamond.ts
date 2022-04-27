@@ -102,7 +102,9 @@ export async function deployDiamond(options: {
 		})
 		await facet.deployed()
 		facets[facetName] = facet
-		console.log(`${facetName} deployed: ${facet.address}`)
+		console.log(
+			`${facetName} deployed: ${facet.address} w/ tx: ${facet.deployTransaction.hash}`
+		)
 		deployedContracts[facetName] = facet.address
 		const functionSelectors = getSelectors(facet)
 		cuts.push({

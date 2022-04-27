@@ -2,7 +2,6 @@ import { Contract, ethers, providers } from 'ethers'
 import type { Transaction } from 'ethers'
 import InitDiamondABI from '../abi/contracts/Meem/InitDiamond.sol/InitDiamond.json'
 import IDiamondCutABI from '../abi/contracts/Meem/interfaces/IDiamondCut.sol/IDiamondCut.json'
-import MeemDiamondABI from '../abi/contracts/MeemDiamond.sol/MeemDiamond.json'
 import aft from '../artifacts/contracts/MeemDiamond.sol/MeemDiamond.json'
 import type {
 	InitParamsStruct,
@@ -32,7 +31,7 @@ export async function deployProxy(options: {
 }) {
 	const { provider } = options
 	const signer = await provider.getSigner()
-	const proxy = new ethers.ContractFactory(MeemDiamondABI, aft.bytecode, signer)
+	const proxy = new ethers.ContractFactory(aft.abi, aft.bytecode, signer)
 	const deployedProxy = await proxy.deploy()
 	await deployedProxy.deployed()
 
@@ -133,13 +132,37 @@ export async function upgrade(options: {
 	chain: Chain.Rinkeby | Chain.Polygon
 	fromVersion: string
 	toVersion: string
-}): Promise<Transaction> {
+}): Promise<Transaction | undefined> {
 	const { provider, proxyContractAddress, chain, fromVersion, toVersion } =
 		options
 
 	const cuts: ICut[] = []
-	const from = versions[chain].history[fromVersion]
-	const to = versions[chain].history[toVersion]
+	const tags = ['latest', 'beta', 'alpha']
+	const from = tags.includes(fromVersion)
+		? // @ts-ignore
+		  versions[chain].history[versions[chain][fromVersion]]
+		: versions[chain].history[fromVersion]
+	const to = tags.includes(toVersion)
+		? // @ts-ignore
+		  versions[chain].history[versions[chain][toVersion]]
+		: versions[chain].history[toVersion]
+
+	console.log({
+		from,
+		to
+	})
+
+	// const to = versions[chain].history[toVersion]
+
+	if (!from) {
+		log.crit(`Invalid from version specified: ${fromVersion}`)
+		throw new Error('INVALID_FROM_VERSION')
+	}
+	if (!to) {
+		log.crit(`Invalid to version specified: ${toVersion}`)
+		throw new Error('INVALID_TO_VERSION')
+	}
+
 	const toFacetNames = Object.keys(to)
 	const fromFacetNames = Object.keys(from)
 	const diffFacetNames: string[] = []
@@ -226,6 +249,8 @@ export async function upgrade(options: {
 		ethers.constants.AddressZero,
 		'0x'
 	)
+
+	await tx.wait()
 
 	return tx
 }
