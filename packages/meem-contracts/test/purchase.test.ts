@@ -2,7 +2,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
-import { meemMintData } from '../src/lib/meemProperties'
+import { defaultOpenProperties } from '../src/lib/meemProperties'
 import { Chain, MeemType, Permission, UriSource } from '../src/lib/meemStandard'
 import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
@@ -67,7 +67,7 @@ describe('Purchasing', function Test() {
 					mintedBy: signers[0].address
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					remixPermissions: [
 						{
 							permission: Permission.Anyone,
@@ -78,7 +78,7 @@ describe('Purchasing', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -99,7 +99,7 @@ describe('Purchasing', function Test() {
 					mintedBy: signers[2].address
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					remixPermissions: [
 						{
 							permission: Permission.Anyone,
@@ -110,7 +110,7 @@ describe('Purchasing', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		)
 	})
@@ -132,7 +132,7 @@ describe('Purchasing', function Test() {
 					mintedBy: signers[0].address
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					remixPermissions: [
 						{
 							permission: Permission.Anyone,
@@ -143,7 +143,7 @@ describe('Purchasing', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -164,7 +164,7 @@ describe('Purchasing', function Test() {
 					mintedBy: signers[2].address
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					remixPermissions: [
 						{
 							permission: Permission.Anyone,
@@ -175,7 +175,7 @@ describe('Purchasing', function Test() {
 						}
 					]
 				},
-				meemMintData,
+				defaultOpenProperties,
 				{
 					value: ethers.utils.parseEther('0.1')
 				}
@@ -200,7 +200,7 @@ describe('Purchasing', function Test() {
 					mintedBy: signers[0].address
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					remixPermissions: [
 						{
 							permission: Permission.Anyone,
@@ -211,7 +211,7 @@ describe('Purchasing', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -232,7 +232,7 @@ describe('Purchasing', function Test() {
 					mintedBy: signers[2].address
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					remixPermissions: [
 						{
 							permission: Permission.Anyone,
@@ -243,7 +243,7 @@ describe('Purchasing', function Test() {
 						}
 					]
 				},
-				meemMintData,
+				defaultOpenProperties,
 				{
 					value: ethers.utils.parseEther('0.099')
 				}
@@ -268,7 +268,7 @@ describe('Purchasing', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					remixPermissions: [
 						{
 							permission: Permission.Anyone,
@@ -279,7 +279,7 @@ describe('Purchasing', function Test() {
 						}
 					]
 				},
-				meemMintData,
+				defaultOpenProperties,
 				{
 					to: signers[2].address,
 					tokenURI: ipfsURL,
@@ -293,8 +293,8 @@ describe('Purchasing', function Test() {
 					mintedBy: signers[1].address,
 					reactionTypes: []
 				},
-				meemMintData,
-				meemMintData,
+				defaultOpenProperties,
+				defaultOpenProperties,
 				{
 					value: ethers.utils.parseEther('0.1')
 				}

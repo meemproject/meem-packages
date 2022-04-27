@@ -2,7 +2,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
-import { meemMintData } from '../src/lib/meemProperties'
+import { defaultOpenProperties } from '../src/lib/meemProperties'
 import {
 	Chain,
 	MeemType,
@@ -81,7 +81,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -90,7 +90,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -138,7 +138,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -147,7 +147,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -195,7 +195,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							toAddress: '0xbA343C26ad4387345edBB3256e62f4bB73d68a04',
@@ -209,7 +209,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -265,7 +265,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -274,7 +274,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -311,7 +311,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -320,7 +320,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -352,7 +352,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -361,7 +361,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -393,7 +393,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -403,7 +403,7 @@ describe('Set Splits', function Test() {
 					],
 					splitsLockedBy: owner
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -440,7 +440,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -449,7 +449,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -486,7 +486,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -495,7 +495,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 

@@ -2,7 +2,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
-import { meemMintData } from '../src/lib/meemProperties'
+import { defaultOpenProperties } from '../src/lib/meemProperties'
 import { Chain, MeemType, Permission, UriSource } from '../src/lib/meemStandard'
 import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
@@ -63,8 +63,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -90,8 +90,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -114,8 +114,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		)
 	})
@@ -140,8 +140,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -161,8 +161,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -184,8 +184,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		)
 	})
@@ -206,8 +206,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				{ ...meemMintData, totalRemixes: 1 },
-				meemMintData
+				{ ...defaultOpenProperties, totalRemixes: 1 },
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -227,8 +227,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				{ ...meemMintData, totalRemixes: 1 },
-				meemMintData
+				{ ...defaultOpenProperties, totalRemixes: 1 },
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -248,8 +248,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				{ ...meemMintData, totalRemixes: 1 },
-				meemMintData
+				{ ...defaultOpenProperties, totalRemixes: 1 },
+				defaultOpenProperties
 			)
 		)
 	})
@@ -270,8 +270,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				{ ...meemMintData, remixesPerWallet: 1 },
-				meemMintData
+				{ ...defaultOpenProperties, remixesPerWallet: 1 },
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -291,8 +291,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -312,8 +312,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		)
 
@@ -333,8 +333,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 	})
@@ -356,7 +356,7 @@ describe('Minting Permissions', function Test() {
 					mintedBy: signers[0].address
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					remixPermissions: [
 						{
 							permission: Permission.Owner,
@@ -367,7 +367,7 @@ describe('Minting Permissions', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -387,8 +387,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -408,8 +408,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		)
 	})
@@ -431,7 +431,7 @@ describe('Minting Permissions', function Test() {
 					mintedBy: signers[0].address
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					remixPermissions: [
 						{
 							permission: Permission.Addresses,
@@ -442,7 +442,7 @@ describe('Minting Permissions', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -462,8 +462,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -483,8 +483,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		)
 
@@ -504,8 +504,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		)
 	})
@@ -527,7 +527,7 @@ describe('Minting Permissions', function Test() {
 					mintedBy: signers[0].address
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					remixPermissions: [
 						{
 							permission: Permission.Addresses,
@@ -545,7 +545,7 @@ describe('Minting Permissions', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -565,8 +565,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -586,8 +586,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -607,8 +607,8 @@ describe('Minting Permissions', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		)
 	})
@@ -630,7 +630,7 @@ describe('Minting Permissions', function Test() {
 					mintedBy: signers[0].address
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					copyPermissions: [
 						{
 							permission: Permission.Addresses,
@@ -684,7 +684,7 @@ describe('Minting Permissions', function Test() {
 					readPermissionsLockedBy: signers[2].address
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					copyPermissions: [
 						{
 							permission: Permission.Addresses,

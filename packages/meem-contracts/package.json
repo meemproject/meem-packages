@@ -74,7 +74,6 @@
 		"eslint": "^8.13.0",
 		"eslint-config-kengoldfarb": "1.4.1",
 		"ethereum-waffle": "^3.3.0",
-		"ethers": "^5.6.4",
 		"fs-extra": "^10.0.0",
 		"hardhat": "^2.1.1",
 		"hardhat-abi-exporter": "^2.2.1",
@@ -93,6 +92,7 @@
 		"typescript": "^4.6.3"
 	},
 	"dependencies": {
-		"@kengoldfarb/log": "^1.0.5"
+		"@kengoldfarb/log": "^1.0.5",
+		"ethers": "^5.6.4"
 	}
 }

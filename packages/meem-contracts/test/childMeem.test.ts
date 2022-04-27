@@ -2,7 +2,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
-import { meemMintData } from '../src/lib/meemProperties'
+import { defaultOpenProperties } from '../src/lib/meemProperties'
 import { Chain, MeemType, UriSource } from '../src/lib/meemStandard'
 import { deployDiamond } from '../tasks'
 import { MeemBaseFacet, MeemQueryFacet } from '../typechain'
@@ -54,7 +54,7 @@ describe('Child Meem Minting', function Test() {
 					mintedBy: signers[0].address
 				},
 				{
-					...meemMintData
+					...defaultOpenProperties
 					// copyPermissions: [
 					// 	{
 					// 		permission: Permission.Addresses,
@@ -73,9 +73,9 @@ describe('Child Meem Minting', function Test() {
 					// ]
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
-						...meemMintData.splits,
+						...defaultOpenProperties.splits,
 						{
 							toAddress: signers[1].address,
 							amount: 100,
@@ -109,17 +109,17 @@ describe('Child Meem Minting', function Test() {
 					uriSource: UriSource.TokenUri,
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		)
 	})
 
 	it('Can mint child with required splits', async () => {
 		const mintData = {
-			...meemMintData,
+			...defaultOpenProperties,
 			splits: [
-				...meemMintData.splits,
+				...defaultOpenProperties.splits,
 				{
 					toAddress: signers[1].address,
 					amount: 100,
@@ -159,9 +159,9 @@ describe('Child Meem Minting', function Test() {
 
 	it('Can mint child as non-minter role', async () => {
 		const mintData = {
-			...meemMintData,
+			...defaultOpenProperties,
 			splits: [
-				...meemMintData.splits,
+				...defaultOpenProperties.splits,
 				{
 					toAddress: signers[1].address,
 					amount: 100,
@@ -196,9 +196,9 @@ describe('Child Meem Minting', function Test() {
 
 	it('Can mint child as approved wallet address', async () => {
 		const mintData = {
-			...meemMintData,
+			...defaultOpenProperties,
 			splits: [
-				...meemMintData.splits,
+				...defaultOpenProperties.splits,
 				{
 					toAddress: signers[1].address,
 					amount: 100,
@@ -238,9 +238,9 @@ describe('Child Meem Minting', function Test() {
 
 	it('Can not mint copy of copy', async () => {
 		const mintData = {
-			...meemMintData,
+			...defaultOpenProperties,
 			splits: [
-				...meemMintData.splits,
+				...defaultOpenProperties.splits,
 				{
 					toAddress: signers[1].address,
 					amount: 100,
@@ -276,9 +276,9 @@ describe('Child Meem Minting', function Test() {
 
 	it('Can mint with locked URI', async () => {
 		const mintData = {
-			...meemMintData,
+			...defaultOpenProperties,
 			splits: [
-				...meemMintData.splits,
+				...defaultOpenProperties.splits,
 				{
 					toAddress: signers[1].address,
 					amount: 100,

@@ -2,11 +2,11 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
-import { meemMintData } from '../src/lib/meemProperties'
+import { defaultOpenProperties } from '../src/lib/meemProperties'
 import { Chain, MeemType, UriSource } from '../src/lib/meemStandard'
+import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
 import { ERC721Facet, MeemBaseFacet, MeemQueryFacet } from '../typechain'
-import { zeroAddress } from './helpers/utils'
 
 use(chaiAsPromised)
 
@@ -64,8 +64,8 @@ describe('Minting', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		)
 	})
@@ -86,8 +86,8 @@ describe('Minting', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -128,8 +128,8 @@ describe('Minting', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -187,8 +187,8 @@ describe('Minting', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -236,8 +236,8 @@ describe('Minting', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -271,8 +271,8 @@ describe('Minting', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -293,8 +293,8 @@ describe('Minting', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		)
 	})
@@ -335,8 +335,8 @@ describe('Minting', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -356,8 +356,8 @@ describe('Minting', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 	})

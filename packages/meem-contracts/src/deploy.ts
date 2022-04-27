@@ -16,7 +16,14 @@ import {
 	defaultMeemProperties
 } from './lib/meemProperties'
 import { Chain } from './lib/meemStandard'
+import { zeroAddress } from './lib/utils'
 import { IVersion, versions } from './versions'
+
+export interface ICut {
+	facetAddress: string
+	action: FacetCutAction
+	functionSelectors: string[]
+}
 
 export async function getCuts() {}
 
@@ -46,7 +53,7 @@ export async function initProxy(options: {
 	childDepth?: number
 	nonOwnerSplitAllocationAmount?: number
 	tokenCounterStart?: number
-	version?: number
+	version?: string
 	customVersion?: IVersion
 	cuts?: IFacetCut[]
 }): Promise<Transaction> {
@@ -67,9 +74,18 @@ export async function initProxy(options: {
 	const defaultChildProperties =
 		options.defaultChildProperties ?? defaultMeemProperties
 
-	const version = options.version
-		? versions[chain][options.version]
-		: versions[chain][versions[chain].latest]
+	let version = versions[chain].history[versions[chain].latest]
+	if (options.customVersion) {
+		version = options.customVersion
+	} else if (options.version) {
+		// @ts-ignore
+		version = versions[chain][options.version]
+			? // @ts-ignore
+			  versions[chain].history[versions[chain][options.version]]
+			: versions[chain].history[options.version]
+	}
+
+	console.log({ versions, chain, opt: options.version, version })
 
 	const cuts =
 		options.cuts ??
@@ -111,4 +127,105 @@ export async function initProxy(options: {
 	return tx
 }
 
-// export function upgradeProxy(options: {}) {}
+export async function upgrade(options: {
+	provider: providers.JsonRpcProvider | providers.Web3Provider
+	proxyContractAddress: string
+	chain: Chain.Rinkeby | Chain.Polygon
+	fromVersion: string
+	toVersion: string
+}): Promise<Transaction> {
+	const { provider, proxyContractAddress, chain, fromVersion, toVersion } =
+		options
+
+	const cuts: ICut[] = []
+	const from = versions[chain].history[fromVersion]
+	const to = versions[chain].history[toVersion]
+	const toFacetNames = Object.keys(to)
+	const fromFacetNames = Object.keys(from)
+	const diffFacetNames: string[] = []
+
+	// Find new facets and add them
+	toFacetNames.forEach(facetName => {
+		const fromFacetName = fromFacetNames.find(f => f === facetName)
+		if (!fromFacetName) {
+			cuts.push({
+				facetAddress: to[facetName].address,
+				action: FacetCutAction.Add,
+				functionSelectors: to[facetName].functionSelectors
+			})
+		} else {
+			diffFacetNames.push(facetName)
+		}
+	})
+
+	// Find removed facets and remove them
+	fromFacetNames.forEach(facetName => {
+		const toFacetName = toFacetNames.find(f => f === facetName)
+		if (!toFacetName) {
+			cuts.push({
+				facetAddress: to[facetName].address,
+				action: FacetCutAction.Remove,
+				functionSelectors: to[facetName].functionSelectors
+			})
+		}
+	})
+
+	// Perform diff of remaining facets
+	diffFacetNames.forEach(facetName => {
+		const facetSelectors = to[facetName].functionSelectors
+		const previousSelectors = from[facetName].functionSelectors
+		const replaceSelectors: string[] = []
+		const addSelectors: string[] = []
+		const removeSelectors: string[] = []
+
+		facetSelectors.forEach(f => {
+			const prev = previousSelectors.find(ps => ps === f)
+			if (prev) {
+				replaceSelectors.push(f)
+			} else {
+				addSelectors.push(f)
+			}
+		})
+
+		previousSelectors.forEach(ps => {
+			const curr = facetSelectors.find(f => f === ps)
+			if (!curr) {
+				removeSelectors.push(ps)
+			}
+		})
+
+		if (removeSelectors.length > 0) {
+			cuts.push({
+				facetAddress: zeroAddress,
+				action: FacetCutAction.Remove,
+				functionSelectors: removeSelectors
+			})
+		}
+
+		if (replaceSelectors.length > 0) {
+			cuts.push({
+				facetAddress: to[facetName].address,
+				action: FacetCutAction.Replace,
+				functionSelectors: replaceSelectors
+			})
+		}
+
+		if (addSelectors.length > 0) {
+			cuts.push({
+				facetAddress: to[facetName].address,
+				action: FacetCutAction.Add,
+				functionSelectors: addSelectors
+			})
+		}
+	})
+
+	const signer = await provider.getSigner()
+	const diamondCut = new Contract(proxyContractAddress, IDiamondCutABI, signer)
+	const tx = await diamondCut.diamondCut(
+		cuts,
+		ethers.constants.AddressZero,
+		'0x'
+	)
+
+	return tx
+}

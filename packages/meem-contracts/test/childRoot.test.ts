@@ -2,7 +2,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
-import { meemMintData } from '../src/lib/meemProperties'
+import { defaultOpenProperties } from '../src/lib/meemProperties'
 import {
 	Chain,
 	MeemType,
@@ -90,8 +90,8 @@ describe('Child root properties', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -114,8 +114,8 @@ describe('Child root properties', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -142,8 +142,8 @@ describe('Child root properties', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -163,8 +163,8 @@ describe('Child root properties', function Test() {
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)

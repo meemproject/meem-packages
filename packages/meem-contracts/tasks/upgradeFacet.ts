@@ -13,7 +13,7 @@ import { FacetCutAction, getSelectors } from './lib/diamond'
 // 	waitForConfirmation?: boolean
 // }
 
-interface ICut {
+export interface ICut {
 	facetAddress: string
 	action: FacetCutAction
 	functionSelectors: string[]
