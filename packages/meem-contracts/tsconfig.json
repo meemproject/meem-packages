@@ -20,15 +20,14 @@
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
-    "target": "es6",
+    "target": "es6"
   },
   "exclude": ["**/dist"],
   "include": [
     "./tasks",
     "./test",
     "./scripts",
-    "./types",
-    "./src"
+    "./types"
   ],
-  "files": ["./hardhat.config.ts", "./index.ts"]
+  "files": ["./hardhat.config.ts"]
 }

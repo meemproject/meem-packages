@@ -21,7 +21,7 @@
 		"test:build": "waffle",
 		"clean": "rm -rf cache artifacts abi dist typechain types",
 		"clean:modules": "rm -rf node_modules",
-		"build:sol": "hardhat compile && echo 'build:sol Finished'",
+		"build:sol": "TS_NODE_TRANSPILE_ONLY=true hardhat compile && echo 'build:sol Finished'",
 		"build:ts": "tsc -p ./tsconfig.build.json && echo 'build:ts Finished'",
 		"hardhat": "hardhat",
 		"accounts": "hardhat accounts",
