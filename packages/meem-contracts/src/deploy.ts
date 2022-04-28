@@ -1,7 +1,7 @@
 import { Contract, ethers, providers } from 'ethers'
 import type { Transaction } from 'ethers'
-import InitDiamondABI from '../abi/contracts/Meem/InitDiamond.sol/InitDiamond.json'
-import IDiamondCutABI from '../abi/contracts/Meem/interfaces/IDiamondCut.sol/IDiamondCut.json'
+import InitDiamondABI from '../artifacts/contracts/Meem/InitDiamond.sol/InitDiamond.json'
+import IDiamondCutABI from '../artifacts/contracts/Meem/interfaces/IDiamondCut.sol/IDiamondCut.json'
 import aft from '../artifacts/contracts/MeemDiamond.sol/MeemDiamond.json'
 import type {
 	InitParamsStruct,
@@ -96,8 +96,16 @@ export async function initProxy(options: {
 
 	const signer = await provider.getSigner()
 
-	const diamondCut = new Contract(proxyContractAddress, IDiamondCutABI, signer)
-	const initDiamond = new Contract(proxyContractAddress, InitDiamondABI, signer)
+	const diamondCut = new Contract(
+		proxyContractAddress,
+		IDiamondCutABI.abi,
+		signer
+	)
+	const initDiamond = new Contract(
+		proxyContractAddress,
+		InitDiamondABI.abi,
+		signer
+	)
 
 	const initParams: InitParamsStruct = {
 		name,
@@ -243,7 +251,11 @@ export async function upgrade(options: {
 	})
 
 	const signer = await provider.getSigner()
-	const diamondCut = new Contract(proxyContractAddress, IDiamondCutABI, signer)
+	const diamondCut = new Contract(
+		proxyContractAddress,
+		IDiamondCutABI.abi,
+		signer
+	)
 	const tx = await diamondCut.diamondCut(
 		cuts,
 		ethers.constants.AddressZero,
