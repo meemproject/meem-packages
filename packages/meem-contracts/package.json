@@ -17,7 +17,7 @@
 		"artifacts"
 	],
 	"scripts": {
-		"build": "concurrently \"yarn build:sol\" \"yarn build:ts\"",
+		"build": "yarn build:sol && yarn build:ts",
 		"test:build": "waffle",
 		"clean": "rm -rf cache artifacts abi dist typechain types",
 		"clean:modules": "rm -rf node_modules",
