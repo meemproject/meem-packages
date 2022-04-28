@@ -25,8 +25,8 @@ export interface IDeployHistory {
 
 export async function deployDiamond(options: {
 	args?: {
-		gwei: number
-		deployProxy: boolean
+		gwei?: number
+		deployProxy?: boolean
 	}
 	ethers: HardhatEthersHelpers
 	hardhatArguments?: HardhatArguments

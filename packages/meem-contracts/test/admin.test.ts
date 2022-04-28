@@ -34,6 +34,9 @@ describe('Contract Admin', function Test() {
 	before(async () => {
 		signers = await ethers.getSigners()
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
+			args: {
+				deployProxy: true
+			},
 			ethers
 		})
 
