@@ -16,7 +16,8 @@
 		"build": "npm run clean ; tsc ; echo \"Finished Building\"",
 		"lint": "eslint --max-warnings=0 --ext=.ts,.tsx . && tsc -p . --noEmit",
 		"lint:fix": "eslint --fix --ext=.ts,.tsx .",
-		"watch": "yarn run build && chokidar 'src/**/*.(js|jsx|ts|tsx)' -c 'yarn run build'"
+		"watch": "yarn run build && chokidar 'src/**/*.(js|jsx|ts|tsx)' -c 'yarn run build'",
+		"link": "yarn link"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^9.0.13",
@@ -34,7 +35,7 @@
 	"dependencies": {
 		"@kengoldfarb/log": "^1.0.5",
 		"@meemproject/meem-contracts": "^0.1.9",
-		"ethers": "^5.6.3"
+		"ethers": "^5.6.4"
 	},
 	"publishConfig": {
 		"access": "public",

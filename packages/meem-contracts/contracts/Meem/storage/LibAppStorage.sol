@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 import {LibMeta} from '../libraries/LibMeta.sol';
-import {MeemBase, MeemProperties, Chain} from '../interfaces/MeemStandard.sol';
+import {MeemBase, MeemProperties, Chain, BaseProperties} from '../interfaces/MeemStandard.sol';
 
 library LibAppStorage {
 	bytes32 constant DIAMOND_STORAGE_POSITION =
@@ -13,14 +13,15 @@ library LibAppStorage {
 	}
 
 	struct AppStorage {
+		/** DEPRECATED */
 		address proxyRegistryAddress;
 		/** AccessControl Role: Admin */
 		bytes32 ADMIN_ROLE;
-		/** AccessControl Role: Pauser */
+		/** DEPRECATED */
 		bytes32 PAUSER_ROLE;
 		/** AccessControl Role: Minter */
 		bytes32 MINTER_ROLE;
-		/** AccessControl Role: Upgrader */
+		/** DEPRECATED */
 		bytes32 UPGRADER_ROLE;
 		/** Counter of next incremental token */
 		uint256 tokenCounter;
@@ -73,7 +74,7 @@ library LibAppStorage {
 		/** Index of tokenId => allTokens index */
 		mapping(uint256 => uint256) originalMeemTokensIndex;
 		/** MeemID contract address */
-		address meemID;
+		address meemIDContractAddress;
 		mapping(uint256 => uint256[]) copies;
 		mapping(uint256 => mapping(address => uint256[])) copiesOwnerTokens;
 		/** Keep track of "clipped" meems */
@@ -95,6 +96,15 @@ library LibAppStorage {
 		mapping(address => mapping(uint256 => string[])) addressReactions;
 		/** address => token => reaction name => index */
 		mapping(address => mapping(uint256 => mapping(string => uint256))) addressReactionsIndex;
+		BaseProperties baseProperties;
+		MeemProperties defaultProperties;
+		MeemProperties defaultChildProperties;
+		/** Keeping track of  */
+		mapping(address => mapping(uint256 => bool)) originalOwnerTokens;
+		/** Number of original tokens held by a wallet */
+		mapping(address => uint256) originalOwnerCount;
+		mapping(address => mapping(uint256 => uint256)) copiesOwnerTokenIndexes;
+		mapping(address => mapping(uint256 => uint256)) remixesOwnerTokenIndexes;
 	}
 
 	function diamondStorage() internal pure returns (AppStorage storage ds) {

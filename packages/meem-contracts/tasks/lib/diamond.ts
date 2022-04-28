@@ -14,6 +14,7 @@ export interface Contract {
 }
 
 export interface IDeployHistoryFacet {
+	version: string
 	address: string
 	functionSelectors: string[]
 }

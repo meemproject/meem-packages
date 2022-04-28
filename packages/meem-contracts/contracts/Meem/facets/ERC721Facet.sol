@@ -6,12 +6,12 @@ import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibMeta} from '../libraries/LibMeta.sol';
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
-import {Base64} from '../libraries/Base64.sol';
+import {Base64} from '../utils/Base64.sol';
 import {IERC721} from '../interfaces/IERC721.sol';
 import {IERC721Enumerable} from '@solidstate/contracts/token/ERC721/enumerable/IERC721Enumerable.sol';
 import {IERC721Metadata} from '@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol';
 import {ERC721BaseStorage} from '@solidstate/contracts/token/ERC721/base/ERC721BaseStorage.sol';
-import {InvalidToken} from '../libraries/Errors.sol';
+import {Error} from '../libraries/Errors.sol';
 
 contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	function contractURI() external view returns (string memory) {
@@ -209,7 +209,7 @@ contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 		bytes calldata
 	) external view returns (bytes4) {
 		if (msg.sender != address(this)) {
-			revert InvalidToken();
+			revert(Error.InvalidToken);
 		}
 		return
 			bytes4(

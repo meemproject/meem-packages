@@ -2,11 +2,11 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
+import { defaultOpenProperties } from '../src/lib/meemProperties'
+import { Chain, MeemType, Permission, UriSource } from '../src/lib/meemStandard'
+import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
 import { MeemAdminFacet, MeemBaseFacet, MeemQueryFacet } from '../typechain'
-import { meemMintData } from './helpers/meemProperties'
-import { Chain, MeemType, Permission, UriSource } from './helpers/meemStandard'
-import { zeroAddress } from './helpers/utils'
 
 use(chaiAsPromised)
 
@@ -27,6 +27,9 @@ describe('Minting Curation', function Test() {
 		signers = await ethers.getSigners()
 		console.log({ signers })
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
+			args: {
+				deployProxy: true
+			},
 			ethers
 		})
 
@@ -63,8 +66,8 @@ describe('Minting Curation', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -87,8 +90,8 @@ describe('Minting Curation', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				{ ...meemMintData, totalCopies: 1 },
-				meemMintData,
+				{ ...defaultOpenProperties, totalCopies: 1 },
+				defaultOpenProperties,
 				copyAddress
 			)
 		).wait()
@@ -121,8 +124,8 @@ describe('Minting Curation', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData,
+				defaultOpenProperties,
+				defaultOpenProperties,
 				{
 					to: signers[1].address,
 					tokenURI: ipfsURL,
@@ -136,8 +139,8 @@ describe('Minting Curation', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
-import {MissingRequiredRole, NoRenounceOthers} from './Errors.sol';
+import {Error} from './Errors.sol';
 
 library LibAccessControl {
 	/**
@@ -60,7 +60,7 @@ library LibAccessControl {
 
 	function requireRole(bytes32 role) internal view {
 		if (!hasRole(role, msg.sender)) {
-			revert MissingRequiredRole(role);
+			revert(Error.MissingRequiredRole);
 		}
 	}
 
@@ -134,7 +134,7 @@ library LibAccessControl {
 	 */
 	function renounceRole(bytes32 role, address account) internal {
 		if (account != _msgSender()) {
-			revert NoRenounceOthers();
+			revert(Error.NoRenounceOthers);
 		}
 
 		_revokeRole(role, account);

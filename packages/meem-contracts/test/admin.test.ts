@@ -2,6 +2,9 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
+import { defaultOpenProperties } from '../src/lib/meemProperties'
+import { Chain, MeemType, UriSource } from '../src/lib/meemStandard'
+import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
 import {
 	AccessControlFacet,
@@ -11,9 +14,6 @@ import {
 	MeemSplitsFacet,
 	Ownable
 } from '../typechain'
-import { meemMintData } from './helpers/meemProperties'
-import { Chain, MeemType, UriSource } from './helpers/meemStandard'
-import { zeroAddress } from './helpers/utils'
 
 use(chaiAsPromised)
 
@@ -33,8 +33,10 @@ describe('Contract Admin', function Test() {
 
 	before(async () => {
 		signers = await ethers.getSigners()
-		console.log({ signers })
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
+			args: {
+				deployProxy: true
+			},
 			ethers
 		})
 
@@ -99,6 +101,10 @@ describe('Contract Admin', function Test() {
 			.connect(signers[0])
 			.nonOwnerSplitAllocationAmount()
 		assert.equal(splitAmount.toNumber(), 100)
+
+		await (
+			await adminFacet.connect(signers[0]).setNonOwnerSplitAllocationAmount(0)
+		).wait()
 	})
 
 	it('Can not set split amount as non-admin', async () => {
@@ -159,8 +165,8 @@ describe('Contract Admin', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -192,8 +198,8 @@ describe('Contract Admin', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)

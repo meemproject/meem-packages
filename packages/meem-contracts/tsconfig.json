@@ -27,7 +27,8 @@
     "./tasks",
     "./test",
     "./scripts",
-    "./types"
+    "./types",
+    "./src"
   ],
-  "files": ["./hardhat.config.ts"]
+  "files": ["./hardhat.config.ts", "./index.ts"]
 }

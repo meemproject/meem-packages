@@ -19,13 +19,14 @@
     "build": "tsdx build --transpileOnly",
     "test": "tsdx test --passWithNoTests",
     "#lint": "tsdx lint",
-    "lint": "eslint --max-warnings=0 --ext=.ts,.tsx . && tsc -p . --noEmit",
+    "lint": "eslint --max-warnings=0 --ext=.ts,.tsx ./src && tsc -p . --noEmit",
     "lint:fix": "eslint --fix --ext=.ts,.tsx .",
     "#prepare": "tsdx build",
     "size": "size-limit",
     "analyze": "size-limit --why",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "link": "yarn link"
   },
   "publishConfig": {
     "access": "public",

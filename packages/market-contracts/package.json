@@ -30,7 +30,8 @@
     "console": "hardhat console",
     "watch": "concurrently -r --kill-others \"chokidar 'contracts/**/*.sol' -c 'yarn build:sol'\"",
     "createABI": "tsnd --transpile-only scripts/createABI.ts",
-    "generateTypes": "typechain --target ethers-v5  './types/MeemMarket.json'"
+    "generateTypes": "typechain --target ethers-v5  './types/MeemMarket.json'",
+    "link": "yarn link"
   },
   "publishConfig": {
     "access": "public",
@@ -58,7 +59,7 @@
     "eslint": "^8.13.0",
     "eslint-config-kengoldfarb": "1.4.1",
     "ethereum-waffle": "^3.3.0",
-    "ethers": "^5.5.2",
+    "ethers": "^5.6.4",
     "hardhat": "^2.7.0",
     "hardhat-abi-exporter": "^2.3.1",
     "hardhat-contract-sizer": "^2.1.1",

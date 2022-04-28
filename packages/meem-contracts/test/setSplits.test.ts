@@ -2,6 +2,14 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
+import { defaultOpenProperties } from '../src/lib/meemProperties'
+import {
+	Chain,
+	MeemType,
+	PropertyType,
+	UriSource
+} from '../src/lib/meemStandard'
+import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
 import {
 	MeemAdminFacet,
@@ -9,14 +17,6 @@ import {
 	MeemQueryFacet,
 	MeemSplitsFacet
 } from '../typechain'
-import { meemMintData } from './helpers/meemProperties'
-import {
-	Chain,
-	MeemType,
-	PropertyType,
-	UriSource
-} from './helpers/meemStandard'
-import { zeroAddress } from './helpers/utils'
 
 use(chaiAsPromised)
 
@@ -38,6 +38,9 @@ describe('Set Splits', function Test() {
 		signers = await ethers.getSigners()
 		console.log({ signers })
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
+			args: {
+				deployProxy: true
+			},
 			ethers
 		})
 
@@ -81,7 +84,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -90,7 +93,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -138,7 +141,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -147,7 +150,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -195,7 +198,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							toAddress: '0xbA343C26ad4387345edBB3256e62f4bB73d68a04',
@@ -209,7 +212,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -265,7 +268,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -274,7 +277,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -311,7 +314,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -320,7 +323,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -352,7 +355,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -361,7 +364,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -393,7 +396,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -403,7 +406,7 @@ describe('Set Splits', function Test() {
 					],
 					splitsLockedBy: owner
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -440,7 +443,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -449,7 +452,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -486,7 +489,7 @@ describe('Set Splits', function Test() {
 					reactionTypes: []
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					splits: [
 						{
 							amount: 100,
@@ -495,7 +498,7 @@ describe('Set Splits', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 

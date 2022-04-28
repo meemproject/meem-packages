@@ -13,7 +13,8 @@
     "localPackageLink": "yarn && cd packages/react/node_modules/react && yarn link && cd ../react-dom && yarn link",
     "build": "lerna run build",
     "test": "lerna run test --parallel --stream",
-    "watch": "lerna run watch --no-sort --stream"
+    "watch": "lerna run watch --no-sort --stream",
+    "linkAll": "lerna run link"
   },
   "devDependencies": {
     "chokidar-cli": "^3.0.0",

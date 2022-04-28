@@ -24,7 +24,9 @@ enum Permission {
 
 enum PropertyType {
 	Meem,
-	Child
+	Child,
+	DefaultMeem,
+	DefaultChild
 }
 
 enum MeemType {
@@ -70,7 +72,44 @@ struct MeemProperties {
 	address totalCopiesLockedBy;
 	int256 copiesPerWallet;
 	address copiesPerWalletLockedBy;
+	bool isTransferrable;
+	address isTransferrableLockedBy;
+	int256 mintStartTimestamp;
+	int256 mintEndTimestamp;
+	address mintDatesLockedBy;
 }
+
+struct BaseProperties {
+	int256 totalOriginalsSupply;
+	address totalOriginalsSupplyLockedBy;
+	MeemPermission[] mintPermissions;
+	address mintPermissionsLockedBy;
+	Split[] splits;
+	address splitsLockedBy;
+	int256 originalsPerWallet;
+	address originalsPerWalletLockedBy;
+	bool isTransferrable;
+	address isTransferrableLockedBy;
+	int256 mintStartTimestamp;
+	int256 mintEndTimestamp;
+	address mintDatesLockedBy;
+}
+
+// struct BasePropertiesInit {
+// 	int256 totalOriginalsSupply;
+// 	bool isTotalOriginalsSupplyLocked;
+// 	MeemPermission[] mintPermissions;
+// 	bool isMintPermissionsLocked;
+// 	Split[] splits;
+// 	bool isSplitsLocked;
+// 	int256 originalsPerWallet;
+// 	bool isOriginalsPerWalletLocked;
+// 	bool isTransferrable;
+// 	bool isIsTransferrableLocked;
+// 	int256 mintStartTimestamp;
+// 	int256 mintEndTimestamp;
+// 	bool isMintDatesLocked;
+// }
 
 struct MeemBase {
 	address owner;
@@ -133,6 +172,25 @@ struct MeemMintParameters {
 struct Reaction {
 	string reaction;
 	uint256 count;
+}
+
+struct InitParams {
+	string symbol;
+	string name;
+	string contractURI;
+	BaseProperties baseProperties;
+	MeemProperties defaultProperties;
+	MeemProperties defaultChildProperties;
+	address[] admins;
+	uint256 tokenCounterStart;
+	int256 childDepth;
+	uint256 nonOwnerSplitAllocationAmount;
+}
+
+interface IInitDiamondStandard {
+	event MeemContractInitialized(address contractAddress);
+
+	function init(InitParams memory params) external;
 }
 
 interface IMeemBaseStandard {

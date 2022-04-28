@@ -5,3 +5,6 @@ scratch.ts
 typechain
 types
 index.ts
+artifacts
+cache
+abi

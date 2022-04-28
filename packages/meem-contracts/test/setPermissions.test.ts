@@ -2,14 +2,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
-import { deployDiamond } from '../tasks'
-import {
-	MeemAdminFacet,
-	MeemBaseFacet,
-	MeemPermissionsFacet,
-	MeemQueryFacet
-} from '../typechain'
-import { meemMintData } from './helpers/meemProperties'
+import { defaultOpenProperties } from '../src/lib/meemProperties'
 import {
 	Chain,
 	MeemType,
@@ -17,8 +10,15 @@ import {
 	PermissionType,
 	PropertyType,
 	UriSource
-} from './helpers/meemStandard'
-import { zeroAddress } from './helpers/utils'
+} from '../src/lib/meemStandard'
+import { zeroAddress } from '../src/lib/utils'
+import { deployDiamond } from '../tasks'
+import {
+	MeemAdminFacet,
+	MeemBaseFacet,
+	MeemPermissionsFacet,
+	MeemQueryFacet
+} from '../typechain'
 
 use(chaiAsPromised)
 
@@ -40,6 +40,9 @@ describe('Set Permissions', function Test() {
 		signers = await ethers.getSigners()
 		console.log({ signers })
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
+			args: {
+				deployProxy: true
+			},
 			ethers
 		})
 
@@ -82,8 +85,8 @@ describe('Set Permissions', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)
@@ -106,7 +109,7 @@ describe('Set Permissions', function Test() {
 					uriSource: UriSource.TokenUri
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					copyPermissions: [
 						{
 							permission: Permission.Addresses,
@@ -124,7 +127,7 @@ describe('Set Permissions', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -167,7 +170,7 @@ describe('Set Permissions', function Test() {
 					uriSource: UriSource.TokenUri
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					copyPermissions: [
 						{
 							permission: Permission.Addresses,
@@ -186,7 +189,7 @@ describe('Set Permissions', function Test() {
 					],
 					copyPermissionsLockedBy: owner
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -222,7 +225,7 @@ describe('Set Permissions', function Test() {
 					uriSource: UriSource.TokenUri
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					copyPermissions: [
 						{
 							permission: Permission.Addresses,
@@ -240,7 +243,7 @@ describe('Set Permissions', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -276,7 +279,7 @@ describe('Set Permissions', function Test() {
 					uriSource: UriSource.TokenUri
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					copyPermissions: [
 						{
 							permission: Permission.Addresses,
@@ -294,7 +297,7 @@ describe('Set Permissions', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 
@@ -353,7 +356,7 @@ describe('Set Permissions', function Test() {
 					uriSource: UriSource.TokenUri
 				},
 				{
-					...meemMintData,
+					...defaultOpenProperties,
 					copyPermissions: [
 						{
 							permission: Permission.Addresses,
@@ -371,7 +374,7 @@ describe('Set Permissions', function Test() {
 						}
 					]
 				},
-				meemMintData
+				defaultOpenProperties
 			)
 		).wait()
 

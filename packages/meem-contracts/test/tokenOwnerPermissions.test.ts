@@ -2,21 +2,21 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
-import { deployDiamond } from '../tasks'
-import {
-	MeemPermissionsFacet,
-	MeemBaseFacet,
-	MeemQueryFacet
-} from '../typechain'
-import { meemMintData } from './helpers/meemProperties'
+import { defaultOpenProperties } from '../src/lib/meemProperties'
 import {
 	Chain,
 	MeemType,
 	PermissionType,
 	PropertyType,
 	UriSource
-} from './helpers/meemStandard'
-import { zeroAddress } from './helpers/utils'
+} from '../src/lib/meemStandard'
+import { zeroAddress } from '../src/lib/utils'
+import { deployDiamond } from '../tasks'
+import {
+	MeemPermissionsFacet,
+	MeemBaseFacet,
+	MeemQueryFacet
+} from '../typechain'
 
 use(chaiAsPromised)
 
@@ -33,6 +33,9 @@ describe('Token Owner Permissions', function Test() {
 		signers = await ethers.getSigners()
 		console.log({ signers })
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
+			args: {
+				deployProxy: true
+			},
 			ethers
 		})
 
@@ -66,8 +69,8 @@ describe('Token Owner Permissions', function Test() {
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri
 				},
-				meemMintData,
-				meemMintData
+				defaultOpenProperties,
+				defaultOpenProperties
 			)
 		).wait()
 		assert.equal(status, 1)

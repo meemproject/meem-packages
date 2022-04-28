@@ -1,6 +1,6 @@
 import { ERC20, MeemAPI } from '@meemproject/api'
 import erc20ABI from '@meemproject/api/build/abis/ERC20.json'
-import type { MeemMarket } from '@meemproject/market-contracts'
+// import type { MeemMarket } from '@meemproject/market-contracts'
 import auctionABI from '@meemproject/market-contracts/types/MeemMarket.json'
 import type { Meem } from '@meemproject/meem-contracts'
 import meemABI from '@meemproject/meem-contracts/types/Meem.json'
@@ -67,7 +67,8 @@ interface IWalletContextState {
 
 	meemContract?: Meem
 
-	auctionContract?: MeemMarket
+	// auctionContract?: MeemMarket
+	auctionContract?: any
 
 	erc20Contract?: ERC20
 
@@ -131,9 +132,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	const [isAdmin, setIsAdmin] = useState(false)
 	const [meemId, setMeemId] = useState<MeemAPI.IMeemId | undefined>()
 	const [erc20Contract, setERC20Contract] = useState<ERC20 | undefined>()
-	const [auctionContract, setAuctionContract] = useState<
-		MeemMarket | undefined
-	>()
+	const [auctionContract, setAuctionContract] = useState<any | undefined>()
 	const [isConnected, setIsConnected] = useState<boolean>(false)
 	const [isConnectedToWrongNetwork, setIsConnectedToWrongNetwork] =
 		useState(false)
@@ -434,7 +433,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			contractAddressAuction,
 			auctionABI,
 			signer
-		) as unknown as MeemMarket
+		) as unknown as any
 		setAuctionContract(contract)
 	}, [contractAddressAuction, signer])
 
