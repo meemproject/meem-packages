@@ -33,7 +33,7 @@ library LibSplits {
 		Split[] memory splits
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibERC721.requireOwnsToken(tokenId);
+		LibProperties.requireAccess(tokenId, propertyType);
 		MeemProperties storage props = LibProperties.getProperties(
 			tokenId,
 			propertyType
@@ -50,15 +50,35 @@ library LibSplits {
 		for (uint256 i = 0; i < splits.length; i++) {
 			props.splits.push(splits[i]);
 		}
+		address tokenOwner = propertyType == PropertyType.Meem ||
+			propertyType == PropertyType.Child
+			? LibERC721.ownerOf(tokenId)
+			: address(0);
 
-		validateSplits(
-			props,
-			LibERC721.ownerOf(tokenId),
-			s.nonOwnerSplitAllocationAmount
-		);
+		validateSplits(props, tokenOwner, s.nonOwnerSplitAllocationAmount);
 
 		emit SplitsSet(tokenId, propertyType, props.splits);
 		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+	}
+
+	function setBaseSplits(Split[] memory newSplits) internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		validateOverrideSplits(newSplits, s.baseProperties.splits);
+
+		delete s.baseProperties.splits;
+
+		for (uint256 i = 0; i < newSplits.length; i++) {
+			s.baseProperties.splits.push(newSplits[i]);
+		}
+
+		validateSplits(
+			s.baseProperties.splits,
+			address(0),
+			s.nonOwnerSplitAllocationAmount
+		);
+
+		// emit SplitsSet(tokenId, propertyType, currentSplits);
+		// emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
 	function addSplit(
@@ -67,7 +87,7 @@ library LibSplits {
 		Split memory split
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibERC721.requireOwnsToken(tokenId);
+		LibProperties.requireAccess(tokenId, propertyType);
 		MeemProperties storage props = LibProperties.getProperties(
 			tokenId,
 			propertyType
@@ -77,11 +97,13 @@ library LibSplits {
 			revert(Error.PropertyLocked);
 		}
 		props.splits.push(split);
-		validateSplits(
-			props,
-			LibERC721.ownerOf(tokenId),
-			s.nonOwnerSplitAllocationAmount
-		);
+
+		address tokenOwner = propertyType == PropertyType.Meem ||
+			propertyType == PropertyType.Child
+			? LibERC721.ownerOf(tokenId)
+			: address(0);
+
+		validateSplits(props, tokenOwner, s.nonOwnerSplitAllocationAmount);
 		emit SplitsSet(tokenId, propertyType, props.splits);
 		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
@@ -91,7 +113,7 @@ library LibSplits {
 		PropertyType propertyType,
 		uint256 idx
 	) internal {
-		LibERC721.requireOwnsToken(tokenId);
+		LibProperties.requireAccess(tokenId, propertyType);
 		MeemProperties storage props = LibProperties.getProperties(
 			tokenId,
 			propertyType
@@ -124,7 +146,7 @@ library LibSplits {
 		Split memory split
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibERC721.requireOwnsToken(tokenId);
+		LibProperties.requireAccess(tokenId, propertyType);
 		MeemProperties storage props = LibProperties.getProperties(
 			tokenId,
 			propertyType
@@ -138,13 +160,50 @@ library LibSplits {
 		}
 
 		props.splits[idx] = split;
-		validateSplits(
-			props,
-			LibERC721.ownerOf(tokenId),
-			s.nonOwnerSplitAllocationAmount
-		);
+
+		address tokenOwner = propertyType == PropertyType.Meem ||
+			propertyType == PropertyType.Child
+			? LibERC721.ownerOf(tokenId)
+			: address(0);
+
+		validateSplits(props, tokenOwner, s.nonOwnerSplitAllocationAmount);
 		emit SplitsSet(tokenId, propertyType, props.splits);
 		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+	}
+
+	function validateSplits(
+		Split[] storage currentSplits,
+		address tokenOwner,
+		uint256 nonOwnerSplitAllocationAmount
+	) internal view {
+		// Ensure addresses are unique
+		for (uint256 i = 0; i < currentSplits.length; i++) {
+			address split1 = currentSplits[i].toAddress;
+
+			for (uint256 j = 0; j < currentSplits.length; j++) {
+				address split2 = currentSplits[j].toAddress;
+				if (i != j && split1 == split2) {
+					revert('Split addresses must be unique');
+				}
+			}
+		}
+
+		uint256 totalAmount = 0;
+		uint256 totalAmountOfNonOwner = 0;
+		// Require that split amounts
+		for (uint256 i = 0; i < currentSplits.length; i++) {
+			totalAmount += currentSplits[i].amount;
+			if (currentSplits[i].toAddress != tokenOwner) {
+				totalAmountOfNonOwner += currentSplits[i].amount;
+			}
+		}
+
+		if (
+			totalAmount > 10000 ||
+			totalAmountOfNonOwner < nonOwnerSplitAllocationAmount
+		) {
+			revert(Error.InvalidNonOwnerSplitAllocationAmount);
+		}
 	}
 
 	function validateSplits(

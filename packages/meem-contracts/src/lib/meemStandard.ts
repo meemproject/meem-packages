@@ -21,7 +21,9 @@ export enum Permission {
 
 export enum PropertyType {
 	Meem,
-	Child
+	Child,
+	DefaultMeem,
+	DefaultChild
 }
 
 export enum MeemType {

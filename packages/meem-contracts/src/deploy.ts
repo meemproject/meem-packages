@@ -1,8 +1,9 @@
-import { Contract, ethers, providers } from 'ethers'
+import { Contract, ethers } from 'ethers'
 import type { Transaction } from 'ethers'
 import InitDiamondABI from '../artifacts/contracts/Meem/InitDiamond.sol/InitDiamond.json'
 import IDiamondCutABI from '../artifacts/contracts/Meem/interfaces/IDiamondCut.sol/IDiamondCut.json'
 import aft from '../artifacts/contracts/MeemDiamond.sol/MeemDiamond.json'
+import { IDiamondCut, InitDiamond } from '../typechain'
 import type {
 	InitParamsStruct,
 	BasePropertiesStruct
@@ -26,11 +27,8 @@ export interface ICut {
 
 export async function getCuts() {}
 
-export async function deployProxy(options: {
-	provider: providers.JsonRpcProvider | providers.Web3Provider
-}) {
-	const { provider } = options
-	const signer = await provider.getSigner()
+export async function deployProxy(options: { signer: ethers.Signer }) {
+	const { signer } = options
 	const proxy = new ethers.ContractFactory(aft.abi, aft.bytecode, signer)
 	const deployedProxy = await proxy.deploy()
 	await deployedProxy.deployed()
@@ -39,7 +37,7 @@ export async function deployProxy(options: {
 }
 
 export async function initProxy(options: {
-	provider: providers.JsonRpcProvider | providers.Web3Provider
+	signer: ethers.Signer
 	proxyContractAddress: string
 	chain: Chain.Rinkeby | Chain.Polygon
 	name: string
@@ -57,7 +55,7 @@ export async function initProxy(options: {
 	cuts?: IFacetCut[]
 }): Promise<Transaction> {
 	const {
-		provider,
+		signer,
 		proxyContractAddress,
 		name,
 		symbol,
@@ -84,7 +82,7 @@ export async function initProxy(options: {
 			: versions[chain].history[options.version]
 	}
 
-	console.log({ versions, chain, opt: options.version, version })
+	// console.log({ versions, chain, opt: options.version, version })
 
 	const cuts =
 		options.cuts ??
@@ -94,18 +92,16 @@ export async function initProxy(options: {
 			functionSelectors: f.functionSelectors
 		}))
 
-	const signer = await provider.getSigner()
-
 	const diamondCut = new Contract(
 		proxyContractAddress,
 		IDiamondCutABI.abi,
 		signer
-	)
+	) as IDiamondCut
 	const initDiamond = new Contract(
 		proxyContractAddress,
 		InitDiamondABI.abi,
 		signer
-	)
+	) as InitDiamond
 
 	const initParams: InitParamsStruct = {
 		name,
@@ -130,18 +126,18 @@ export async function initProxy(options: {
 		functionCall
 	)
 	log.debug(`Initiating diamond cut tx: ${tx.hash}`)
-	await tx.wait()
+	// await tx.wait()
 	return tx
 }
 
 export async function upgrade(options: {
-	provider: providers.JsonRpcProvider | providers.Web3Provider
+	signer: ethers.Signer
 	proxyContractAddress: string
 	chain: Chain.Rinkeby | Chain.Polygon
 	fromVersion: string
 	toVersion: string
 }): Promise<Transaction | undefined> {
-	const { provider, proxyContractAddress, chain, fromVersion, toVersion } =
+	const { signer, proxyContractAddress, chain, fromVersion, toVersion } =
 		options
 
 	const cuts: ICut[] = []
@@ -154,13 +150,6 @@ export async function upgrade(options: {
 		? // @ts-ignore
 		  versions[chain].history[versions[chain][toVersion]]
 		: versions[chain].history[toVersion]
-
-	console.log({
-		from,
-		to
-	})
-
-	// const to = versions[chain].history[toVersion]
 
 	if (!from) {
 		log.crit(`Invalid from version specified: ${fromVersion}`)
@@ -250,12 +239,12 @@ export async function upgrade(options: {
 		}
 	})
 
-	const signer = await provider.getSigner()
 	const diamondCut = new Contract(
 		proxyContractAddress,
 		IDiamondCutABI.abi,
 		signer
-	)
+	) as IDiamondCut
+
 	const tx = await diamondCut.diamondCut(
 		cuts,
 		ethers.constants.AddressZero,

@@ -4,9 +4,10 @@ pragma experimental ABIEncoderV2;
 
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
+import {LibProperties} from '../libraries/LibProperties.sol';
 import {LibMeem, WrappedItem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
-import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemQueryStandard} from '../interfaces/MeemStandard.sol';
+import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemQueryStandard, BaseProperties} from '../interfaces/MeemStandard.sol';
 import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
@@ -119,5 +120,24 @@ contract MeemQueryFacet is IMeemQueryStandard {
 		returns (uint256[] memory)
 	{
 		return LibMeem.wrappedTokens(items);
+	}
+
+	function getBaseProperties()
+		external
+		view
+		override
+		returns (BaseProperties memory)
+	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return s.baseProperties;
+	}
+
+	function getDefaultProperties(PropertyType propertyType)
+		external
+		view
+		override
+		returns (MeemProperties memory)
+	{
+		return LibProperties.getProperties(0, propertyType);
 	}
 }

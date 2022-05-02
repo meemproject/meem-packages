@@ -275,6 +275,13 @@ interface IMeemQueryStandard {
 		returns (uint256[] memory);
 
 	function getMeem(uint256 tokenId) external view returns (Meem memory);
+
+	function getBaseProperties() external view returns (BaseProperties memory);
+
+	function getDefaultProperties(PropertyType propertyType)
+		external
+		view
+		returns (MeemProperties memory);
 }
 
 interface IMeemAdminStandard {
@@ -294,6 +301,26 @@ interface IMeemAdminStandard {
 		address root,
 		uint256 rootTokenId
 	) external;
+
+	function setBaseSplits(Split[] memory splits) external;
+
+	function setTotalOriginalsSupply(int256 totalSupply) external;
+
+	function setOriginalsPerWallet(int256 originalsPerWallet) external;
+
+	function setIsTransferrable(bool isTransferrable) external;
+
+	function lockBaseSplits() external;
+
+	function lockTotalOriginalsSupply() external;
+
+	function lockOriginalsPerWallet() external;
+
+	function lockIsTransferrable() external;
+
+	function lockMintDates() external;
+
+	function setMintDates(int256 startTimestamp, int256 endTimestamp) external;
 }
 
 interface IMeemSplitsStandard {

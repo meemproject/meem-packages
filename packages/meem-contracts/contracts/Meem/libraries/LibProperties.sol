@@ -5,6 +5,7 @@ import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {PropertyType, MeemProperties, URISource} from '../interfaces/MeemStandard.sol';
 import {LibERC721} from './LibERC721.sol';
 import {LibPermissions} from './LibPermissions.sol';
+import {LibAccessControl} from './LibAccessControl.sol';
 import {LibSplits} from './LibSplits.sol';
 import {Strings} from '../utils/Strings.sol';
 import {Error} from './Errors.sol';
@@ -64,6 +65,27 @@ library LibProperties {
 	event URILockedBySet(uint256 tokenId, address lockedBy);
 
 	event DataSet(uint256 tokenId, string data);
+
+	function requireAccess(uint256 tokenId, PropertyType propertyType)
+		internal
+		view
+	{
+		if (
+			tokenId > 0 &&
+			(propertyType == PropertyType.Meem ||
+				propertyType == PropertyType.Child)
+		) {
+			LibERC721.requireOwnsToken(tokenId);
+		} else if (
+			propertyType == PropertyType.DefaultMeem ||
+			propertyType == PropertyType.DefaultChild
+		) {
+			LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+			LibAccessControl.requireRole(s.ADMIN_ROLE);
+		} else {
+			revert(Error.MissingRequiredRole);
+		}
+	}
 
 	function getProperties(uint256 tokenId, PropertyType propertyType)
 		internal

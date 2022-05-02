@@ -16,6 +16,8 @@ import '@solidstate/contracts/token/ERC721/enumerable/IERC721Enumerable.sol';
 import '@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol';
 import '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
 
+// import 'hardhat/console.sol';
+
 contract InitDiamond is IInitDiamondStandard {
 	using ERC165Storage for ERC165Storage.Layout;
 
