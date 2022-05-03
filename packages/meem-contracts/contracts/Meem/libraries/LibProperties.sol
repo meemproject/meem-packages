@@ -9,13 +9,14 @@ import {LibAccessControl} from './LibAccessControl.sol';
 import {LibSplits} from './LibSplits.sol';
 import {Strings} from '../utils/Strings.sol';
 import {Error} from './Errors.sol';
+import {Events} from './Events.sol';
 
 library LibProperties {
-	event PropertiesSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		MeemProperties props
-	);
+	// event PropertiesSet(
+	// 	uint256 tokenId,
+	// 	PropertyType propertyType,
+	// 	MeemProperties props
+	// );
 
 	event TotalCopiesSet(
 		uint256 tokenId,
@@ -189,7 +190,7 @@ library LibProperties {
 			);
 		}
 
-		emit PropertiesSet(tokenId, propertyType, props);
+		emit Events.PropertiesSet(tokenId, propertyType, props);
 	}
 
 	// Merges the base properties with any overrides

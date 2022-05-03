@@ -17,6 +17,8 @@ library LibPermissions {
 		MeemPermission[] permission
 	);
 
+	event MeemMintPermissionsSet(MeemPermission[] permission);
+
 	function lockPermissions(
 		uint256 tokenId,
 		PropertyType propertyType,
@@ -73,6 +75,25 @@ library LibPermissions {
 		}
 
 		emit PermissionsSet(tokenId, propertyType, permissionType, perms);
+	}
+
+	function setMintPermissions(MeemPermission[] memory permissions) internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+
+		if (s.baseProperties.mintPermissionsLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+
+		// Check if there are any existing locked permissions and if so, verify they're the same as the new permissions
+		validatePermissions(permissions, s.baseProperties.mintPermissions);
+
+		delete s.baseProperties.mintPermissions;
+
+		for (uint256 i = 0; i < permissions.length; i++) {
+			s.baseProperties.mintPermissions.push(permissions[i]);
+		}
+
+		emit MeemMintPermissionsSet(s.baseProperties.mintPermissions);
 	}
 
 	function addPermission(

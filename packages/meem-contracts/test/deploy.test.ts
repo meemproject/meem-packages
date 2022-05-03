@@ -5,31 +5,16 @@ import { Contract } from 'ethers'
 import { ethers } from 'hardhat'
 import _ from 'lodash'
 import { DateTime } from 'luxon'
-import {
-	deployProxy,
-	initProxy,
-	IVersion,
-	versions,
-	PropertyType
-} from '../src'
-import { defaultOpenProperties } from '../src/lib/meemProperties'
-import { Chain, MeemType, Permission, UriSource } from '../src/lib/meemStandard'
+import { deployProxy, initProxy, IVersion } from '../src'
+import { Chain, Permission } from '../src/lib/meemStandard'
 import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
-// import {
-// 	ClippingFacet,
-// 	ERC721Facet,
-// 	MeemAdminFacet,
-// 	MeemBaseFacet,
-// 	MeemPermissionsFacet,
-// 	MeemQueryFacet
-// } from '../typechain'
 import { Meem } from '../types'
 import meemABI from '../types/Meem.json'
 
 use(chaiAsPromised)
 
-// TODO: initProxy call is very slow during tests. why?!?
+// !! These deploy tests are VERY slow to execute (call the diamondCut function) if run using vscode launch with debugger. why?!?
 describe('Deploy', function Test() {
 	// let meemFacet: MeemBaseFacet
 	// let queryFacet: MeemQueryFacet
@@ -58,8 +43,6 @@ describe('Deploy', function Test() {
 
 	before(async () => {
 		signers = await ethers.getSigners()
-		// console.log({ signers })
-		// ethers.getDefaultProvider()
 		const { DiamondProxy } = await deployDiamond({
 			args: {
 				deployProxy: false
@@ -67,27 +50,13 @@ describe('Deploy', function Test() {
 			ethers
 		})
 
-		// facetAddresses.AccessControlFacet = addresses.AccessControlFacet
-		// facetAddresses.ClippingFacet = addresses.ClippingFacet
-		// facetAddresses.ERC721Facet = addresses.ERC721Facet
-		// facetAddresses.InitDiamond = addresses.InitDiamond
-		// facetAddresses.MeemAdminFacet = addresses.MeemAdminFacet
-		// facetAddresses.MeemBaseFacet = addresses.MeemBaseFacet
-		// facetAddresses.MeemPermissionsFacet = addresses.MeemPermissionsFacet
-		// facetAddresses.MeemQueryFacet = addresses.MeemQueryFacet
-		// facetAddresses.MeemSplitsFacet = addresses.MeemSplitsFacet
-		// facetAddresses.ReactionFacet = addresses.ReactionFacet
-
 		const deployHistory = await import('../.diamond/31337.json')
 		// @ts-ignore
 		version = deployHistory[zeroAddress] as IVersion
 	})
 
 	it('Can deploy and init', async () => {
-		// signers = await ethers.getSigners()
-		// console.log({ signers })
 		const provider = ethers.getDefaultProvider()
-		// const signer = await ethers.getSigners()
 		const proxy = await deployProxy({
 			signer: signers[0]
 		})
@@ -123,12 +92,8 @@ describe('Deploy', function Test() {
 		)
 	})
 
-	it.only('Can init custom baseProperties', async () => {
-		console.log('!!! start test')
-		// signers = await ethers.getSigners()
-		// console.log({ signers })
+	it('Can init custom baseProperties', async () => {
 		const provider = ethers.getDefaultProvider()
-		// const signer = await ethers.getSigners()
 		const proxy = await deployProxy({
 			signer: signers[1]
 		})
@@ -197,6 +162,7 @@ describe('Deploy', function Test() {
 		console.log({ baseProperties })
 		// assert.isTrue(_.isEqual(baseProperties, bp))
 		Object.keys(bp).forEach(key => {
+			// TODO: Verify properties
 			console.log(key)
 		})
 	})

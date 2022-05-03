@@ -3,8 +3,9 @@ pragma solidity ^0.8.4;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
+import {LibPermissions} from '../libraries/LibPermissions.sol';
 import {LibSplits} from '../libraries/LibSplits.sol';
-import {IMeemAdminStandard, Chain, Split} from '../interfaces/MeemStandard.sol';
+import {IMeemAdminStandard, Chain, Split, MeemPermission} from '../interfaces/MeemStandard.sol';
 import {Error} from '../libraries/Errors.sol';
 
 contract MeemAdminFacet is IMeemAdminStandard {
@@ -12,6 +13,16 @@ contract MeemAdminFacet is IMeemAdminStandard {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
 		s.tokenCounter = tokenCounter;
+	}
+
+	function setContractInfo(string memory name, string memory symbol)
+		external
+		override
+	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.ADMIN_ROLE);
+		s.name = name;
+		s.symbol = symbol;
 	}
 
 	function setContractURI(string memory newContractURI) external override {
@@ -153,5 +164,14 @@ contract MeemAdminFacet is IMeemAdminStandard {
 
 		s.baseProperties.mintStartTimestamp = startTimestamp;
 		s.baseProperties.mintEndTimestamp = endTimestamp;
+	}
+
+	function setMintPermissions(MeemPermission[] memory permissions)
+		external
+		override
+	{
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.ADMIN_ROLE);
+		LibPermissions.setMintPermissions(permissions);
 	}
 }

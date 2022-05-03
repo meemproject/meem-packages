@@ -277,8 +277,14 @@ library LibMeem {
 			leftover = leftover - amt;
 		}
 
-		if (leftover > 0 && tokenId > 0) {
-			payable(s.meems[tokenId].owner).transfer(leftover);
+		if (leftover > 0) {
+			if (tokenId == 0) {
+				// Original being minted. Refund difference back to the sender
+				payable(msg.sender).transfer(leftover);
+			} else {
+				// Existing token transfer. Pay the current owner before transferring to new owner
+				payable(s.meems[tokenId].owner).transfer(leftover);
+			}
 		}
 	}
 

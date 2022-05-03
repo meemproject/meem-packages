@@ -321,6 +321,10 @@ interface IMeemAdminStandard {
 	function lockMintDates() external;
 
 	function setMintDates(int256 startTimestamp, int256 endTimestamp) external;
+
+	function setContractInfo(string memory name, string memory symbol) external;
+
+	function setMintPermissions(MeemPermission[] memory permissions) external;
 }
 
 interface IMeemSplitsStandard {
