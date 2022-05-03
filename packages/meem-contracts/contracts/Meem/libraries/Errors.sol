@@ -20,6 +20,7 @@ library Error {
 	string public constant ERC721ReceiverNotImplemented =
 		'ERC721_RECEIVER_NOT_IMPLEMENTED';
 	string public constant ToAddressInvalid = 'TO_ADDRESS_INVALID';
+	string public constant TransfersLocked = 'TRANSFERS_LOCKED';
 	string public constant NoTransferWrappedNFT = 'NO_TRANSFER_WRAPPED_NFT';
 	string public constant NFTAlreadyWrapped = 'NFT_ALREADY_WRAPPED';
 	string public constant PropertyLocked = 'PROPERTY_LOCKED';

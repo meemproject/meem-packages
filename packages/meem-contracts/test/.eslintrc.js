@@ -8,6 +8,7 @@ module.exports = {
 		'no-redeclare': 0,
 		'@typescript-eslint/no-unused-vars': 0,
 		'@typescript-eslint/naming-convention': 0,
-		'no-console': 0
+		'no-console': 0,
+		'import/no-extraneous-dependencies': 0
 	}
 }

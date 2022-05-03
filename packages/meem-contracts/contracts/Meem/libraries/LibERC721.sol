@@ -444,6 +444,17 @@ library LibERC721 {
 			revert(Error.NotTokenAdmin);
 		} else if (ownerOf(tokenId) != from) {
 			revert(Error.NotTokenOwner);
+		} else if (
+			s.meems[tokenId].meemType == MeemType.Original &&
+			!s.baseProperties.isTransferrable
+		) {
+			revert(Error.TransfersLocked);
+		} else if (
+			(s.meems[tokenId].meemType == MeemType.Remix ||
+				s.meems[tokenId].meemType == MeemType.Copy) &&
+			!s.meemProperties[tokenId].isTransferrable
+		) {
+			revert(Error.TransfersLocked);
 		}
 
 		if (to == address(0)) {

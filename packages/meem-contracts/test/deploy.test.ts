@@ -11,11 +11,13 @@ import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
 import { Meem } from '../types'
 import meemABI from '../types/Meem.json'
+import { MeemContracts } from './helpers'
 
 use(chaiAsPromised)
 
 // !! These deploy tests are VERY slow to execute (call the diamondCut function) if run using vscode launch with debugger. why?!?
 describe('Deploy', function Test() {
+	let contracts: MeemContracts
 	// let meemFacet: MeemBaseFacet
 	// let queryFacet: MeemQueryFacet
 	let signers: SignerWithAddress[]
