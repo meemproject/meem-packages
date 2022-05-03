@@ -7,6 +7,7 @@ import {LibMeem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {Meem, MeemType, URISource} from '../interfaces/MeemStandard.sol';
 import {Error} from '../libraries/Errors.sol';
+import {MeemERC721Events} from '../libraries/Events.sol';
 import '../interfaces/IERC721TokenReceiver.sol';
 
 library LibERC721 {
@@ -56,6 +57,7 @@ library LibERC721 {
 		updateStorageMappingsForTokenTransfer(owner, address(0), tokenId);
 
 		emit Transfer(owner, address(0), tokenId);
+		emit MeemERC721Events.MeemTransfer(owner, address(0), tokenId);
 	}
 
 	///@notice Query the universal totalSupply of all NFTs ever minted
@@ -209,6 +211,11 @@ library LibERC721 {
 
 		s.operatorApprovals[_msgSender()][operator] = approved;
 		emit ApprovalForAll(_msgSender(), operator, approved);
+		emit MeemERC721Events.MeemApprovalForAll(
+			_msgSender(),
+			operator,
+			approved
+		);
 	}
 
 	/**
@@ -401,6 +408,7 @@ library LibERC721 {
 		s.mintedTokens[tokenId] = true;
 
 		emit Transfer(address(0), to, tokenId);
+		emit MeemERC721Events.MeemTransfer(address(0), to, tokenId);
 	}
 
 	/**
@@ -448,6 +456,7 @@ library LibERC721 {
 		updateStorageMappingsForTokenTransfer(from, to, tokenId);
 
 		emit Transfer(from, to, tokenId);
+		emit MeemERC721Events.MeemTransfer(from, to, tokenId);
 	}
 
 	function updateStorageMappingsForTokenTransfer(
@@ -513,6 +522,7 @@ library LibERC721 {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		s.tokenApprovals[tokenId] = to;
 		emit Approval(ownerOf(tokenId), to, tokenId);
+		emit MeemERC721Events.MeemApproval(ownerOf(tokenId), to, tokenId);
 	}
 
 	/**

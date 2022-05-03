@@ -174,4 +174,10 @@ contract MeemAdminFacet is IMeemAdminStandard {
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
 		LibPermissions.setMintPermissions(permissions);
 	}
+
+	function lockMintPermissions() external override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.ADMIN_ROLE);
+		LibPermissions.lockMintPermissions();
+	}
 }

@@ -5,14 +5,11 @@ import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {PropertyType, Split, MeemProperties, MeemType} from '../interfaces/MeemStandard.sol';
 import {LibERC721} from './LibERC721.sol';
 import {Error} from './Errors.sol';
+import {MeemEvents, MeemBaseEvents} from './Events.sol';
 import {LibProperties} from './LibProperties.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
 library LibSplits {
-	event SplitsSet(uint256 tokenId, PropertyType propertyType, Split[] splits);
-	// Rarible royalties event
-	event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
-
 	function lockSplits(uint256 tokenId, PropertyType propertyType) internal {
 		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = LibProperties.getProperties(
@@ -57,8 +54,8 @@ library LibSplits {
 
 		validateSplits(props, tokenOwner, s.nonOwnerSplitAllocationAmount);
 
-		emit SplitsSet(tokenId, propertyType, props.splits);
-		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+		emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
+		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
 	function setBaseSplits(Split[] memory newSplits) internal {
@@ -77,8 +74,7 @@ library LibSplits {
 			s.nonOwnerSplitAllocationAmount
 		);
 
-		// emit SplitsSet(tokenId, propertyType, currentSplits);
-		// emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+		emit MeemBaseEvents.MeemSplitsSet(s.baseProperties.splits);
 	}
 
 	function addSplit(
@@ -104,8 +100,8 @@ library LibSplits {
 			: address(0);
 
 		validateSplits(props, tokenOwner, s.nonOwnerSplitAllocationAmount);
-		emit SplitsSet(tokenId, propertyType, props.splits);
-		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+		emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
+		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
 	function removeSplitAt(
@@ -135,8 +131,8 @@ library LibSplits {
 		}
 
 		props.splits.pop();
-		emit SplitsSet(tokenId, propertyType, props.splits);
-		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+		emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
+		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
 	function updateSplitAt(
@@ -167,8 +163,8 @@ library LibSplits {
 			: address(0);
 
 		validateSplits(props, tokenOwner, s.nonOwnerSplitAllocationAmount);
-		emit SplitsSet(tokenId, propertyType, props.splits);
-		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+		emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
+		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
 	function validateSplits(

@@ -6,24 +6,9 @@ import {LibERC721} from './LibERC721.sol';
 import {Array} from '../utils/Array.sol';
 import {Reaction} from '../interfaces/MeemStandard.sol';
 import {Error} from './Errors.sol';
+import {MeemEvents} from './Events.sol';
 
 library LibReaction {
-	event TokenReactionAdded(
-		uint256 tokenId,
-		address addy,
-		string reaction,
-		uint256 newTotalReactions
-	);
-
-	event TokenReactionRemoved(
-		uint256 tokenId,
-		address addy,
-		string reaction,
-		uint256 newTotalReactions
-	);
-
-	event TokenReactionTypesSet(uint256 tokenId, string[] reactionTypes);
-
 	function addReaction(uint256 tokenId, string memory reaction) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
@@ -39,7 +24,7 @@ library LibReaction {
 
 		s.tokenReactions[tokenId][reaction]++;
 
-		emit TokenReactionAdded(
+		emit MeemEvents.MeemTokenReactionAdded(
 			tokenId,
 			msg.sender,
 			reaction,
@@ -62,7 +47,7 @@ library LibReaction {
 
 		s.tokenReactions[tokenId][reaction]--;
 
-		emit TokenReactionRemoved(
+		emit MeemEvents.MeemTokenReactionRemoved(
 			tokenId,
 			msg.sender,
 			reaction,
@@ -91,7 +76,7 @@ library LibReaction {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		s.meems[tokenId].reactionTypes = reactionTypes;
 
-		emit TokenReactionTypesSet(tokenId, reactionTypes);
+		emit MeemEvents.MeemTokenReactionTypesSet(tokenId, reactionTypes);
 	}
 
 	function getReactions(uint256 tokenId)

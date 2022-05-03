@@ -9,64 +9,9 @@ import {LibAccessControl} from './LibAccessControl.sol';
 import {LibSplits} from './LibSplits.sol';
 import {Strings} from '../utils/Strings.sol';
 import {Error} from './Errors.sol';
-import {Events} from './Events.sol';
+import {MeemEvents} from './Events.sol';
 
 library LibProperties {
-	// event PropertiesSet(
-	// 	uint256 tokenId,
-	// 	PropertyType propertyType,
-	// 	MeemProperties props
-	// );
-
-	event TotalCopiesSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		int256 newTotalCopies
-	);
-	event TotalCopiesLocked(
-		uint256 tokenId,
-		PropertyType propertyType,
-		address lockedBy
-	);
-	event CopiesPerWalletSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		int256 newTotalRemixes
-	);
-	event TotalRemixesSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		int256 newTotalRemixes
-	);
-	event TotalRemixesLocked(
-		uint256 tokenId,
-		PropertyType propertyType,
-		address lockedBy
-	);
-	event RemixesPerWalletSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		int256 newTotalRemixes
-	);
-	event CopiesPerWalletLocked(
-		uint256 tokenId,
-		PropertyType propertyType,
-		address lockedBy
-	);
-	event RemixesPerWalletLocked(
-		uint256 tokenId,
-		PropertyType propertyType,
-		address lockedBy
-	);
-
-	event URISourceSet(uint256 tokenId, URISource uriSource);
-
-	event URISet(uint256 tokenId, string uri);
-
-	event URILockedBySet(uint256 tokenId, address lockedBy);
-
-	event DataSet(uint256 tokenId, string data);
-
 	function requireAccess(uint256 tokenId, PropertyType propertyType)
 		internal
 		view
@@ -190,7 +135,7 @@ library LibProperties {
 			);
 		}
 
-		emit Events.PropertiesSet(tokenId, propertyType, props);
+		emit MeemEvents.MeemPropertiesSet(tokenId, propertyType, props);
 	}
 
 	// Merges the base properties with any overrides
@@ -297,7 +242,11 @@ library LibProperties {
 		}
 
 		props.totalCopies = newTotalCopies;
-		emit TotalCopiesSet(tokenId, propertyType, newTotalCopies);
+		emit MeemEvents.MeemTotalCopiesSet(
+			tokenId,
+			propertyType,
+			newTotalCopies
+		);
 	}
 
 	function lockTotalCopies(uint256 tokenId, PropertyType propertyType)
@@ -314,7 +263,11 @@ library LibProperties {
 		}
 
 		props.totalCopiesLockedBy = msg.sender;
-		emit TotalCopiesLocked(tokenId, propertyType, msg.sender);
+		emit MeemEvents.MeemTotalCopiesLocked(
+			tokenId,
+			propertyType,
+			msg.sender
+		);
 	}
 
 	function setCopiesPerWallet(
@@ -333,7 +286,11 @@ library LibProperties {
 		}
 
 		props.copiesPerWallet = newTotalCopies;
-		emit CopiesPerWalletSet(tokenId, propertyType, newTotalCopies);
+		emit MeemEvents.MeemCopiesPerWalletSet(
+			tokenId,
+			propertyType,
+			newTotalCopies
+		);
 	}
 
 	function lockCopiesPerWallet(uint256 tokenId, PropertyType propertyType)
@@ -350,7 +307,11 @@ library LibProperties {
 		}
 
 		props.copiesPerWalletLockedBy = msg.sender;
-		emit CopiesPerWalletLocked(tokenId, propertyType, msg.sender);
+		emit MeemEvents.MeemCopiesPerWalletLocked(
+			tokenId,
+			propertyType,
+			msg.sender
+		);
 	}
 
 	function setTotalRemixes(
@@ -379,7 +340,11 @@ library LibProperties {
 		}
 
 		props.totalRemixes = newTotalRemixes;
-		emit TotalRemixesSet(tokenId, propertyType, newTotalRemixes);
+		emit MeemEvents.MeemTotalRemixesSet(
+			tokenId,
+			propertyType,
+			newTotalRemixes
+		);
 	}
 
 	function lockTotalRemixes(uint256 tokenId, PropertyType propertyType)
@@ -396,7 +361,11 @@ library LibProperties {
 		}
 
 		props.totalRemixesLockedBy = msg.sender;
-		emit TotalRemixesLocked(tokenId, propertyType, msg.sender);
+		emit MeemEvents.MeemTotalRemixesLocked(
+			tokenId,
+			propertyType,
+			msg.sender
+		);
 	}
 
 	function setRemixesPerWallet(
@@ -415,7 +384,11 @@ library LibProperties {
 		}
 
 		props.remixesPerWallet = newTotalRemixes;
-		emit RemixesPerWalletSet(tokenId, propertyType, newTotalRemixes);
+		emit MeemEvents.MeemRemixesPerWalletSet(
+			tokenId,
+			propertyType,
+			newTotalRemixes
+		);
 	}
 
 	function lockRemixesPerWallet(uint256 tokenId, PropertyType propertyType)
@@ -432,7 +405,11 @@ library LibProperties {
 		}
 
 		props.remixesPerWalletLockedBy = msg.sender;
-		emit RemixesPerWalletLocked(tokenId, propertyType, msg.sender);
+		emit MeemEvents.MeemRemixesPerWalletLocked(
+			tokenId,
+			propertyType,
+			msg.sender
+		);
 	}
 
 	function setData(uint256 tokenId, string memory data) internal {
@@ -443,7 +420,7 @@ library LibProperties {
 		}
 
 		s.meems[tokenId].data = data;
-		emit DataSet(tokenId, s.meems[tokenId].data);
+		emit MeemEvents.MeemDataSet(tokenId, s.meems[tokenId].data);
 	}
 
 	function lockUri(uint256 tokenId) internal {
@@ -466,7 +443,10 @@ library LibProperties {
 
 		s.meems[tokenId].uriLockedBy = msg.sender;
 
-		emit URILockedBySet(tokenId, s.meems[tokenId].uriLockedBy);
+		emit MeemEvents.MeemURILockedBySet(
+			tokenId,
+			s.meems[tokenId].uriLockedBy
+		);
 	}
 
 	function setURISource(uint256 tokenId, URISource uriSource) internal {
@@ -477,7 +457,7 @@ library LibProperties {
 		}
 
 		s.meems[tokenId].uriSource = uriSource;
-		emit URISourceSet(tokenId, uriSource);
+		emit MeemEvents.MeemURISourceSet(tokenId, uriSource);
 	}
 
 	function setTokenUri(uint256 tokenId, string memory uri) internal {
@@ -489,7 +469,7 @@ library LibProperties {
 
 		s.tokenURIs[tokenId] = uri;
 
-		emit URISet(tokenId, uri);
+		emit MeemEvents.MeemURISet(tokenId, uri);
 	}
 
 	// function requirePropertiesAccess(uint256 tokenId, PropertyType propertyType)

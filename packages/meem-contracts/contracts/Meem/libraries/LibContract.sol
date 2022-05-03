@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import {LibAccessControl} from './LibAccessControl.sol';
+import {MeemBaseEvents} from './Events.sol';
 import {Error} from './Errors.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {BaseProperties, PropertyType, MeemProperties} from '../interfaces/MeemStandard.sol';

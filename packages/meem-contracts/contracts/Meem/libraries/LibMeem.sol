@@ -12,12 +12,9 @@ import {LibProperties} from './LibProperties.sol';
 import {LibPermissions} from './LibPermissions.sol';
 import {Strings} from '../utils/Strings.sol';
 import {Error} from '../libraries/Errors.sol';
+import {MeemEvents} from '../libraries/Events.sol';
 
 library LibMeem {
-	event TokenClipped(uint256 tokenId, address addy);
-
-	event TokenUnClipped(uint256 tokenId, address addy);
-
 	function mint(
 		MeemMintParameters memory params,
 		MeemProperties memory mProperties,
@@ -545,7 +542,7 @@ library LibMeem {
 			1;
 		s.hasAddressClipped[msg.sender][tokenId] = true;
 
-		emit TokenClipped(tokenId, msg.sender);
+		emit MeemEvents.MeemClipped(tokenId, msg.sender);
 	}
 
 	function unClip(uint256 tokenId) internal {
@@ -567,7 +564,7 @@ library LibMeem {
 		s.addressClippingsIndex[msg.sender][tokenId] = 0;
 		s.hasAddressClipped[msg.sender][tokenId] = false;
 
-		emit TokenUnClipped(tokenId, msg.sender);
+		emit MeemEvents.MeemUnClipped(tokenId, msg.sender);
 	}
 
 	function tokenClippings(uint256 tokenId)
