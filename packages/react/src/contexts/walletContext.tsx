@@ -273,7 +273,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 
 				const data = [
 					{
-						chainId: '31337',
+						chainId: '0x7A69',
 						chainName: 'Localhost:8545',
 						nativeCurrency: {
 							name: 'Local',

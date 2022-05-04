@@ -120,6 +120,8 @@ export async function initProxy(options: {
 		initParams
 	])
 
+	console.log({ cuts, proxyContractAddress, functionCall })
+
 	const tx = await diamondCut.diamondCut(
 		cuts,
 		proxyContractAddress,

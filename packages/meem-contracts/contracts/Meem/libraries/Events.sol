@@ -197,5 +197,5 @@ library MeemEvents {
 		Split[] splits
 	);
 	// Rarible royalties event
-	event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
+	// event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
 }
