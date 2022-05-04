@@ -123,6 +123,11 @@ library LibProperties {
 		props.remixPermissionsLockedBy = newProps.remixPermissionsLockedBy;
 		props.readPermissionsLockedBy = newProps.readPermissionsLockedBy;
 		props.splitsLockedBy = newProps.splitsLockedBy;
+		props.isTransferrable = newProps.isTransferrable;
+		props.isTransferrableLockedBy = newProps.isTransferrableLockedBy;
+		props.mintStartTimestamp = newProps.mintStartTimestamp;
+		props.mintEndTimestamp = newProps.mintEndTimestamp;
+		props.mintDatesLockedBy = newProps.mintDatesLockedBy;
 
 		if (
 			propertyType == PropertyType.Meem ||
@@ -166,6 +171,18 @@ library LibProperties {
 			mergedProps.remixesPerWalletLockedBy = overrideProps
 				.remixesPerWalletLockedBy;
 			mergedProps.remixesPerWallet = overrideProps.remixesPerWallet;
+		}
+
+		if (overrideProps.isTransferrableLockedBy != address(0)) {
+			mergedProps.isTransferrableLockedBy = overrideProps
+				.isTransferrableLockedBy;
+			mergedProps.isTransferrable = overrideProps.isTransferrable;
+		}
+
+		if (overrideProps.mintDatesLockedBy != address(0)) {
+			mergedProps.mintDatesLockedBy = overrideProps.mintDatesLockedBy;
+			mergedProps.mintStartTimestamp = overrideProps.mintStartTimestamp;
+			mergedProps.mintEndTimestamp = overrideProps.mintEndTimestamp;
 		}
 
 		// Merge / validate properties
