@@ -5,14 +5,11 @@ import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {PropertyType, Split, MeemProperties, MeemType} from '../interfaces/MeemStandard.sol';
 import {LibERC721} from './LibERC721.sol';
 import {Error} from './Errors.sol';
+import {MeemEvents, MeemBaseEvents} from './Events.sol';
 import {LibProperties} from './LibProperties.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
 library LibSplits {
-	event SplitsSet(uint256 tokenId, PropertyType propertyType, Split[] splits);
-	// Rarible royalties event
-	event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
-
 	function lockSplits(uint256 tokenId, PropertyType propertyType) internal {
 		LibERC721.requireOwnsToken(tokenId);
 		MeemProperties storage props = LibProperties.getProperties(
@@ -33,7 +30,7 @@ library LibSplits {
 		Split[] memory splits
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibERC721.requireOwnsToken(tokenId);
+		LibProperties.requireAccess(tokenId, propertyType);
 		MeemProperties storage props = LibProperties.getProperties(
 			tokenId,
 			propertyType
@@ -50,15 +47,34 @@ library LibSplits {
 		for (uint256 i = 0; i < splits.length; i++) {
 			props.splits.push(splits[i]);
 		}
+		address tokenOwner = propertyType == PropertyType.Meem ||
+			propertyType == PropertyType.Child
+			? LibERC721.ownerOf(tokenId)
+			: address(0);
+
+		validateSplits(props, tokenOwner, s.nonOwnerSplitAllocationAmount);
+
+		emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
+		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+	}
+
+	function setBaseSplits(Split[] memory newSplits) internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		validateOverrideSplits(newSplits, s.baseProperties.splits);
+
+		delete s.baseProperties.splits;
+
+		for (uint256 i = 0; i < newSplits.length; i++) {
+			s.baseProperties.splits.push(newSplits[i]);
+		}
 
 		validateSplits(
-			props,
-			LibERC721.ownerOf(tokenId),
+			s.baseProperties.splits,
+			address(0),
 			s.nonOwnerSplitAllocationAmount
 		);
 
-		emit SplitsSet(tokenId, propertyType, props.splits);
-		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+		emit MeemBaseEvents.MeemSplitsSet(s.baseProperties.splits);
 	}
 
 	function addSplit(
@@ -67,7 +83,7 @@ library LibSplits {
 		Split memory split
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibERC721.requireOwnsToken(tokenId);
+		LibProperties.requireAccess(tokenId, propertyType);
 		MeemProperties storage props = LibProperties.getProperties(
 			tokenId,
 			propertyType
@@ -77,13 +93,15 @@ library LibSplits {
 			revert(Error.PropertyLocked);
 		}
 		props.splits.push(split);
-		validateSplits(
-			props,
-			LibERC721.ownerOf(tokenId),
-			s.nonOwnerSplitAllocationAmount
-		);
-		emit SplitsSet(tokenId, propertyType, props.splits);
-		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+
+		address tokenOwner = propertyType == PropertyType.Meem ||
+			propertyType == PropertyType.Child
+			? LibERC721.ownerOf(tokenId)
+			: address(0);
+
+		validateSplits(props, tokenOwner, s.nonOwnerSplitAllocationAmount);
+		emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
+		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
 	function removeSplitAt(
@@ -91,7 +109,7 @@ library LibSplits {
 		PropertyType propertyType,
 		uint256 idx
 	) internal {
-		LibERC721.requireOwnsToken(tokenId);
+		LibProperties.requireAccess(tokenId, propertyType);
 		MeemProperties storage props = LibProperties.getProperties(
 			tokenId,
 			propertyType
@@ -113,8 +131,8 @@ library LibSplits {
 		}
 
 		props.splits.pop();
-		emit SplitsSet(tokenId, propertyType, props.splits);
-		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+		emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
+		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
 	function updateSplitAt(
@@ -124,7 +142,7 @@ library LibSplits {
 		Split memory split
 	) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibERC721.requireOwnsToken(tokenId);
+		LibProperties.requireAccess(tokenId, propertyType);
 		MeemProperties storage props = LibProperties.getProperties(
 			tokenId,
 			propertyType
@@ -138,13 +156,50 @@ library LibSplits {
 		}
 
 		props.splits[idx] = split;
-		validateSplits(
-			props,
-			LibERC721.ownerOf(tokenId),
-			s.nonOwnerSplitAllocationAmount
-		);
-		emit SplitsSet(tokenId, propertyType, props.splits);
-		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+
+		address tokenOwner = propertyType == PropertyType.Meem ||
+			propertyType == PropertyType.Child
+			? LibERC721.ownerOf(tokenId)
+			: address(0);
+
+		validateSplits(props, tokenOwner, s.nonOwnerSplitAllocationAmount);
+		emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
+		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+	}
+
+	function validateSplits(
+		Split[] storage currentSplits,
+		address tokenOwner,
+		uint256 nonOwnerSplitAllocationAmount
+	) internal view {
+		// Ensure addresses are unique
+		for (uint256 i = 0; i < currentSplits.length; i++) {
+			address split1 = currentSplits[i].toAddress;
+
+			for (uint256 j = 0; j < currentSplits.length; j++) {
+				address split2 = currentSplits[j].toAddress;
+				if (i != j && split1 == split2) {
+					revert('Split addresses must be unique');
+				}
+			}
+		}
+
+		uint256 totalAmount = 0;
+		uint256 totalAmountOfNonOwner = 0;
+		// Require that split amounts
+		for (uint256 i = 0; i < currentSplits.length; i++) {
+			totalAmount += currentSplits[i].amount;
+			if (currentSplits[i].toAddress != tokenOwner) {
+				totalAmountOfNonOwner += currentSplits[i].amount;
+			}
+		}
+
+		if (
+			totalAmount > 10000 ||
+			totalAmountOfNonOwner < nonOwnerSplitAllocationAmount
+		) {
+			revert(Error.InvalidNonOwnerSplitAllocationAmount);
+		}
 	}
 
 	function validateSplits(

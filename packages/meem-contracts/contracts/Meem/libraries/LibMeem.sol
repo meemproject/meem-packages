@@ -2,8 +2,9 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
-import 'hardhat/console.sol';
+// import 'hardhat/console.sol';
 import {WrappedItem, PropertyType, PermissionType, MeemPermission, MeemProperties, URISource, MeemMintParameters, Meem, Chain, MeemType, MeemBase, Permission, BaseProperties, Split} from '../interfaces/MeemStandard.sol';
+import {IERC721} from '../interfaces/IERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from './LibERC721.sol';
 import {LibAccessControl} from './LibAccessControl.sol';
@@ -12,12 +13,11 @@ import {LibProperties} from './LibProperties.sol';
 import {LibPermissions} from './LibPermissions.sol';
 import {Strings} from '../utils/Strings.sol';
 import {Error} from '../libraries/Errors.sol';
+import {MeemEvents} from '../libraries/Events.sol';
+
+import 'hardhat/console.sol';
 
 library LibMeem {
-	event TokenClipped(uint256 tokenId, address addy);
-
-	event TokenUnClipped(uint256 tokenId, address addy);
-
 	function mint(
 		MeemMintParameters memory params,
 		MeemProperties memory mProperties,
@@ -277,8 +277,14 @@ library LibMeem {
 			leftover = leftover - amt;
 		}
 
-		if (leftover > 0 && tokenId > 0) {
-			payable(s.meems[tokenId].owner).transfer(leftover);
+		if (leftover > 0) {
+			if (tokenId == 0) {
+				// Original being minted. Refund difference back to the sender
+				payable(msg.sender).transfer(leftover);
+			} else {
+				// Existing token transfer. Pay the current owner before transferring to new owner
+				payable(s.meems[tokenId].owner).transfer(leftover);
+			}
 		}
 	}
 
@@ -464,19 +470,36 @@ library LibMeem {
 				}
 			}
 
+			if (perm.permission == Permission.Holders) {
+				console.log('Checking holders', msg.sender);
+				// Check each address
+				for (uint256 j = 0; j < perm.addresses.length; j++) {
+					console.log('Checking address', perm.addresses[j]);
+					uint256 balance = IERC721(perm.addresses[j]).balanceOf(
+						msg.sender
+					);
+					console.log('Balance: ', balance);
+					console.log('numTokens: ', perm.numTokens);
+					if (balance >= perm.numTokens) {
+						hasPermission = true;
+						break;
+					}
+				}
+			}
+
 			if (
 				hasPermission &&
 				(!hasCostBeenSet || (hasCostBeenSet && costWei > perm.costWei))
 			) {
-				console.log('SET COST');
-				console.log(
-					perm.permission == Permission.Anyone
-						? 'anyone'
-						: 'not anyone'
-				);
-				// console.log(perm.permission);
-				// console.log(perm.addresses);
-				console.log(perm.costWei);
+				// console.log('SET COST');
+				// console.log(
+				// 	perm.permission == Permission.Anyone
+				// 		? 'anyone'
+				// 		: 'not anyone'
+				// );
+				// // console.log(perm.permission);
+				// // console.log(perm.addresses);
+				// console.log(perm.costWei);
 				costWei = perm.costWei;
 				hasCostBeenSet = true;
 			}
@@ -487,9 +510,9 @@ library LibMeem {
 			revert(Error.NoPermission);
 		}
 
-		console.log('Cost:');
-		console.log(costWei);
-		console.log(msg.value);
+		// console.log('Cost:');
+		// console.log(costWei);
+		// console.log(msg.value);
 
 		if (costWei != msg.value) {
 			revert(Error.IncorrectMsgValue);
@@ -539,7 +562,7 @@ library LibMeem {
 			1;
 		s.hasAddressClipped[msg.sender][tokenId] = true;
 
-		emit TokenClipped(tokenId, msg.sender);
+		emit MeemEvents.MeemClipped(tokenId, msg.sender);
 	}
 
 	function unClip(uint256 tokenId) internal {
@@ -561,7 +584,7 @@ library LibMeem {
 		s.addressClippingsIndex[msg.sender][tokenId] = 0;
 		s.hasAddressClipped[msg.sender][tokenId] = false;
 
-		emit TokenUnClipped(tokenId, msg.sender);
+		emit MeemEvents.MeemUnClipped(tokenId, msg.sender);
 	}
 
 	function tokenClippings(uint256 tokenId)

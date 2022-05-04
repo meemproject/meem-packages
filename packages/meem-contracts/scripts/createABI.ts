@@ -10,6 +10,11 @@ import meemQueryABI from '../artifacts/contracts/Meem/facets/MeemQueryFacet.sol/
 import meemSplitsABI from '../artifacts/contracts/Meem/facets/MeemSplitsFacet.sol/MeemSplitsFacet.json'
 import reactionsABI from '../artifacts/contracts/Meem/facets/ReactionFacet.sol/ReactionFacet.json'
 import initFacet from '../artifacts/contracts/Meem/InitDiamond.sol/InitDiamond.json'
+import accessControlEventsABI from '../artifacts/contracts/Meem/libraries/Events.sol/AccessControlEvents.json'
+import initEventsABI from '../artifacts/contracts/Meem/libraries/Events.sol/InitEvents.json'
+import meemBaseEventsABI from '../artifacts/contracts/Meem/libraries/Events.sol/MeemBaseEvents.json'
+import meemERC721EventsABI from '../artifacts/contracts/Meem/libraries/Events.sol/MeemERC721Events.json'
+import meemEventsABI from '../artifacts/contracts/Meem/libraries/Events.sol/MeemEvents.json'
 import meemDiamondABI from '../artifacts/contracts/MeemDiamond.sol/MeemDiamond.json'
 
 const combinedABI = [
@@ -23,7 +28,12 @@ const combinedABI = [
 	...meemSplitsABI.abi,
 	...meemDiamondABI.abi,
 	...reactionsABI.abi,
-	...initFacet.abi
+	...initFacet.abi,
+	...accessControlEventsABI.abi,
+	...initEventsABI.abi,
+	...meemBaseEventsABI.abi,
+	...meemERC721EventsABI.abi,
+	...meemEventsABI.abi
 ]
 
 const basePath = path.join(process.cwd(), 'types')

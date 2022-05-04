@@ -83,6 +83,11 @@ const config: HardhatUserConfig = {
 			accounts: process.env.LOCAL_MNEMONIC
 				? { mnemonic: process.env.LOCAL_MNEMONIC }
 				: [process.env.LOCAL_WALLET_PRIVATE_KEY!].filter(Boolean)
+		},
+		hardhat: {
+			mining: {
+				auto: true
+			}
 		}
 	},
 	etherscan: {

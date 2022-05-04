@@ -8,15 +8,9 @@ import {LibProperties} from './LibProperties.sol';
 import {LibSplits} from './LibSplits.sol';
 import {Array} from '../utils/Array.sol';
 import {Error} from './Errors.sol';
+import {MeemBaseEvents, MeemEvents} from './Events.sol';
 
 library LibPermissions {
-	event PermissionsSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		PermissionType permissionType,
-		MeemPermission[] permission
-	);
-
 	function lockPermissions(
 		uint256 tokenId,
 		PropertyType propertyType,
@@ -72,7 +66,43 @@ library LibPermissions {
 			perms.push(permissions[i]);
 		}
 
-		emit PermissionsSet(tokenId, propertyType, permissionType, perms);
+		emit MeemEvents.MeemPermissionsSet(
+			tokenId,
+			propertyType,
+			permissionType,
+			perms
+		);
+	}
+
+	function lockMintPermissions() internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+
+		if (s.baseProperties.mintPermissionsLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+
+		s.baseProperties.mintPermissionsLockedBy = msg.sender;
+	}
+
+	function setMintPermissions(MeemPermission[] memory permissions) internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+
+		if (s.baseProperties.mintPermissionsLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+
+		// Check if there are any existing locked permissions and if so, verify they're the same as the new permissions
+		validatePermissions(permissions, s.baseProperties.mintPermissions);
+
+		delete s.baseProperties.mintPermissions;
+
+		for (uint256 i = 0; i < permissions.length; i++) {
+			s.baseProperties.mintPermissions.push(permissions[i]);
+		}
+
+		emit MeemBaseEvents.MeemMintPermissionsSet(
+			s.baseProperties.mintPermissions
+		);
 	}
 
 	function addPermission(
@@ -91,7 +121,12 @@ library LibPermissions {
 		MeemPermission[] storage perms = getPermissions(props, permissionType);
 		perms.push(permission);
 
-		emit PermissionsSet(tokenId, propertyType, permissionType, perms);
+		emit MeemEvents.MeemPermissionsSet(
+			tokenId,
+			propertyType,
+			permissionType,
+			perms
+		);
 	}
 
 	function removePermissionAt(
@@ -122,7 +157,12 @@ library LibPermissions {
 		}
 
 		perms.pop();
-		emit PermissionsSet(tokenId, propertyType, permissionType, perms);
+		emit MeemEvents.MeemPermissionsSet(
+			tokenId,
+			propertyType,
+			permissionType,
+			perms
+		);
 	}
 
 	function updatePermissionAt(
@@ -146,7 +186,12 @@ library LibPermissions {
 		}
 
 		perms[idx] = permission;
-		emit PermissionsSet(tokenId, propertyType, permissionType, perms);
+		emit MeemEvents.MeemPermissionsSet(
+			tokenId,
+			propertyType,
+			permissionType,
+			perms
+		);
 	}
 
 	function validatePermissions(

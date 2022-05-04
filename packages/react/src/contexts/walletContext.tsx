@@ -268,6 +268,28 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 					})
 					log.warn(tx)
 				}
+			} else if (requiredNetworkName === 'localhost') {
+				// If network should be matic, switch to matic
+
+				const data = [
+					{
+						chainId: '0x7A69',
+						chainName: 'Localhost:8545',
+						nativeCurrency: {
+							name: 'Local',
+							symbol: 'LOCAL',
+							decimals: 18
+						},
+						rpcUrls: ['https://localhost:8545/']
+					}
+				]
+				if (ethereum !== undefined) {
+					const tx = await ethereum.request({
+						method: 'wallet_addEthereumChain',
+						params: data
+					})
+					log.warn(tx)
+				}
 			}
 		} else {
 			log.debug(`required network name = ${requiredNetworkName}`)

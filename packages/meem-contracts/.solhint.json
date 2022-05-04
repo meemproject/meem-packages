@@ -1,0 +1,15 @@
+{
+	"extends": "solhint:recommended",
+	"plugins": [],
+	"rules": {
+		"quotes": [
+			"error",
+			"single"
+		],
+		"const-name-snakecase": "off",
+		"compiler-version": [
+			"error",
+			"^0.8.4"
+		]
+	}
+}

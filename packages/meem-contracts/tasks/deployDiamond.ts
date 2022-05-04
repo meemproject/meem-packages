@@ -15,6 +15,20 @@ import {
 	IDeployHistoryFacet
 } from './lib/diamond'
 
+export interface IFacets {
+	AccessControlFacet: Ethers.Contract | null
+	ClippingFacet: Ethers.Contract | null
+	ERC721Facet: Ethers.Contract | null
+	InitDiamond: Ethers.Contract | null
+	MeemAdminFacet: Ethers.Contract | null
+	MeemBaseFacet: Ethers.Contract | null
+	MeemPermissionsFacet: Ethers.Contract | null
+	MeemQueryFacet: Ethers.Contract | null
+	MeemSplitsFacet: Ethers.Contract | null
+	ReactionFacet: Ethers.Contract | null
+	[key: string]: Ethers.Contract | null
+}
+
 export interface IDeployHistory {
 	[proxyAddress: string]: {
 		[facetName: string]: IDeployHistoryFacet & {
@@ -78,7 +92,7 @@ export async function deployDiamond(options: {
 	console.log('')
 	console.log('Deploying facets')
 
-	const facets: Record<string, Ethers.Contract | null> = {
+	const facets: IFacets = {
 		AccessControlFacet: null,
 		ClippingFacet: null,
 		ERC721Facet: null,

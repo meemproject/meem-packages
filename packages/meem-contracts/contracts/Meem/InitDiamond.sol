@@ -10,11 +10,14 @@ import {IDiamondLoupe} from './interfaces/IDiamondLoupe.sol';
 import {IRoyaltiesProvider} from '../royalties/IRoyaltiesProvider.sol';
 import {IMeemBaseStandard, IMeemSplitsStandard, IMeemPermissionsStandard, IInitDiamondStandard, InitParams, PropertyType} from './interfaces/MeemStandard.sol';
 import {Error} from './libraries/Errors.sol';
+import {InitEvents} from './libraries/Events.sol';
 import '@solidstate/contracts/introspection/ERC165.sol';
 import '@solidstate/contracts/token/ERC721/IERC721.sol';
 import '@solidstate/contracts/token/ERC721/enumerable/IERC721Enumerable.sol';
 import '@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol';
 import '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
+
+// import 'hardhat/console.sol';
 
 contract InitDiamond is IInitDiamondStandard {
 	using ERC165Storage for ERC165Storage.Layout;
@@ -80,6 +83,6 @@ contract InitDiamond is IInitDiamondStandard {
 			params.defaultChildProperties
 		);
 
-		emit MeemContractInitialized(address(this));
+		emit InitEvents.MeemContractInitialized(address(this));
 	}
 }

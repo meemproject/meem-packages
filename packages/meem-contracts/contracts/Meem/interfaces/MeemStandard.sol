@@ -188,18 +188,10 @@ struct InitParams {
 }
 
 interface IInitDiamondStandard {
-	event MeemContractInitialized(address contractAddress);
-
 	function init(InitParams memory params) external;
 }
 
 interface IMeemBaseStandard {
-	event PropertiesSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		MeemProperties props
-	);
-
 	function mint(
 		MeemMintParameters memory params,
 		MeemProperties memory properties,
@@ -275,6 +267,13 @@ interface IMeemQueryStandard {
 		returns (uint256[] memory);
 
 	function getMeem(uint256 tokenId) external view returns (Meem memory);
+
+	function getBaseProperties() external view returns (BaseProperties memory);
+
+	function getDefaultProperties(PropertyType propertyType)
+		external
+		view
+		returns (MeemProperties memory);
 }
 
 interface IMeemAdminStandard {
@@ -294,11 +293,35 @@ interface IMeemAdminStandard {
 		address root,
 		uint256 rootTokenId
 	) external;
+
+	function setBaseSplits(Split[] memory splits) external;
+
+	function setTotalOriginalsSupply(int256 totalSupply) external;
+
+	function setOriginalsPerWallet(int256 originalsPerWallet) external;
+
+	function setIsTransferrable(bool isTransferrable) external;
+
+	function lockBaseSplits() external;
+
+	function lockTotalOriginalsSupply() external;
+
+	function lockOriginalsPerWallet() external;
+
+	function lockIsTransferrable() external;
+
+	function lockMintDates() external;
+
+	function setMintDates(int256 startTimestamp, int256 endTimestamp) external;
+
+	function setContractInfo(string memory name, string memory symbol) external;
+
+	function setMintPermissions(MeemPermission[] memory permissions) external;
+
+	function lockMintPermissions() external;
 }
 
 interface IMeemSplitsStandard {
-	event SplitsSet(uint256 tokenId, PropertyType propertyType, Split[] splits);
-
 	function nonOwnerSplitAllocationAmount() external view returns (uint256);
 
 	function lockSplits(uint256 tokenId, PropertyType propertyType) external;
@@ -330,62 +353,6 @@ interface IMeemSplitsStandard {
 }
 
 interface IMeemPermissionsStandard {
-	event TotalCopiesSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		int256 newTotalCopies
-	);
-	event TotalCopiesLocked(
-		uint256 tokenId,
-		PropertyType propertyType,
-		address lockedBy
-	);
-	event CopiesPerWalletSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		int256 newTotalCopies
-	);
-	event CopiesPerWalletLocked(
-		uint256 tokenId,
-		PropertyType propertyType,
-		address lockedBy
-	);
-	event TotalRemixesSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		int256 newTotalRemixes
-	);
-	event TotalRemixesLocked(
-		uint256 tokenId,
-		PropertyType propertyType,
-		address lockedBy
-	);
-	event RemixesPerWalletSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		int256 newTotalRemixes
-	);
-	event RemixesPerWalletLocked(
-		uint256 tokenId,
-		PropertyType propertyType,
-		address lockedBy
-	);
-
-	event PermissionsSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		PermissionType permissionType,
-		MeemPermission[] permission
-	);
-
-	event URISourceSet(uint256 tokenId, URISource uriSource);
-
-	event URISet(uint256 tokenId, string uri);
-
-	event URILockedBySet(uint256 tokenId, address lockedBy);
-
-	event DataSet(uint256 tokenId, string data);
-
 	function lockPermissions(
 		uint256 tokenId,
 		PropertyType propertyType,
@@ -467,10 +434,6 @@ interface IMeemPermissionsStandard {
 }
 
 interface IClippingStandard {
-	event TokenClipped(uint256 tokenId, address addy);
-
-	event TokenUnClipped(uint256 tokenId, address addy);
-
 	function clip(uint256 tokenId) external;
 
 	function unClip(uint256 tokenId) external;
@@ -494,22 +457,6 @@ interface IClippingStandard {
 }
 
 interface IReactionStandard {
-	event TokenReactionAdded(
-		uint256 tokenId,
-		address addy,
-		string reaction,
-		uint256 newTotalReactions
-	);
-
-	event TokenReactionRemoved(
-		uint256 tokenId,
-		address addy,
-		string reaction,
-		uint256 newTotalReactions
-	);
-
-	event TokenReactionTypesSet(uint256 tokenId, string[] reactionTypes);
-
 	function addReaction(uint256 tokenId, string memory reaction) external;
 
 	function removeReaction(uint256 tokenId, string memory reaction) external;
