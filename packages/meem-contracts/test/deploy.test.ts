@@ -52,9 +52,9 @@ describe('Deploy', function Test() {
 			ethers
 		})
 
+		// @ts-ignore
 		// eslint-disable-next-line import/no-unresolved
 		const deployHistory = await import('../.diamond/31337.json')
-		// @ts-ignore
 		version = deployHistory[zeroAddress] as IVersion
 	})
 
