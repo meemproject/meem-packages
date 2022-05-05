@@ -26,7 +26,7 @@ describe('Minting', function Test() {
 
 	before(async () => {
 		signers = await ethers.getSigners()
-		console.log({ signers })
+
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
 			args: {
 				deployProxy: true
@@ -154,7 +154,6 @@ describe('Minting', function Test() {
 		assert.equal(tokenIds[0].toNumber(), token1)
 
 		const meem = await queryFacet.connect(signers[2]).getMeem(token1)
-		console.log({ meem, zero: meem[0] })
 		assert.equal(meem.owner, signers[2].address)
 
 		await assert.isRejected(
@@ -198,13 +197,11 @@ describe('Minting', function Test() {
 
 		let meem = await queryFacet.connect(signers[2]).getMeem(token2)
 		assert.equal(meem.generation.toNumber(), 1)
-		console.log({ meem, contractAddress })
 		assert.equal(meem.owner, signers[2].address)
 		assert.equal(meem.parent, contractAddress)
 		assert.equal(meem.root, contractAddress)
 
 		const ca = await erc721Facet.contractAddress()
-		console.log({ contractAddress: ca })
 
 		const transferResult = await (
 			await erc721Facet
@@ -214,7 +211,6 @@ describe('Minting', function Test() {
 		assert.equal(transferResult.status, 1)
 
 		meem = await queryFacet.connect(signers[2]).getMeem(token2)
-		console.log({ meem, contractAddress })
 		assert.equal(meem.owner, owner)
 		assert.equal(meem.parent, contractAddress)
 		assert.equal(meem.root, contractAddress)

@@ -41,7 +41,7 @@ describe('Child root properties', function Test() {
 
 	beforeEach(async () => {
 		signers = await ethers.getSigners()
-		console.log({ signers })
+
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
 			args: {
 				deployProxy: true

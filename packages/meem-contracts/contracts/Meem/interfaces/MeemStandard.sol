@@ -338,6 +338,11 @@ interface IMeemAdminStandard {
 	function setTransferLockup(uint256 lockupUntil) external;
 
 	function lockTransferLockup() external;
+
+	function setProperties(
+		PropertyType propertyType,
+		MeemProperties memory props
+	) external;
 }
 
 interface IMeemSplitsStandard {

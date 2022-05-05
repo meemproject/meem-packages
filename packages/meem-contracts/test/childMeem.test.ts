@@ -22,7 +22,7 @@ describe('Child Meem Minting', function Test() {
 
 	before(async () => {
 		signers = await ethers.getSigners()
-		console.log({ signers })
+
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
 			args: {
 				deployProxy: true
@@ -155,9 +155,6 @@ describe('Child Meem Minting', function Test() {
 			)
 		).wait()
 		assert.equal(status, 1)
-
-		const meem = await queryFacet.getMeem(token1)
-		console.log({ meem })
 	})
 
 	it('Can mint child as non-minter role', async () => {
@@ -234,9 +231,6 @@ describe('Child Meem Minting', function Test() {
 			)
 		).wait()
 		assert.equal(status, 1)
-
-		const meem = await queryFacet.getMeem(token1)
-		console.log({ meem })
 	})
 
 	it('Can not mint copy of copy', async () => {

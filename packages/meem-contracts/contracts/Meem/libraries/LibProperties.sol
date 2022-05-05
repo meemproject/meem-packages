@@ -54,6 +54,13 @@ library LibProperties {
 	}
 
 	function setProperties(
+		PropertyType propertyType,
+		MeemProperties memory mProperties
+	) internal {
+		setProperties(0, propertyType, mProperties, 0, false);
+	}
+
+	function setProperties(
 		uint256 tokenId,
 		PropertyType propertyType,
 		MeemProperties memory mProperties
@@ -94,6 +101,11 @@ library LibProperties {
 		if (shouldMergeParent) {
 			newProps = mergeProperties(mProperties, parentProperties);
 		}
+
+		delete props.copyPermissions;
+		delete props.remixPermissions;
+		delete props.readPermissions;
+		delete props.splits;
 
 		for (uint256 i = 0; i < newProps.copyPermissions.length; i++) {
 			props.copyPermissions.push(newProps.copyPermissions[i]);

@@ -295,7 +295,6 @@ library LibMeem {
 		if (parent != address(0) && parent != address(this)) {
 			if (s.chainWrappedNFTs[chain][parent][tokenId] != 0) {
 				revert(Error.NFTAlreadyWrapped);
-				// revert('NFT_ALREADY_WRAPPED');
 			}
 		}
 	}
@@ -349,7 +348,6 @@ library LibMeem {
 		}
 
 		MeemProperties storage parentProperties = s.meemProperties[tokenId];
-		// uint256 currentChildren = s.children[tokenId].length;
 
 		if (
 			parentProperties.mintStartTimestamp > 0 &&
@@ -499,11 +497,6 @@ library LibMeem {
 				hasPermission &&
 				(!hasCostBeenSet || (hasCostBeenSet && costWei > perm.costWei))
 			) {
-				// 	perm.permission == Permission.Anyone
-				// 		? 'anyone'
-				// 		: 'not anyone'
-				// );
-
 				costWei = perm.costWei;
 				hasCostBeenSet = true;
 			}

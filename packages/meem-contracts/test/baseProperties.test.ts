@@ -5,7 +5,14 @@ import { Contract } from 'ethers'
 import { ethers } from 'hardhat'
 import _ from 'lodash'
 import { DateTime } from 'luxon'
-import { PropertyType } from '../src'
+import {
+	Chain,
+	defaultOpenProperties,
+	MeemType,
+	Permission,
+	PropertyType,
+	UriSource
+} from '../src'
 import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
 import { Meem } from '../types'
@@ -18,6 +25,7 @@ describe('BaseProperties', function Test() {
 	let contracts: MeemContracts
 	let signers: SignerWithAddress[]
 	let contractAddress: string
+	const token0 = 100000
 	const ipfsURL = 'ipfs://QmWEFSMku6yGLQ9TQr66HjSd9kay8ZDYKbBEfjNi4pLtrr/1'
 
 	before(async () => {
@@ -154,5 +162,54 @@ describe('BaseProperties', function Test() {
 		await assert.isRejected(
 			contracts.meemAdminFacet.connect(signers[1]).setMintDates(start, end)
 		)
+	})
+
+	it('Can not set default properties as non-admin', async () => {
+		await assert.isRejected(
+			contracts.meemAdminFacet
+				.connect(signers[2])
+				.setProperties(PropertyType.DefaultMeem, {
+					...defaultOpenProperties
+				})
+		)
+	})
+
+	it('Merges default properties', async () => {
+		await (
+			await contracts.meemAdminFacet.setProperties(PropertyType.DefaultMeem, {
+				...defaultOpenProperties
+			})
+		).wait()
+
+		const { status } = await (
+			await contracts.meemBaseFacet.connect(signers[1]).mint(
+				{
+					to: signers[1].address,
+					tokenURI: ipfsURL,
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: token0,
+					meemType: MeemType.Original,
+					data: '',
+					isURILocked: false,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri,
+					mintedBy: signers[0].address
+				},
+				{
+					...defaultOpenProperties,
+					remixPermissions: [
+						{
+							permission: Permission.Anyone,
+							numTokens: 0,
+							lockedBy: signers[1].address,
+							addresses: [],
+							costWei: ethers.utils.parseEther('0.1')
+						}
+					]
+				},
+				defaultOpenProperties
+			)
+		).wait()
 	})
 })

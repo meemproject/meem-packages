@@ -4,8 +4,9 @@ pragma solidity ^0.8.13;
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPermissions} from '../libraries/LibPermissions.sol';
+import {LibProperties} from '../libraries/LibProperties.sol';
 import {LibSplits} from '../libraries/LibSplits.sol';
-import {IMeemAdminStandard, Chain, Split, MeemPermission} from '../interfaces/MeemStandard.sol';
+import {IMeemAdminStandard, Chain, Split, MeemPermission, PropertyType, MeemProperties} from '../interfaces/MeemStandard.sol';
 import {Error} from '../libraries/Errors.sol';
 
 contract MeemAdminFacet is IMeemAdminStandard {
@@ -197,5 +198,14 @@ contract MeemAdminFacet is IMeemAdminStandard {
 			revert(Error.PropertyLocked);
 		}
 		s.baseProperties.transferLockupUntilLockedBy = msg.sender;
+	}
+
+	function setProperties(
+		PropertyType propertyType,
+		MeemProperties memory props
+	) external override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.ADMIN_ROLE);
+		LibProperties.setProperties(propertyType, props);
 	}
 }

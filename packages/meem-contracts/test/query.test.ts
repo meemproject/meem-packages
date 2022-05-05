@@ -24,7 +24,7 @@ describe('Query Meems', function Test() {
 
 	before(async () => {
 		signers = await ethers.getSigners()
-		console.log({ signers })
+
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
 			args: {
 				deployProxy: true
