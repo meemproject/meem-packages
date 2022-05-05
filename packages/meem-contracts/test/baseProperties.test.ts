@@ -5,19 +5,27 @@ import { Contract } from 'ethers'
 import { ethers } from 'hardhat'
 import _ from 'lodash'
 import { DateTime } from 'luxon'
-import { PropertyType } from '../src'
+import {
+	Chain,
+	defaultOpenProperties,
+	MeemType,
+	Permission,
+	PropertyType,
+	UriSource
+} from '../src'
 import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
 import { Meem } from '../types'
 import meemABI from '../types/Meem.json'
+import { getMeemContracts, MeemContracts } from './helpers'
 
 use(chaiAsPromised)
 
 describe('BaseProperties', function Test() {
-	let contract: Meem
-	let nonAdminContract: Meem
+	let contracts: MeemContracts
 	let signers: SignerWithAddress[]
 	let contractAddress: string
+	const token0 = 100000
 	const ipfsURL = 'ipfs://QmWEFSMku6yGLQ9TQr66HjSd9kay8ZDYKbBEfjNi4pLtrr/1'
 
 	before(async () => {
@@ -30,23 +38,12 @@ describe('BaseProperties', function Test() {
 		})
 
 		contractAddress = DiamondProxy
-
-		contract = new Contract(
-			contractAddress,
-			meemABI,
-			signers[0]
-		) as unknown as Meem
-
-		nonAdminContract = new Contract(
-			contractAddress,
-			meemABI,
-			signers[1]
-		) as unknown as Meem
+		contracts = await getMeemContracts(contractAddress)
 	})
 
 	it('Can not set base splits as non-admin', async () => {
 		await assert.isRejected(
-			nonAdminContract.setBaseSplits([
+			contracts.meemAdminFacet.connect(signers[1]).setBaseSplits([
 				{
 					toAddress: signers[1].address,
 					amount: 100,
@@ -57,7 +54,7 @@ describe('BaseProperties', function Test() {
 	})
 
 	it('Can set base splits', async () => {
-		await contract.setBaseSplits([
+		await contracts.meemAdminFacet.setBaseSplits([
 			{
 				toAddress: signers[0].address,
 				amount: 100,
@@ -65,7 +62,7 @@ describe('BaseProperties', function Test() {
 			}
 		])
 
-		const props = await contract.getBaseProperties()
+		const props = await contracts.meemQueryFacet.getBaseProperties()
 		assert.equal(props.splits[0].toAddress, signers[0].address)
 		assert.equal(props.splits[0].amount.toNumber(), 100)
 		assert.equal(props.splits[0].lockedBy, zeroAddress)
@@ -73,18 +70,20 @@ describe('BaseProperties', function Test() {
 
 	it('Can not set default splits as non-admin', async () => {
 		await assert.isRejected(
-			nonAdminContract.setSplits(0, PropertyType.DefaultMeem, [
-				{
-					toAddress: signers[1].address,
-					amount: 100,
-					lockedBy: zeroAddress
-				}
-			])
+			contracts.meemSplitsFacet
+				.connect(signers[1])
+				.setSplits(0, PropertyType.DefaultMeem, [
+					{
+						toAddress: signers[1].address,
+						amount: 100,
+						lockedBy: zeroAddress
+					}
+				])
 		)
 	})
 
 	it('Can set default splits', async () => {
-		await contract.setSplits(0, PropertyType.DefaultMeem, [
+		await contracts.meemSplitsFacet.setSplits(0, PropertyType.DefaultMeem, [
 			{
 				toAddress: signers[0].address,
 				amount: 100,
@@ -92,40 +91,48 @@ describe('BaseProperties', function Test() {
 			}
 		])
 
-		const props = await contract.getDefaultProperties(PropertyType.DefaultMeem)
+		const props = await contracts.meemQueryFacet.getDefaultProperties(
+			PropertyType.DefaultMeem
+		)
 		assert.equal(props.splits[0].toAddress, signers[0].address)
 		assert.equal(props.splits[0].amount.toNumber(), 100)
 		assert.equal(props.splits[0].lockedBy, zeroAddress)
 	})
 
 	it('Can setTotalOriginalsSupply', async () => {
-		await contract.setTotalOriginalsSupply(100)
-		const props = await contract.getBaseProperties()
+		await contracts.meemAdminFacet.setTotalOriginalsSupply(100)
+		const props = await contracts.meemQueryFacet.getBaseProperties()
 		assert.equal(props.totalOriginalsSupply.toNumber(), 100)
 	})
 
 	it('Can not setTotalOriginalsSupply as non-admin', async () => {
-		await assert.isRejected(nonAdminContract.setTotalOriginalsSupply(100))
+		await assert.isRejected(
+			contracts.meemAdminFacet.connect(signers[1]).setTotalOriginalsSupply(100)
+		)
 	})
 
 	it('Can setOriginalsPerWallet', async () => {
-		await contract.setOriginalsPerWallet(100)
-		const props = await contract.getBaseProperties()
+		await contracts.meemAdminFacet.setOriginalsPerWallet(100)
+		const props = await contracts.meemQueryFacet.getBaseProperties()
 		assert.equal(props.originalsPerWallet.toNumber(), 100)
 	})
 
 	it('Can not setOriginalsPerWallet as non-admin', async () => {
-		await assert.isRejected(nonAdminContract.setOriginalsPerWallet(100))
+		await assert.isRejected(
+			contracts.meemAdminFacet.connect(signers[1]).setOriginalsPerWallet(100)
+		)
 	})
 
 	it('Can setIsTransferrable', async () => {
-		await contract.setIsTransferrable(false)
-		const props = await contract.getBaseProperties()
+		await contracts.meemAdminFacet.setIsTransferrable(false)
+		const props = await contracts.meemQueryFacet.getBaseProperties()
 		assert.isFalse(props.isTransferrable)
 	})
 
 	it('Can not setIsTransferrable as non-admin', async () => {
-		await assert.isRejected(nonAdminContract.setIsTransferrable(false))
+		await assert.isRejected(
+			contracts.meemAdminFacet.connect(signers[1]).setIsTransferrable(false)
+		)
 	})
 
 	it('Can setMintDates', async () => {
@@ -137,8 +144,8 @@ describe('BaseProperties', function Test() {
 				})
 				.toSeconds()
 		)
-		await contract.setMintDates(start, end)
-		const props = await contract.getBaseProperties()
+		await contracts.meemAdminFacet.setMintDates(start, end)
+		const props = await contracts.meemQueryFacet.getBaseProperties()
 		assert.equal(props.mintStartTimestamp.toNumber(), start)
 		assert.equal(props.mintEndTimestamp.toNumber(), end)
 	})
@@ -152,6 +159,57 @@ describe('BaseProperties', function Test() {
 				})
 				.toSeconds()
 		)
-		await assert.isRejected(nonAdminContract.setMintDates(start, end))
+		await assert.isRejected(
+			contracts.meemAdminFacet.connect(signers[1]).setMintDates(start, end)
+		)
+	})
+
+	it('Can not set default properties as non-admin', async () => {
+		await assert.isRejected(
+			contracts.meemAdminFacet
+				.connect(signers[2])
+				.setProperties(PropertyType.DefaultMeem, {
+					...defaultOpenProperties
+				})
+		)
+	})
+
+	it('Merges default properties', async () => {
+		await (
+			await contracts.meemAdminFacet.setProperties(PropertyType.DefaultMeem, {
+				...defaultOpenProperties
+			})
+		).wait()
+
+		const { status } = await (
+			await contracts.meemBaseFacet.connect(signers[1]).mint(
+				{
+					to: signers[1].address,
+					tokenURI: ipfsURL,
+					parentChain: Chain.Polygon,
+					parent: zeroAddress,
+					parentTokenId: token0,
+					meemType: MeemType.Original,
+					data: '',
+					isURILocked: false,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri,
+					mintedBy: signers[0].address
+				},
+				{
+					...defaultOpenProperties,
+					remixPermissions: [
+						{
+							permission: Permission.Anyone,
+							numTokens: 0,
+							lockedBy: signers[1].address,
+							addresses: [],
+							costWei: ethers.utils.parseEther('0.1')
+						}
+					]
+				},
+				defaultOpenProperties
+			)
+		).wait()
 	})
 })

@@ -25,7 +25,7 @@ describe('Minting Permissions', function Test() {
 
 	beforeEach(async () => {
 		signers = await ethers.getSigners()
-		console.log({ signers })
+
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
 			args: {
 				deployProxy: true
@@ -746,7 +746,6 @@ describe('Minting Permissions', function Test() {
 			)
 		).wait()
 		const m0 = await queryFacet.getMeem(token0)
-		console.log(m0)
 
 		assert.equal(m0.properties.copyPermissionsLockedBy, signers[2].address)
 		assert.equal(m0.properties.remixPermissionsLockedBy, signers[2].address)

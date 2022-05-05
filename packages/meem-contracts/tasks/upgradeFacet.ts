@@ -2,6 +2,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import { task, types } from 'hardhat/config'
 import packageJson from '../package.json'
+import log from '../src/lib/log'
 import { zeroAddress } from '../src/lib/utils'
 import { IDeployHistory } from './deployDiamond'
 import { FacetCutAction, getSelectors } from './lib/diamond'
@@ -38,26 +39,24 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 		try {
 			history = await fs.readJSON(diamondHistoryFile)
 		} catch (e) {
-			console.log(e)
+			log.crit(e)
 		}
 
 		const wei = args.gwei ? args.gwei * 1000000000 : undefined
 
 		const [deployer] = await ethers.getSigners()
-		console.log('Deploying contracts with the account:', deployer.address)
+		log.info('Deploying contracts with the account:', deployer.address)
 
-		console.log('Account balance:', (await deployer.getBalance()).toString())
+		log.info('Account balance:', (await deployer.getBalance()).toString())
 
 		const Facet = await ethers.getContractFactory(facetName)
 		const facet = await Facet.deploy({
 			gasPrice: wei
 		})
-		console.log(
-			`Deploying new facet w/ tx hash: ${facet.deployTransaction.hash}`
-		)
+		log.info(`Deploying new facet w/ tx hash: ${facet.deployTransaction.hash}`)
 		await facet.deployed()
 
-		console.log(`Deployed new ${facetName}: ${facet.address}`)
+		log.info(`Deployed new ${facetName}: ${facet.address}`)
 
 		const facetSelectors = getSelectors(facet)
 
@@ -120,13 +119,13 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 			{ gasLimit: 5000000, gasPrice: wei }
 		)
 
-		console.log(`Initiated diamond cut transaction: ${tx.hash}`)
+		log.info(`Initiated diamond cut transaction: ${tx.hash}`)
 
 		const receipt = await tx.wait()
 		if (!receipt.status) {
 			throw Error(`Diamond upgrade failed: ${tx.hash}`)
 		}
-		console.log('Completed diamond cut w/ tx: ', tx.hash)
+		log.info('Completed diamond cut w/ tx: ', tx.hash)
 
 		const previousDeploys =
 			history[proxyAddress] && history[proxyAddress][facetName]
@@ -156,5 +155,5 @@ task('upgradeFacet', 'Upgrade MeemFacet')
 			flag: 'w'
 		})
 
-		console.log(`Upgrade history written to ${diamondHistoryFile}`)
+		log.info(`Upgrade history written to ${diamondHistoryFile}`)
 	})

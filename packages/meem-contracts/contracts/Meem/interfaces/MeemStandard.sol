@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 enum Chain {
 	Ethereum,
@@ -77,6 +77,8 @@ struct MeemProperties {
 	int256 mintStartTimestamp;
 	int256 mintEndTimestamp;
 	address mintDatesLockedBy;
+	uint256 transferLockupUntil;
+	address transferLockupUntilLockedBy;
 }
 
 struct BaseProperties {
@@ -93,6 +95,8 @@ struct BaseProperties {
 	int256 mintStartTimestamp;
 	int256 mintEndTimestamp;
 	address mintDatesLockedBy;
+	uint256 transferLockupUntil;
+	address transferLockupUntilLockedBy;
 }
 
 // struct BasePropertiesInit {
@@ -183,6 +187,17 @@ struct InitParams {
 	MeemProperties defaultChildProperties;
 	address[] admins;
 	uint256 tokenCounterStart;
+	int256 childDepth;
+	uint256 nonOwnerSplitAllocationAmount;
+}
+
+struct ContractInfo {
+	string symbol;
+	string name;
+	string contractURI;
+	BaseProperties baseProperties;
+	MeemProperties defaultProperties;
+	MeemProperties defaultChildProperties;
 	int256 childDepth;
 	uint256 nonOwnerSplitAllocationAmount;
 }
@@ -319,6 +334,15 @@ interface IMeemAdminStandard {
 	function setMintPermissions(MeemPermission[] memory permissions) external;
 
 	function lockMintPermissions() external;
+
+	function setTransferLockup(uint256 lockupUntil) external;
+
+	function lockTransferLockup() external;
+
+	function setProperties(
+		PropertyType propertyType,
+		MeemProperties memory props
+	) external;
 }
 
 interface IMeemSplitsStandard {
@@ -431,6 +455,22 @@ interface IMeemPermissionsStandard {
 	function setURISource(uint256 tokenId, URISource uriSource) external;
 
 	function setTokenUri(uint256 tokenId, string memory uri) external;
+
+	function setIsTransferrable(uint256 tokenId, bool isTransferrable) external;
+
+	function lockIsTransferrable(uint256 tokenId) external;
+
+	function lockMintDates(uint256 tokenId) external;
+
+	function setMintDates(
+		uint256 tokenId,
+		int256 startTimestamp,
+		int256 endTimestamp
+	) external;
+
+	function setTransferLockup(uint256 tokenId, uint256 lockupUntil) external;
+
+	function lockTransferLockup(uint256 tokenId) external;
 }
 
 interface IClippingStandard {

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 import {PropertyType, MeemProperties, URISource, MeemPermission, Split, PermissionType} from '../interfaces/MeemStandard.sol';
 import {LibPart} from '../../royalties/LibPart.sol';

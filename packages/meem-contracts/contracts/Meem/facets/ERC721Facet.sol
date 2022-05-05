@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
@@ -15,14 +15,7 @@ import {Error} from '../libraries/Errors.sol';
 
 contract ERC721Facet is IERC721, IERC721Enumerable, IERC721Metadata {
 	function contractURI() external view returns (string memory) {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return
-			string(
-				abi.encodePacked(
-					'data:application/json;base64,',
-					Base64.encode(bytes(s.contractURI))
-				)
-			);
+		return LibERC721.contractURI();
 	}
 
 	function contractAddress() external view returns (address) {

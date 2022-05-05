@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {Array} from '../utils/Array.sol';
@@ -9,6 +9,7 @@ import {Meem, MeemType, URISource} from '../interfaces/MeemStandard.sol';
 import {Error} from '../libraries/Errors.sol';
 import {MeemERC721Events} from '../libraries/Events.sol';
 import '../interfaces/IERC721TokenReceiver.sol';
+import {Base64} from '../utils/Base64.sol';
 
 library LibERC721 {
 	/**
@@ -430,6 +431,8 @@ library LibERC721 {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		bool canFacilitateClaim = _canFacilitateClaim(_msgSender(), tokenId);
 
+		uint256 parentTokenId = s.meems[tokenId].parentTokenId;
+
 		// Meems can be transferred if:
 		// 1. They are wrapped and the sender can facilitate claim
 		// 2. They are owned by this contract and the sender can facilitate claim
@@ -446,13 +449,18 @@ library LibERC721 {
 			revert(Error.NotTokenOwner);
 		} else if (
 			s.meems[tokenId].meemType == MeemType.Original &&
-			!s.baseProperties.isTransferrable
+			(!s.baseProperties.isTransferrable ||
+				(s.baseProperties.transferLockupUntil > 0 &&
+					s.baseProperties.transferLockupUntil > block.timestamp))
 		) {
 			revert(Error.TransfersLocked);
 		} else if (
 			(s.meems[tokenId].meemType == MeemType.Remix ||
 				s.meems[tokenId].meemType == MeemType.Copy) &&
-			!s.meemProperties[tokenId].isTransferrable
+			(!s.meemProperties[parentTokenId].isTransferrable ||
+				(s.meemProperties[parentTokenId].transferLockupUntil > 0 &&
+					s.meemProperties[parentTokenId].transferLockupUntil >
+					block.timestamp))
 		) {
 			revert(Error.TransfersLocked);
 		}
@@ -653,5 +661,16 @@ library LibERC721 {
 		}
 
 		return true;
+	}
+
+	function contractURI() internal view returns (string memory) {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return
+			string(
+				abi.encodePacked(
+					'data:application/json;base64,',
+					Base64.encode(bytes(s.contractURI))
+				)
+			);
 	}
 }

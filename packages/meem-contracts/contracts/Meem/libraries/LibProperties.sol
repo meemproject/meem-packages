@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {PropertyType, MeemProperties, URISource} from '../interfaces/MeemStandard.sol';
@@ -54,6 +54,13 @@ library LibProperties {
 	}
 
 	function setProperties(
+		PropertyType propertyType,
+		MeemProperties memory mProperties
+	) internal {
+		setProperties(0, propertyType, mProperties, 0, false);
+	}
+
+	function setProperties(
 		uint256 tokenId,
 		PropertyType propertyType,
 		MeemProperties memory mProperties
@@ -95,6 +102,11 @@ library LibProperties {
 			newProps = mergeProperties(mProperties, parentProperties);
 		}
 
+		delete props.copyPermissions;
+		delete props.remixPermissions;
+		delete props.readPermissions;
+		delete props.splits;
+
 		for (uint256 i = 0; i < newProps.copyPermissions.length; i++) {
 			props.copyPermissions.push(newProps.copyPermissions[i]);
 		}
@@ -128,6 +140,9 @@ library LibProperties {
 		props.mintStartTimestamp = newProps.mintStartTimestamp;
 		props.mintEndTimestamp = newProps.mintEndTimestamp;
 		props.mintDatesLockedBy = newProps.mintDatesLockedBy;
+		props.transferLockupUntil = newProps.transferLockupUntil;
+		props.transferLockupUntilLockedBy = newProps
+			.transferLockupUntilLockedBy;
 
 		if (
 			propertyType == PropertyType.Meem ||
@@ -487,6 +502,72 @@ library LibProperties {
 		s.tokenURIs[tokenId] = uri;
 
 		emit MeemEvents.MeemURISet(tokenId, uri);
+	}
+
+	function setIsTransferrable(uint256 tokenId, bool isTransferrable)
+		internal
+	{
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.meemProperties[tokenId].isTransferrableLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+		s.meemProperties[tokenId].isTransferrable = isTransferrable;
+	}
+
+	function lockIsTransferrable(uint256 tokenId) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.meemProperties[tokenId].isTransferrableLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+		s.meemProperties[tokenId].isTransferrableLockedBy = msg.sender;
+	}
+
+	function lockMintDates(uint256 tokenId) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.meemProperties[tokenId].mintDatesLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+		s.meemProperties[tokenId].mintDatesLockedBy = msg.sender;
+	}
+
+	function setMintDates(
+		uint256 tokenId,
+		int256 startTimestamp,
+		int256 endTimestamp
+	) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (s.meemProperties[tokenId].mintDatesLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+
+		s.meemProperties[tokenId].mintStartTimestamp = startTimestamp;
+		s.meemProperties[tokenId].mintEndTimestamp = endTimestamp;
+	}
+
+	function setTransferLockup(uint256 tokenId, uint256 lockupUntil) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (
+			s.meemProperties[tokenId].transferLockupUntilLockedBy != address(0)
+		) {
+			revert(Error.PropertyLocked);
+		}
+		s.meemProperties[tokenId].transferLockupUntil = lockupUntil;
+	}
+
+	function lockTransferLockup(uint256 tokenId) internal {
+		LibERC721.requireOwnsToken(tokenId);
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		if (
+			s.meemProperties[tokenId].transferLockupUntilLockedBy != address(0)
+		) {
+			revert(Error.PropertyLocked);
+		}
+		s.meemProperties[tokenId].transferLockupUntilLockedBy = msg.sender;
 	}
 
 	// function requirePropertiesAccess(uint256 tokenId, PropertyType propertyType)

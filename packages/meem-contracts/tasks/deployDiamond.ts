@@ -5,6 +5,7 @@ import fs from 'fs-extra'
 import { task, types } from 'hardhat/config'
 import { HardhatArguments } from 'hardhat/types'
 import packageJson from '../package.json'
+import log from '../src/lib/log'
 import { defaultMeemProperties } from '../src/lib/meemProperties'
 import { Permission } from '../src/lib/meemStandard'
 import { zeroAddress } from '../src/lib/utils'
@@ -59,7 +60,7 @@ export async function deployDiamond(options: {
 	try {
 		history = await fs.readJSON(diamondHistoryFile)
 	} catch (e) {
-		console.log(e)
+		log.crit(e)
 	}
 
 	const wei = args?.gwei ? args.gwei * 1000000000 : undefined
@@ -67,9 +68,9 @@ export async function deployDiamond(options: {
 
 	const accounts = await ethers.getSigners()
 	const contractOwner = accounts[0]
-	console.log('Deploying contracts with the account:', contractOwner.address)
+	log.info('Deploying contracts with the account:', contractOwner.address)
 
-	console.log('Account balance:', (await contractOwner.getBalance()).toString())
+	log.info('Account balance:', (await contractOwner.getBalance()).toString())
 
 	let diamondAddress = zeroAddress
 
@@ -89,8 +90,7 @@ export async function deployDiamond(options: {
 	history[diamondAddress] = {}
 
 	// deploy facets
-	console.log('')
-	console.log('Deploying facets')
+	log.info('Deploying facets...')
 
 	const facets: IFacets = {
 		AccessControlFacet: null,
@@ -116,7 +116,7 @@ export async function deployDiamond(options: {
 		})
 		await facet.deployed()
 		facets[facetName] = facet
-		console.log(
+		log.info(
 			`${facetName} deployed: ${facet.address} w/ tx: ${facet.deployTransaction.hash}`
 		)
 		deployedContracts[facetName] = facet.address
@@ -149,8 +149,7 @@ export async function deployDiamond(options: {
 
 	if (shouldDeployProxy) {
 		// upgrade diamond with facets
-		console.log('')
-		console.log('Diamond Cut:', cuts)
+		log.debug('Diamond Cuts:', cuts)
 		const diamondCut = await ethers.getContractAt('IDiamondCut', diamondAddress)
 
 		// let proxyRegistryAddress = ''
@@ -208,7 +207,9 @@ export async function deployDiamond(options: {
 				isTransferrableLockedBy: zeroAddress,
 				mintStartTimestamp: -1,
 				mintEndTimestamp: -1,
-				mintDatesLockedBy: zeroAddress
+				mintDatesLockedBy: zeroAddress,
+				transferLockupUntil: 0,
+				transferLockupUntilLockedBy: zeroAddress
 			},
 			defaultProperties: defaultMeemProperties,
 			defaultChildProperties: defaultMeemProperties,
@@ -225,7 +226,7 @@ export async function deployDiamond(options: {
 		const tx = await diamondCut.diamondCut(cuts, diamondAddress, functionCall, {
 			gasPrice: wei
 		})
-		console.log('Diamond cut tx: ', tx.hash)
+		log.info('Diamond cut tx: ', tx.hash)
 		const receipt = await tx.wait()
 		if (!receipt.status) {
 			throw Error(`Diamond upgrade failed: ${tx.hash}`)
@@ -237,7 +238,7 @@ export async function deployDiamond(options: {
 		flag: 'w'
 	})
 
-	console.log({
+	log.info({
 		deployedContracts
 	})
 

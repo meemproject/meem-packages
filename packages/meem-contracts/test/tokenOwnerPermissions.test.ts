@@ -31,7 +31,7 @@ describe('Token Owner Permissions', function Test() {
 
 	before(async () => {
 		signers = await ethers.getSigners()
-		console.log({ signers })
+
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
 			args: {
 				deployProxy: true
@@ -85,7 +85,6 @@ describe('Token Owner Permissions', function Test() {
 		assert.equal(status, 1)
 
 		const meem = await queryFacet.connect(signers[1]).getMeem(token0)
-		console.log({ meem })
 		assert.equal(meem.properties.totalCopies.toNumber(), 5000)
 	})
 
@@ -121,7 +120,6 @@ describe('Token Owner Permissions', function Test() {
 		assert.equal(status, 1)
 
 		const meem = await queryFacet.connect(signers[1]).getMeem(token0)
-		console.log({ meem })
 		assert.equal(meem.properties.totalCopies.toNumber(), 5000)
 	})
 

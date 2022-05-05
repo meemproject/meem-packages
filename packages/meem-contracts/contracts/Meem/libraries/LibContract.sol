@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 import {LibAccessControl} from './LibAccessControl.sol';
 import {MeemBaseEvents} from './Events.sol';
@@ -60,6 +60,14 @@ library LibContract {
 			s.baseProperties.mintEndTimestamp = props.mintEndTimestamp;
 			if (props.mintDatesLockedBy != address(0)) {
 				s.baseProperties.mintDatesLockedBy = props.mintDatesLockedBy;
+			}
+		}
+
+		if (s.baseProperties.transferLockupUntilLockedBy == address(0)) {
+			s.baseProperties.transferLockupUntil = props.transferLockupUntil;
+			if (props.transferLockupUntilLockedBy != address(0)) {
+				s.baseProperties.transferLockupUntilLockedBy = props
+					.transferLockupUntilLockedBy;
 			}
 		}
 	}

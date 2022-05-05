@@ -354,9 +354,6 @@ describe('Purchase Original', function Test() {
 		})
 		const otherContracts = await getMeemContracts(DiamondProxy)
 
-		console.log('Signer: ', signers[1].address)
-		console.log('Other Contract: ', DiamondProxy)
-
 		await contracts.meemAdminFacet.setMintPermissions([
 			{
 				permission: Permission.Holders,

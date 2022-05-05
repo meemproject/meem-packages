@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
 import {LibPermissions} from '../libraries/LibPermissions.sol';
+import {LibProperties} from '../libraries/LibProperties.sol';
 import {LibSplits} from '../libraries/LibSplits.sol';
-import {IMeemAdminStandard, Chain, Split, MeemPermission} from '../interfaces/MeemStandard.sol';
+import {IMeemAdminStandard, Chain, Split, MeemPermission, PropertyType, MeemProperties} from '../interfaces/MeemStandard.sol';
 import {Error} from '../libraries/Errors.sol';
 
 contract MeemAdminFacet is IMeemAdminStandard {
@@ -98,15 +99,6 @@ contract MeemAdminFacet is IMeemAdminStandard {
 		s.baseProperties.originalsPerWallet = originalsPerWallet;
 	}
 
-	function setIsTransferrable(bool isTransferrable) external override {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibAccessControl.requireRole(s.ADMIN_ROLE);
-		if (s.baseProperties.isTransferrableLockedBy != address(0)) {
-			revert(Error.PropertyLocked);
-		}
-		s.baseProperties.isTransferrable = isTransferrable;
-	}
-
 	function lockBaseSplits() external override {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
@@ -132,6 +124,15 @@ contract MeemAdminFacet is IMeemAdminStandard {
 			revert(Error.PropertyLocked);
 		}
 		s.baseProperties.originalsPerWalletLockedBy = msg.sender;
+	}
+
+	function setIsTransferrable(bool isTransferrable) external override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.ADMIN_ROLE);
+		if (s.baseProperties.isTransferrableLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+		s.baseProperties.isTransferrable = isTransferrable;
 	}
 
 	function lockIsTransferrable() external override {
@@ -179,5 +180,32 @@ contract MeemAdminFacet is IMeemAdminStandard {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
 		LibPermissions.lockMintPermissions();
+	}
+
+	function setTransferLockup(uint256 lockupUntil) external override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.ADMIN_ROLE);
+		if (s.baseProperties.transferLockupUntilLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+		s.baseProperties.transferLockupUntil = lockupUntil;
+	}
+
+	function lockTransferLockup() external override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.ADMIN_ROLE);
+		if (s.baseProperties.transferLockupUntilLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+		s.baseProperties.transferLockupUntilLockedBy = msg.sender;
+	}
+
+	function setProperties(
+		PropertyType propertyType,
+		MeemProperties memory props
+	) external override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.ADMIN_ROLE);
+		LibProperties.setProperties(propertyType, props);
 	}
 }

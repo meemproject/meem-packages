@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 pragma experimental ABIEncoderV2;
 
 import {LibERC721} from '../libraries/LibERC721.sol';
@@ -10,6 +10,7 @@ import {LibProperties} from '../libraries/LibProperties.sol';
 import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemPermissionsStandard, URISource} from '../interfaces/MeemStandard.sol';
 import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
+import {Error} from '../libraries/Errors.sol';
 
 contract MeemPermissionsFacet is IMeemPermissionsStandard {
 	function setTotalCopies(
@@ -159,5 +160,39 @@ contract MeemPermissionsFacet is IMeemPermissionsStandard {
 
 	function setTokenUri(uint256 tokenId, string memory uri) external override {
 		LibProperties.setTokenUri(tokenId, uri);
+	}
+
+	function setIsTransferrable(uint256 tokenId, bool isTransferrable)
+		external
+		override
+	{
+		LibProperties.setIsTransferrable(tokenId, isTransferrable);
+	}
+
+	function lockIsTransferrable(uint256 tokenId) external override {
+		LibProperties.lockIsTransferrable(tokenId);
+	}
+
+	function lockMintDates(uint256 tokenId) external override {
+		LibProperties.lockMintDates(tokenId);
+	}
+
+	function setMintDates(
+		uint256 tokenId,
+		int256 startTimestamp,
+		int256 endTimestamp
+	) external override {
+		LibProperties.setMintDates(tokenId, startTimestamp, endTimestamp);
+	}
+
+	function setTransferLockup(uint256 tokenId, uint256 lockupUntil)
+		external
+		override
+	{
+		LibProperties.setTransferLockup(tokenId, lockupUntil);
+	}
+
+	function lockTransferLockup(uint256 tokenId) external override {
+		LibProperties.lockTransferLockup(tokenId);
 	}
 }

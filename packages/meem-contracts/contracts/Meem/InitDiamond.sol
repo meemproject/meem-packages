@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 import {LibAppStorage} from './storage/LibAppStorage.sol';
 import {LibAccessControl} from './libraries/LibAccessControl.sol';
@@ -16,8 +16,6 @@ import '@solidstate/contracts/token/ERC721/IERC721.sol';
 import '@solidstate/contracts/token/ERC721/enumerable/IERC721Enumerable.sol';
 import '@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol';
 import '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
-
-// import 'hardhat/console.sol';
 
 contract InitDiamond is IInitDiamondStandard {
 	using ERC165Storage for ERC165Storage.Layout;
