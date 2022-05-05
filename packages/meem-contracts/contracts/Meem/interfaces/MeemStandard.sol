@@ -77,6 +77,8 @@ struct MeemProperties {
 	int256 mintStartTimestamp;
 	int256 mintEndTimestamp;
 	address mintDatesLockedBy;
+	uint256 transferLockupUntil;
+	address transferLockupUntilLockedBy;
 }
 
 struct BaseProperties {
@@ -93,6 +95,8 @@ struct BaseProperties {
 	int256 mintStartTimestamp;
 	int256 mintEndTimestamp;
 	address mintDatesLockedBy;
+	uint256 transferLockupUntil;
+	address transferLockupUntilLockedBy;
 }
 
 // struct BasePropertiesInit {
@@ -183,6 +187,17 @@ struct InitParams {
 	MeemProperties defaultChildProperties;
 	address[] admins;
 	uint256 tokenCounterStart;
+	int256 childDepth;
+	uint256 nonOwnerSplitAllocationAmount;
+}
+
+struct ContractInfo {
+	string symbol;
+	string name;
+	string contractURI;
+	BaseProperties baseProperties;
+	MeemProperties defaultProperties;
+	MeemProperties defaultChildProperties;
 	int256 childDepth;
 	uint256 nonOwnerSplitAllocationAmount;
 }
@@ -350,6 +365,10 @@ interface IMeemSplitsStandard {
 		uint256 idx,
 		Split memory split
 	) external;
+
+	function setTransferLockup(uint256 lockupUntil) external;
+
+	function lockTransferLockup() external;
 }
 
 interface IMeemPermissionsStandard {

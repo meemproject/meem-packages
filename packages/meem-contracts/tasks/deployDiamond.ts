@@ -208,7 +208,9 @@ export async function deployDiamond(options: {
 				isTransferrableLockedBy: zeroAddress,
 				mintStartTimestamp: -1,
 				mintEndTimestamp: -1,
-				mintDatesLockedBy: zeroAddress
+				mintDatesLockedBy: zeroAddress,
+				transferLockupUntil: 0,
+				transferLockupUntilLockedBy: zeroAddress
 			},
 			defaultProperties: defaultMeemProperties,
 			defaultChildProperties: defaultMeemProperties,

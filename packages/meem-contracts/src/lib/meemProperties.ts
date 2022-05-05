@@ -23,7 +23,9 @@ export const defaultMeemProperties: MeemPropertiesStruct = {
 	isTransferrableLockedBy: zeroAddress,
 	mintStartTimestamp: -1,
 	mintEndTimestamp: -1,
-	mintDatesLockedBy: zeroAddress
+	mintDatesLockedBy: zeroAddress,
+	transferLockupUntil: 0,
+	transferLockupUntilLockedBy: zeroAddress
 }
 
 export const defaultOpenProperties: MeemPropertiesStruct = {
@@ -71,7 +73,9 @@ export const defaultOpenProperties: MeemPropertiesStruct = {
 	isTransferrableLockedBy: zeroAddress,
 	mintStartTimestamp: -1,
 	mintEndTimestamp: -1,
-	mintDatesLockedBy: zeroAddress
+	mintDatesLockedBy: zeroAddress,
+	transferLockupUntil: 0,
+	transferLockupUntilLockedBy: zeroAddress
 }
 
 export const defaultBaseProperties: BasePropertiesStruct = {
@@ -95,5 +99,7 @@ export const defaultBaseProperties: BasePropertiesStruct = {
 	isTransferrableLockedBy: zeroAddress,
 	mintStartTimestamp: -1,
 	mintEndTimestamp: -1,
-	mintDatesLockedBy: zeroAddress
+	mintDatesLockedBy: zeroAddress,
+	transferLockupUntil: 0,
+	transferLockupUntilLockedBy: zeroAddress
 }

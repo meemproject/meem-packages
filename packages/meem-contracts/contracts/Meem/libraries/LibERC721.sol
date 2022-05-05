@@ -9,6 +9,7 @@ import {Meem, MeemType, URISource} from '../interfaces/MeemStandard.sol';
 import {Error} from '../libraries/Errors.sol';
 import {MeemERC721Events} from '../libraries/Events.sol';
 import '../interfaces/IERC721TokenReceiver.sol';
+import {Base64} from '../utils/Base64.sol';
 
 library LibERC721 {
 	/**
@@ -446,13 +447,18 @@ library LibERC721 {
 			revert(Error.NotTokenOwner);
 		} else if (
 			s.meems[tokenId].meemType == MeemType.Original &&
-			!s.baseProperties.isTransferrable
+			(!s.baseProperties.isTransferrable ||
+				(s.baseProperties.transferLockupUntil > 0 &&
+					s.baseProperties.transferLockupUntil > block.timestamp))
 		) {
 			revert(Error.TransfersLocked);
 		} else if (
 			(s.meems[tokenId].meemType == MeemType.Remix ||
 				s.meems[tokenId].meemType == MeemType.Copy) &&
-			!s.meemProperties[tokenId].isTransferrable
+			(!s.meemProperties[tokenId].isTransferrable ||
+				(s.meemProperties[tokenId].transferLockupUntil > 0 &&
+					s.meemProperties[tokenId].transferLockupUntil >
+					block.timestamp))
 		) {
 			revert(Error.TransfersLocked);
 		}
@@ -653,5 +659,16 @@ library LibERC721 {
 		}
 
 		return true;
+	}
+
+	function contractURI() internal view returns (string memory) {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return
+			string(
+				abi.encodePacked(
+					'data:application/json;base64,',
+					Base64.encode(bytes(s.contractURI))
+				)
+			);
 	}
 }

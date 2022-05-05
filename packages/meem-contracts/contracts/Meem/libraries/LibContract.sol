@@ -62,5 +62,13 @@ library LibContract {
 				s.baseProperties.mintDatesLockedBy = props.mintDatesLockedBy;
 			}
 		}
+
+		if (s.baseProperties.transferLockupUntilLockedBy == address(0)) {
+			s.baseProperties.transferLockupUntil = props.transferLockupUntil;
+			if (props.transferLockupUntilLockedBy != address(0)) {
+				s.baseProperties.transferLockupUntilLockedBy = props
+					.transferLockupUntilLockedBy;
+			}
+		}
 	}
 }

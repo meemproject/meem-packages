@@ -7,7 +7,7 @@ import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibProperties} from '../libraries/LibProperties.sol';
 import {LibMeem, WrappedItem} from '../libraries/LibMeem.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
-import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemQueryStandard, BaseProperties} from '../interfaces/MeemStandard.sol';
+import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemQueryStandard, BaseProperties, ContractInfo} from '../interfaces/MeemStandard.sol';
 import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
 
@@ -139,5 +139,26 @@ contract MeemQueryFacet is IMeemQueryStandard {
 		returns (MeemProperties memory)
 	{
 		return LibProperties.getProperties(0, propertyType);
+	}
+
+	function getContractInfo() external view returns (ContractInfo memory) {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return
+			ContractInfo({
+				symbol: s.symbol,
+				name: s.name,
+				contractURI: LibERC721.contractURI(),
+				baseProperties: s.baseProperties,
+				defaultProperties: LibProperties.getProperties(
+					0,
+					PropertyType.DefaultMeem
+				),
+				defaultChildProperties: LibProperties.getProperties(
+					0,
+					PropertyType.DefaultChild
+				),
+				childDepth: s.childDepth,
+				nonOwnerSplitAllocationAmount: s.nonOwnerSplitAllocationAmount
+			});
 	}
 }
