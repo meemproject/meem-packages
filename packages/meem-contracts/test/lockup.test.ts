@@ -206,4 +206,96 @@ describe('Transfer Lockup', function Test() {
 				.transferFrom(signers[2].address, signers[3].address, token1)
 		).wait()
 	})
+
+	it('Can not transfer meem if isTransferrable=false', async () => {
+		await contracts.meemBaseFacet.connect(signers[1]).mint(
+			{
+				to: signers[1].address,
+				tokenURI: ipfsURL,
+				parentChain: Chain.Polygon,
+				parent: zeroAddress,
+				parentTokenId: 0,
+				meemType: MeemType.Original,
+				data: '',
+				isURILocked: true,
+				mintedBy: signers[0].address,
+				reactionTypes: [],
+				uriSource: UriSource.TokenUri
+			},
+			{ ...defaultOpenProperties, isTransferrable: false },
+			defaultOpenProperties
+		)
+
+		await (
+			await contracts.meemBaseFacet.connect(signers[2]).mint(
+				{
+					to: signers[2].address,
+					tokenURI: ipfsURL,
+					parentChain: Chain.Polygon,
+					parent: contractAddress,
+					parentTokenId: token0,
+					meemType: MeemType.Remix,
+					data: '',
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
+				},
+				defaultOpenProperties,
+				defaultOpenProperties
+			)
+		).wait()
+
+		await assert.isRejected(
+			contracts.eRC721Facet
+				.connect(signers[2])
+				.transferFrom(signers[2].address, signers[3].address, token1)
+		)
+	})
+
+	it('Can transfer meem if isTransferrable=true', async () => {
+		await contracts.meemBaseFacet.connect(signers[1]).mint(
+			{
+				to: signers[1].address,
+				tokenURI: ipfsURL,
+				parentChain: Chain.Polygon,
+				parent: zeroAddress,
+				parentTokenId: 0,
+				meemType: MeemType.Original,
+				data: '',
+				isURILocked: true,
+				mintedBy: signers[0].address,
+				reactionTypes: [],
+				uriSource: UriSource.TokenUri
+			},
+			{ ...defaultOpenProperties, isTransferrable: true },
+			defaultOpenProperties
+		)
+
+		await (
+			await contracts.meemBaseFacet.connect(signers[2]).mint(
+				{
+					to: signers[2].address,
+					tokenURI: ipfsURL,
+					parentChain: Chain.Polygon,
+					parent: contractAddress,
+					parentTokenId: token0,
+					meemType: MeemType.Remix,
+					data: '',
+					isURILocked: true,
+					mintedBy: signers[0].address,
+					reactionTypes: [],
+					uriSource: UriSource.TokenUri
+				},
+				defaultOpenProperties,
+				defaultOpenProperties
+			)
+		).wait()
+
+		await (
+			await contracts.eRC721Facet
+				.connect(signers[2])
+				.transferFrom(signers[2].address, signers[3].address, token1)
+		).wait()
+	})
 })

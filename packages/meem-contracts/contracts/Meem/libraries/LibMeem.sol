@@ -351,6 +351,20 @@ library LibMeem {
 		MeemProperties storage parentProperties = s.meemProperties[tokenId];
 		// uint256 currentChildren = s.children[tokenId].length;
 
+		if (
+			parentProperties.mintStartTimestamp > 0 &&
+			block.timestamp < uint256(parentProperties.mintStartTimestamp)
+		) {
+			revert(Error.MintingNotStarted);
+		}
+
+		if (
+			parentProperties.mintEndTimestamp > 0 &&
+			block.timestamp > uint256(parentProperties.mintEndTimestamp)
+		) {
+			revert(Error.MintingFinished);
+		}
+
 		// Check total children
 		if (
 			meemType == MeemType.Copy &&

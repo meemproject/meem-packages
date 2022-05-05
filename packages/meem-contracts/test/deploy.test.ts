@@ -10,7 +10,7 @@ import { Chain, Permission } from '../src/lib/meemStandard'
 import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
 import { Meem } from '../types'
-import meemABI from '../types/Meem.json'
+import meemABI, { BasePropertiesStruct } from '../types/Meem'
 import { MeemContracts } from './helpers'
 
 use(chaiAsPromised)
@@ -103,7 +103,7 @@ describe('Deploy', function Test() {
 
 		assert.isOk(proxy.address)
 
-		const bp = {
+		const bp: BasePropertiesStruct = {
 			totalOriginalsSupply: 100,
 			totalOriginalsSupplyLockedBy: signers[1].address,
 			mintPermissions: [
@@ -138,7 +138,15 @@ describe('Deploy', function Test() {
 					})
 					.toSeconds()
 			),
-			mintDatesLockedBy: signers[1].address
+			mintDatesLockedBy: signers[1].address,
+			transferLockupUntil: Math.floor(
+				DateTime.now()
+					.plus({
+						days: 30
+					})
+					.toSeconds()
+			),
+			transferLockupUntilLockedBy: signers[1].address
 		}
 
 		const tx = await initProxy({
@@ -162,11 +170,48 @@ describe('Deploy', function Test() {
 
 		const baseProperties = await contract.getBaseProperties()
 
-		console.log({ baseProperties })
-		// assert.isTrue(_.isEqual(baseProperties, bp))
-		Object.keys(bp).forEach(key => {
-			// TODO: Verify properties
-			console.log(key)
-		})
+		assert.equal(baseProperties.totalOriginalsSupply, bp.totalOriginalsSupply)
+		assert.equal(
+			baseProperties.totalOriginalsSupplyLockedBy,
+			bp.totalOriginalsSupplyLockedBy
+		)
+		assert.equal(
+			baseProperties.mintPermissions[0].addresses[0],
+			bp.mintPermissions[0].addresses[0]
+		)
+		assert.equal(
+			baseProperties.mintPermissions[0].costWei,
+			bp.mintPermissions[0].costWei
+		)
+		assert.equal(
+			baseProperties.mintPermissions[0].lockedBy,
+			bp.mintPermissions[0].lockedBy
+		)
+		assert.equal(
+			baseProperties.mintPermissionsLockedBy,
+			bp.mintPermissionsLockedBy
+		)
+		assert.equal(baseProperties.splits[0].toAddress, bp.splits[0].toAddress)
+		assert.equal(baseProperties.splits[0].amount, bp.splits[0].amount)
+		assert.equal(baseProperties.splits[0].lockedBy, bp.splits[0].lockedBy)
+		assert.equal(baseProperties.splitsLockedBy, bp.splitsLockedBy)
+		assert.equal(baseProperties.originalsPerWallet, bp.originalsPerWallet)
+		assert.equal(
+			baseProperties.originalsPerWalletLockedBy,
+			bp.originalsPerWalletLockedBy
+		)
+		assert.equal(baseProperties.isTransferrable, bp.isTransferrable)
+		assert.equal(
+			baseProperties.isTransferrableLockedBy,
+			bp.isTransferrableLockedBy
+		)
+		assert.equal(baseProperties.mintStartTimestamp, bp.mintStartTimestamp)
+		assert.equal(baseProperties.mintEndTimestamp, bp.mintEndTimestamp)
+		assert.equal(baseProperties.mintDatesLockedBy, bp.mintDatesLockedBy)
+		assert.equal(baseProperties.transferLockupUntil, bp.transferLockupUntil)
+		assert.equal(
+			baseProperties.transferLockupUntilLockedBy,
+			bp.transferLockupUntilLockedBy
+		)
 	})
 })

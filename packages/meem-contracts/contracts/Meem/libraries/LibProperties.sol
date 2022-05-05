@@ -11,8 +11,6 @@ import {Strings} from '../utils/Strings.sol';
 import {Error} from './Errors.sol';
 import {MeemEvents} from './Events.sol';
 
-import 'hardhat/console.sol';
-
 library LibProperties {
 	function requireAccess(uint256 tokenId, PropertyType propertyType)
 		internal
@@ -112,10 +110,6 @@ library LibProperties {
 		for (uint256 i = 0; i < newProps.splits.length; i++) {
 			props.splits.push(newProps.splits[i]);
 		}
-
-		console.log('SET PROPERTIES');
-		console.log(tokenId);
-		console.log(newProps.transferLockupUntil);
 
 		props.totalCopies = newProps.totalCopies;
 		props.totalCopiesLockedBy = newProps.totalCopiesLockedBy;
