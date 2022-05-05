@@ -42,7 +42,6 @@
 		"size": "hardhat size-contracts",
 		"createABI": "tsnd --transpile-only scripts/createABI.ts",
 		"generateTypes": "typechain --target ethers-v5  './types/Meem.json' --out-dir ./types",
-		"generateDocs": "solidity-docgen --solc-module solc-0.8 -i ./contracts -o ./docs",
 		"solregex": "solregex",
 		"link": "yarn link"
 	},
@@ -87,9 +86,7 @@
 		"prettier": "^2.4.1",
 		"prettier-plugin-solidity": "^1.0.0-beta.12",
 		"prompt": "^1.1.0",
-		"solc-0.8": "npm:solc@^0.8.4",
 		"solhint": "^3.3.7",
-		"solidity-docgen": "^0.5.16",
 		"solregex": "^0.3.1",
 		"ts-node": "^10.0.0",
 		"ts-node-dev": "^1.1.8",

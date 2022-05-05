@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibAccessControl} from '../libraries/LibAccessControl.sol';
@@ -179,5 +179,23 @@ contract MeemAdminFacet is IMeemAdminStandard {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
 		LibPermissions.lockMintPermissions();
+	}
+
+	function setTransferLockup(uint256 lockupUntil) external override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.ADMIN_ROLE);
+		if (s.baseProperties.transferLockupUntilLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+		s.baseProperties.transferLockupUntil = lockupUntil;
+	}
+
+	function lockTransferLockup() external override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.ADMIN_ROLE);
+		if (s.baseProperties.transferLockupUntilLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+		s.baseProperties.transferLockupUntilLockedBy = msg.sender;
 	}
 }

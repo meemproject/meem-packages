@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 import {LibReaction} from '../libraries/LibReaction.sol';
 import {IReactionStandard, Reaction} from '../interfaces/MeemStandard.sol';

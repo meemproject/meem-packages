@@ -16,7 +16,7 @@ M::::::M               M::::::ME::::::::::::::::::::EE::::::::::::::::::::EM::::
 MMMMMMMM               MMMMMMMMEEEEEEEEEEEE https://meem.wtf EEEEEEEEEEEEEEMMMMMMMM               MMMMMM*/
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 import '@solidstate/contracts/proxy/diamond/Diamond.sol';
 import '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 enum Chain {
 	Ethereum,
@@ -334,6 +334,10 @@ interface IMeemAdminStandard {
 	function setMintPermissions(MeemPermission[] memory permissions) external;
 
 	function lockMintPermissions() external;
+
+	function setTransferLockup(uint256 lockupUntil) external;
+
+	function lockTransferLockup() external;
 }
 
 interface IMeemSplitsStandard {
@@ -365,10 +369,6 @@ interface IMeemSplitsStandard {
 		uint256 idx,
 		Split memory split
 	) external;
-
-	function setTransferLockup(uint256 lockupUntil) external;
-
-	function lockTransferLockup() external;
 }
 
 interface IMeemPermissionsStandard {
