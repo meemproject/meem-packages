@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/meemproject/meem-packages/compare/v0.2.0...v0.3.0) (2022-05-05)
+
+
+### Features
+
+* upgrade to solidity 0.8.13 ([13b9874](https://github.com/meemproject/meem-packages/commit/13b9874))
+
+
+
+
+
 # [0.2.0](https://github.com/meemproject/meem-packages/compare/v0.1.9...v0.2.0) (2022-04-28)
 
 
