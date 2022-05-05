@@ -98,15 +98,6 @@ contract MeemAdminFacet is IMeemAdminStandard {
 		s.baseProperties.originalsPerWallet = originalsPerWallet;
 	}
 
-	function setIsTransferrable(bool isTransferrable) external override {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibAccessControl.requireRole(s.ADMIN_ROLE);
-		if (s.baseProperties.isTransferrableLockedBy != address(0)) {
-			revert(Error.PropertyLocked);
-		}
-		s.baseProperties.isTransferrable = isTransferrable;
-	}
-
 	function lockBaseSplits() external override {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
@@ -132,6 +123,15 @@ contract MeemAdminFacet is IMeemAdminStandard {
 			revert(Error.PropertyLocked);
 		}
 		s.baseProperties.originalsPerWalletLockedBy = msg.sender;
+	}
+
+	function setIsTransferrable(bool isTransferrable) external override {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		LibAccessControl.requireRole(s.ADMIN_ROLE);
+		if (s.baseProperties.isTransferrableLockedBy != address(0)) {
+			revert(Error.PropertyLocked);
+		}
+		s.baseProperties.isTransferrable = isTransferrable;
 	}
 
 	function lockIsTransferrable() external override {

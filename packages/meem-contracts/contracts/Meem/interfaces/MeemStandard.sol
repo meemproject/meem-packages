@@ -450,6 +450,22 @@ interface IMeemPermissionsStandard {
 	function setURISource(uint256 tokenId, URISource uriSource) external;
 
 	function setTokenUri(uint256 tokenId, string memory uri) external;
+
+	function setIsTransferrable(uint256 tokenId, bool isTransferrable) external;
+
+	function lockIsTransferrable(uint256 tokenId) external;
+
+	function lockMintDates(uint256 tokenId) external;
+
+	function setMintDates(
+		uint256 tokenId,
+		int256 startTimestamp,
+		int256 endTimestamp
+	) external;
+
+	function setTransferLockup(uint256 tokenId, uint256 lockupUntil) external;
+
+	function lockTransferLockup(uint256 tokenId) external;
 }
 
 interface IClippingStandard {

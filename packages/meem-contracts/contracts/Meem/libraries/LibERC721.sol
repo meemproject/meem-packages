@@ -431,6 +431,8 @@ library LibERC721 {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		bool canFacilitateClaim = _canFacilitateClaim(_msgSender(), tokenId);
 
+		uint256 parentTokenId = s.meems[tokenId].parentTokenId;
+
 		// Meems can be transferred if:
 		// 1. They are wrapped and the sender can facilitate claim
 		// 2. They are owned by this contract and the sender can facilitate claim
@@ -455,9 +457,9 @@ library LibERC721 {
 		} else if (
 			(s.meems[tokenId].meemType == MeemType.Remix ||
 				s.meems[tokenId].meemType == MeemType.Copy) &&
-			(!s.meemProperties[tokenId].isTransferrable ||
-				(s.meemProperties[tokenId].transferLockupUntil > 0 &&
-					s.meemProperties[tokenId].transferLockupUntil >
+			(!s.meemProperties[parentTokenId].isTransferrable ||
+				(s.meemProperties[parentTokenId].transferLockupUntil > 0 &&
+					s.meemProperties[parentTokenId].transferLockupUntil >
 					block.timestamp))
 		) {
 			revert(Error.TransfersLocked);

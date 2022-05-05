@@ -2,7 +2,6 @@
 pragma solidity ^0.8.13;
 pragma experimental ABIEncoderV2;
 
-// import 'hardhat/console.sol';
 import {WrappedItem, PropertyType, PermissionType, MeemPermission, MeemProperties, URISource, MeemMintParameters, Meem, Chain, MeemType, MeemBase, Permission, BaseProperties, Split} from '../interfaces/MeemStandard.sol';
 import {IERC721} from '../interfaces/IERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
@@ -14,8 +13,6 @@ import {LibPermissions} from './LibPermissions.sol';
 import {Strings} from '../utils/Strings.sol';
 import {Error} from '../libraries/Errors.sol';
 import {MeemEvents} from '../libraries/Events.sol';
-
-import 'hardhat/console.sol';
 
 library LibMeem {
 	function mint(
@@ -471,15 +468,12 @@ library LibMeem {
 			}
 
 			if (perm.permission == Permission.Holders) {
-				console.log('Checking holders', msg.sender);
 				// Check each address
 				for (uint256 j = 0; j < perm.addresses.length; j++) {
-					console.log('Checking address', perm.addresses[j]);
 					uint256 balance = IERC721(perm.addresses[j]).balanceOf(
 						msg.sender
 					);
-					console.log('Balance: ', balance);
-					console.log('numTokens: ', perm.numTokens);
+
 					if (balance >= perm.numTokens) {
 						hasPermission = true;
 						break;
@@ -491,15 +485,11 @@ library LibMeem {
 				hasPermission &&
 				(!hasCostBeenSet || (hasCostBeenSet && costWei > perm.costWei))
 			) {
-				// console.log('SET COST');
-				// console.log(
 				// 	perm.permission == Permission.Anyone
 				// 		? 'anyone'
 				// 		: 'not anyone'
 				// );
-				// // console.log(perm.permission);
-				// // console.log(perm.addresses);
-				// console.log(perm.costWei);
+
 				costWei = perm.costWei;
 				hasCostBeenSet = true;
 			}
@@ -509,10 +499,6 @@ library LibMeem {
 		if (!hasPermission) {
 			revert(Error.NoPermission);
 		}
-
-		// console.log('Cost:');
-		// console.log(costWei);
-		// console.log(msg.value);
 
 		if (costWei != msg.value) {
 			revert(Error.IncorrectMsgValue);
