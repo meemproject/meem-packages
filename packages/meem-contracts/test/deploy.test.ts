@@ -10,7 +10,10 @@ import { Chain, Permission } from '../src/lib/meemStandard'
 import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
 import { Meem } from '../types'
-import meemABI, { BasePropertiesStruct } from '../types/Meem'
+// eslint-disable-next-line import/no-duplicates
+import { BasePropertiesStruct } from '../types/Meem'
+// eslint-disable-next-line import/no-duplicates
+import meemABI from '../types/Meem.json'
 import { MeemContracts } from './helpers'
 
 use(chaiAsPromised)
