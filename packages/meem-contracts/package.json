@@ -13,8 +13,7 @@
 		"package.json",
 		"README.md",
 		"CHANGELOG.md",
-		"dist",
-		"artifacts"
+		"dist"
 	],
 	"scripts": {
 		"build": "yarn build:sol && yarn build:ts",

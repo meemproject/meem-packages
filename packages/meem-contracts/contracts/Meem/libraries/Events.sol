@@ -120,7 +120,7 @@ library MeemEvents {
 	event MeemCopiesPerWalletSet(
 		uint256 tokenId,
 		PropertyType propertyType,
-		int256 newTotalRemixes
+		int256 newTotalCopies
 	);
 	event MeemTotalRemixesSet(
 		uint256 tokenId,
