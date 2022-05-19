@@ -289,6 +289,10 @@ interface IMeemQueryStandard {
 		external
 		view
 		returns (MeemProperties memory);
+
+	function getContractInfo() external view returns (ContractInfo memory);
+
+	function getRoles(bytes32 role) external view returns (address[] memory);
 }
 
 interface IMeemAdminStandard {
@@ -343,6 +347,8 @@ interface IMeemAdminStandard {
 		PropertyType propertyType,
 		MeemProperties memory props
 	) external;
+
+	function reInitialize(InitParams memory params) external;
 }
 
 interface IMeemSplitsStandard {

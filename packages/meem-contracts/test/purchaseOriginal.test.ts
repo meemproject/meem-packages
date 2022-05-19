@@ -34,7 +34,7 @@ describe('Purchase Original', function Test() {
 		signers = await ethers.getSigners()
 		const { DiamondProxy } = await deployDiamond({
 			args: {
-				deployProxy: true
+				proxy: true
 			},
 			ethers
 		})
@@ -349,7 +349,7 @@ describe('Purchase Original', function Test() {
 		const { DiamondProxy } = await deployDiamond({
 			ethers,
 			args: {
-				deployProxy: true
+				proxy: true
 			}
 		})
 		const otherContracts = await getMeemContracts(DiamondProxy)

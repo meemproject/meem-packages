@@ -47,6 +47,12 @@ library AccessControlEvents {
 		address indexed account,
 		address indexed sender
 	);
+
+	event MeemRoleSet(
+		bytes32 indexed role,
+		address[] indexed account,
+		address indexed sender
+	);
 }
 
 library MeemERC721Events {
@@ -120,7 +126,7 @@ library MeemEvents {
 	event MeemCopiesPerWalletSet(
 		uint256 tokenId,
 		PropertyType propertyType,
-		int256 newTotalRemixes
+		int256 newTotalCopies
 	);
 	event MeemTotalRemixesSet(
 		uint256 tokenId,

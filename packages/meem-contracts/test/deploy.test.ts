@@ -14,7 +14,7 @@ import { Meem } from '../types'
 import { BasePropertiesStruct } from '../types/Meem'
 // eslint-disable-next-line import/no-duplicates
 import meemABI from '../types/Meem.json'
-import { MeemContracts } from './helpers'
+import { getMeemContracts, MeemContracts } from './helpers'
 
 use(chaiAsPromised)
 
@@ -50,7 +50,7 @@ describe('Deploy', function Test() {
 		signers = await ethers.getSigners()
 		const { DiamondProxy } = await deployDiamond({
 			args: {
-				deployProxy: false
+				proxy: false
 			},
 			ethers
 		})
@@ -61,7 +61,7 @@ describe('Deploy', function Test() {
 		version = deployHistory[zeroAddress] as IVersion
 	})
 
-	it('Can deploy and init', async () => {
+	it('Can deploy and init and not init again', async () => {
 		const provider = ethers.getDefaultProvider()
 		const proxy = await deployProxy({
 			signer: signers[0]
@@ -96,6 +96,11 @@ describe('Deploy', function Test() {
 			).toString(),
 			contractURI
 		)
+
+		const adminRole = await contract.ADMIN_ROLE()
+		const admins = await contract.getRoles(adminRole)
+
+		assert.equal(admins[0], signers[0].address)
 	})
 
 	it('Can init custom baseProperties', async () => {

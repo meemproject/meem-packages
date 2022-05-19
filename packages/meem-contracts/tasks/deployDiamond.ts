@@ -41,7 +41,7 @@ export interface IDeployHistory {
 export async function deployDiamond(options: {
 	args?: {
 		gwei?: number
-		deployProxy?: boolean
+		proxy?: boolean
 	}
 	ethers: HardhatEthersHelpers
 	hardhatArguments?: HardhatArguments
@@ -64,7 +64,7 @@ export async function deployDiamond(options: {
 	}
 
 	const wei = args?.gwei ? args.gwei * 1000000000 : undefined
-	const shouldDeployProxy = !!args?.deployProxy
+	const shouldDeployProxy = !!args?.proxy
 
 	const accounts = await ethers.getSigners()
 	const contractOwner = accounts[0]
@@ -248,7 +248,7 @@ export async function deployDiamond(options: {
 task('deployDiamond', 'Deploys Meem')
 	.addParam('gwei', 'The gwei price', 31, types.int, true)
 	.addParam(
-		'deployProxy',
+		'proxy',
 		'Deploy a proxy contract with the facets',
 		false,
 		types.boolean,

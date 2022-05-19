@@ -35,7 +35,7 @@ describe('Mint Dates', function Test() {
 		signers = await ethers.getSigners()
 		const { DiamondProxy } = await deployDiamond({
 			args: {
-				deployProxy: true
+				proxy: true
 			},
 			ethers
 		})

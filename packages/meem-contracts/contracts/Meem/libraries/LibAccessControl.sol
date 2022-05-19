@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
+import {Array} from '../utils/Array.sol';
 import {Error} from './Errors.sol';
 import {AccessControlEvents} from './Events.sol';
 
@@ -36,17 +37,6 @@ library LibAccessControl {
 	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.roles[role].members[account];
-	}
-
-	/**
-	 * @dev Returns the admin role that controls `role`. See {grantRole} and
-	 * {revokeRole}.
-	 *
-	 * To change a role's admin, use {_setRoleAdmin}.
-	 */
-	function getRoleAdmin(bytes32 role) internal view returns (bytes32) {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.roles[role].adminRole;
 	}
 
 	/**
@@ -95,7 +85,7 @@ library LibAccessControl {
 	 * - the caller must be `account`.
 	 */
 	function renounceRole(bytes32 role, address account) internal {
-		if (account != _msgSender()) {
+		if (account != msg.sender) {
 			revert(Error.NoRenounceOthers);
 		}
 
@@ -158,31 +148,13 @@ library LibAccessControl {
 		return string(buffer);
 	}
 
-	/**
-	 * @dev Sets `adminRole` as ``role``'s admin role.
-	 *
-	 * Emits a {RoleAdminChanged} event.
-	 */
-	function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		bytes32 previousAdminRole = getRoleAdmin(role);
-		s.roles[role].adminRole = adminRole;
-		emit AccessControlEvents.MeemRoleAdminChanged(
-			role,
-			previousAdminRole,
-			adminRole
-		);
-	}
-
 	function _grantRole(bytes32 role, address account) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		if (!hasRole(role, account)) {
 			s.roles[role].members[account] = true;
-			emit AccessControlEvents.MeemRoleGranted(
-				role,
-				account,
-				_msgSender()
-			);
+			s.rolesList[role].push(account);
+			s.rolesListIndex[role][account] = s.rolesList[role].length - 1;
+			emit AccessControlEvents.MeemRoleGranted(role, account, msg.sender);
 		}
 	}
 
@@ -190,15 +162,32 @@ library LibAccessControl {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		if (hasRole(role, account)) {
 			s.roles[role].members[account] = false;
-			emit AccessControlEvents.MeemRoleRevoked(
-				role,
-				account,
-				_msgSender()
-			);
+			uint256 idx = s.rolesListIndex[role][account];
+			Array.removeAt(s.rolesList[role], idx);
+
+			emit AccessControlEvents.MeemRoleRevoked(role, account, msg.sender);
 		}
 	}
 
-	function _msgSender() internal view returns (address) {
-		return msg.sender;
+	function _setRole(bytes32 role, address[] memory accounts) internal {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		requireRole(s.ADMIN_ROLE);
+		for (uint256 i = 0; i < s.rolesList[role].length; i++) {
+			address addy = s.rolesList[role][i];
+			delete s.rolesListIndex[role][addy];
+			s.roles[role].members[addy] = false;
+		}
+		delete s.rolesList[role];
+
+		for (uint256 i = 0; i < accounts.length; i++) {
+			address addy = accounts[i];
+			if (!hasRole(role, addy)) {
+				s.rolesList[role].push(addy);
+				s.rolesListIndex[role][addy] = i;
+				s.roles[role].members[addy] = true;
+			}
+		}
+
+		emit AccessControlEvents.MeemRoleSet(role, accounts, msg.sender);
 	}
 }
