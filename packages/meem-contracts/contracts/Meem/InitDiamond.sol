@@ -16,15 +16,49 @@ import '@solidstate/contracts/token/ERC721/IERC721.sol';
 import '@solidstate/contracts/token/ERC721/enumerable/IERC721Enumerable.sol';
 import '@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol';
 import '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
+import {OwnableStorage} from '@solidstate/contracts/access/OwnableStorage.sol';
 
 contract InitDiamond is IInitDiamondStandard {
 	using ERC165Storage for ERC165Storage.Layout;
 
 	function init(InitParams memory params) external override {
-		ERC721MetadataStorage.Layout storage erc721 = ERC721MetadataStorage
-			.layout();
-		erc721.name = params.name;
-		erc721.symbol = params.symbol;
+		OwnableStorage.Layout storage o = OwnableStorage.layout();
+		if (o.owner != msg.sender) {
+			revert(Error.NotOwner);
+		}
+
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+
+		if (s.isInitialized) {
+			revert(Error.AlreadyInitialized);
+		}
+
+		s.ADMIN_ROLE = keccak256('ADMIN_ROLE');
+		s.MINTER_ROLE = keccak256('MINTER_ROLE');
+
+		LibAccessControl._grantRole(s.ADMIN_ROLE, msg.sender);
+		LibAccessControl._grantRole(s.MINTER_ROLE, msg.sender);
+
+		address[] memory admins = new address[](params.admins.length + 1);
+		for (uint256 i = 0; i < params.admins.length; i++) {
+			admins[i] = params.admins[i];
+		}
+
+		admins[params.admins.length] = msg.sender;
+
+		InitParams memory newParams = InitParams({
+			symbol: params.symbol,
+			name: params.name,
+			contractURI: params.contractURI,
+			baseProperties: params.baseProperties,
+			defaultProperties: params.defaultProperties,
+			defaultChildProperties: params.defaultChildProperties,
+			admins: admins,
+			tokenCounterStart: params.tokenCounterStart,
+			childDepth: params.childDepth,
+			nonOwnerSplitAllocationAmount: params.nonOwnerSplitAllocationAmount
+		});
+		LibContract.initialize(newParams);
 
 		ERC165Storage.Layout storage erc165 = ERC165Storage.layout();
 		erc165.setSupportedInterface(type(IERC721).interfaceId, true);
@@ -47,40 +81,6 @@ contract InitDiamond is IInitDiamondStandard {
 			true
 		);
 
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		s.name = params.name;
-		s.symbol = params.symbol;
-		s.childDepth = params.childDepth;
-		s.nonOwnerSplitAllocationAmount = params.nonOwnerSplitAllocationAmount;
-		s.tokenCounter = params.tokenCounterStart;
-		s.ADMIN_ROLE = keccak256('ADMIN_ROLE');
-		s.MINTER_ROLE = keccak256('MINTER_ROLE');
-		s.contractURI = params.contractURI;
-		if (params.tokenCounterStart < 1) {
-			revert(Error.InvalidTokenCounter);
-		}
-		s.tokenCounter = params.tokenCounterStart;
-
-		LibAccessControl._grantRole(s.ADMIN_ROLE, msg.sender);
-		LibAccessControl._grantRole(s.MINTER_ROLE, msg.sender);
-
-		for (uint256 i = 0; i < params.admins.length; i++) {
-			LibAccessControl._grantRole(s.ADMIN_ROLE, params.admins[i]);
-			LibAccessControl._grantRole(s.MINTER_ROLE, params.admins[i]);
-		}
-
-		LibContract.setBaseProperties(params.baseProperties);
-		LibProperties.setProperties(
-			0,
-			PropertyType.DefaultMeem,
-			params.defaultProperties
-		);
-		LibProperties.setProperties(
-			0,
-			PropertyType.DefaultChild,
-			params.defaultChildProperties
-		);
-
-		emit InitEvents.MeemContractInitialized(address(this));
+		s.isInitialized = true;
 	}
 }

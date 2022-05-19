@@ -161,4 +161,9 @@ contract MeemQueryFacet is IMeemQueryStandard {
 				nonOwnerSplitAllocationAmount: s.nonOwnerSplitAllocationAmount
 			});
 	}
+
+	function getRoles(bytes32 role) external view returns (address[] memory) {
+		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		return s.rolesList[role];
+	}
 }

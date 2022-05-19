@@ -29,7 +29,7 @@ describe('Minting', function Test() {
 
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
 			args: {
-				deployProxy: true
+				proxy: true
 			},
 			ethers
 		})

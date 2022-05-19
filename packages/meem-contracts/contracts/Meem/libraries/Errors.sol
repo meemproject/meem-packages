@@ -60,6 +60,8 @@ library Error {
 	string public constant MintingNotStarted = 'MINTING_NOT_STARTED';
 	string public constant MintingFinished = 'MINTING_FINISHED';
 	string public constant InvalidTokenCounter = 'INVALID_TOKEN_COUNTER';
+	string public constant NotOwner = 'NOT_OWNER';
+	string public constant AlreadyInitialized = 'ALREADY_INITIALIZED';
 }
 
 // TODO: Use custom errors when more widely supported

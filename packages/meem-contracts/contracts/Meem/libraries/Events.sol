@@ -47,6 +47,12 @@ library AccessControlEvents {
 		address indexed account,
 		address indexed sender
 	);
+
+	event MeemRoleSet(
+		bytes32 indexed role,
+		address[] indexed account,
+		address indexed sender
+	);
 }
 
 library MeemERC721Events {

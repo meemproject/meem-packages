@@ -9,6 +9,7 @@ library LibAppStorage {
 
 	struct RoleData {
 		mapping(address => bool) members;
+		/** DEPRECATED */
 		bytes32 adminRole;
 	}
 
@@ -99,12 +100,16 @@ library LibAppStorage {
 		BaseProperties baseProperties;
 		MeemProperties defaultProperties;
 		MeemProperties defaultChildProperties;
-		/** Keeping track of  */
+		/** Keeping track of original tokens owner -> token -> isOwner */
 		mapping(address => mapping(uint256 => bool)) originalOwnerTokens;
 		/** Number of original tokens held by a wallet */
 		mapping(address => uint256) originalOwnerCount;
 		mapping(address => mapping(uint256 => uint256)) copiesOwnerTokenIndexes;
 		mapping(address => mapping(uint256 => uint256)) remixesOwnerTokenIndexes;
+		/** role -> addresses[] */
+		mapping(bytes32 => address[]) rolesList;
+		mapping(bytes32 => mapping(address => uint256)) rolesListIndex;
+		bool isInitialized;
 	}
 
 	function diamondStorage() internal pure returns (AppStorage storage ds) {

@@ -2,23 +2,28 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
+import { DateTime } from 'luxon'
+import { defaultMeemProperties, Permission } from '../src'
 import { defaultOpenProperties } from '../src/lib/meemProperties'
 import { Chain, MeemType, UriSource } from '../src/lib/meemStandard'
 import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
 import {
 	AccessControlFacet,
+	InitDiamond,
 	MeemAdminFacet,
 	MeemBaseFacet,
 	MeemQueryFacet,
 	MeemSplitsFacet,
 	Ownable
 } from '../typechain'
+import { BasePropertiesStruct } from '../types/Meem'
 
 use(chaiAsPromised)
 
 describe('Contract Admin', function Test() {
 	let meemFacet: MeemBaseFacet
+	let initFacet: InitDiamond
 	let adminFacet: MeemAdminFacet
 	let meemSplitsFacet: MeemSplitsFacet
 	let ownershipFacet: Ownable
@@ -35,7 +40,7 @@ describe('Contract Admin', function Test() {
 		signers = await ethers.getSigners()
 		const { DiamondProxy: DiamondAddress } = await deployDiamond({
 			args: {
-				deployProxy: true
+				proxy: true
 			},
 			ethers
 		})
@@ -69,6 +74,11 @@ describe('Contract Admin', function Test() {
 			'MeemQueryFacet',
 			DiamondAddress
 		)) as MeemQueryFacet
+
+		initFacet = (await ethers.getContractAt(
+			'InitDiamond',
+			DiamondAddress
+		)) as InitDiamond
 	})
 
 	it('Assigns ownership to deployer', async () => {
@@ -216,5 +226,142 @@ describe('Contract Admin', function Test() {
 		assert.equal(token.root, parent)
 		assert.equal(token.rootChain, Chain.Ethereum)
 		assert.equal(token.rootTokenId.toNumber(), 23)
+	})
+
+	it('Can re-initialize as admin', async () => {
+		const bp: BasePropertiesStruct = {
+			totalOriginalsSupply: 100,
+			totalOriginalsSupplyLockedBy: signers[1].address,
+			mintPermissions: [
+				{
+					permission: Permission.Addresses,
+					addresses: [signers[2].address, signers[2].address],
+					numTokens: 0,
+					lockedBy: signers[2].address,
+					costWei: 1000
+				}
+			],
+			mintPermissionsLockedBy: signers[2].address,
+			splits: [
+				{
+					toAddress: signers[2].address,
+					amount: 100,
+					// lockedBy: signers[2].address
+					lockedBy: zeroAddress
+				}
+			],
+			// splitsLockedBy: signers[2].address,
+			splitsLockedBy: zeroAddress,
+			originalsPerWallet: 1,
+			originalsPerWalletLockedBy: signers[2].address,
+			isTransferrable: false,
+			isTransferrableLockedBy: signers[2].address,
+			mintStartTimestamp: Math.floor(DateTime.now().toSeconds()),
+			mintEndTimestamp: Math.floor(
+				DateTime.now()
+					.plus({
+						days: 30
+					})
+					.toSeconds()
+			),
+			mintDatesLockedBy: signers[2].address,
+			transferLockupUntil: Math.floor(
+				DateTime.now()
+					.plus({
+						days: 30
+					})
+					.toSeconds()
+			),
+			transferLockupUntilLockedBy: signers[2].address
+		}
+
+		const params: Parameters<typeof adminFacet.reInitialize> = [
+			{
+				symbol: 'REINIT',
+				name: 'Re init test',
+				contractURI: JSON.stringify({ test: 'https://test.example.com' }),
+				baseProperties: bp,
+				defaultProperties: defaultMeemProperties,
+				defaultChildProperties: defaultMeemProperties,
+				admins: [signers[0].address, signers[2].address],
+				tokenCounterStart: 10,
+				childDepth: 23,
+				nonOwnerSplitAllocationAmount: 10
+			}
+		]
+
+		// Can't call init() again
+		await assert.isRejected(initFacet.connect(signers[0]).init(...params))
+
+		// Can call reinitialize
+		const { status } = await (
+			await adminFacet.connect(signers[0]).reInitialize(...params)
+		).wait()
+
+		const adminRole = await accessControlFacet.ADMIN_ROLE()
+		const admins = await queryFacet.getRoles(adminRole)
+
+		assert.equal(admins[0], signers[0].address)
+		assert.equal(admins[1], signers[2].address)
+
+		const baseProperties = await queryFacet.getBaseProperties()
+		assert.equal(baseProperties.totalOriginalsSupply, bp.totalOriginalsSupply)
+		assert.equal(
+			baseProperties.totalOriginalsSupplyLockedBy,
+			bp.totalOriginalsSupplyLockedBy
+		)
+		assert.equal(
+			baseProperties.mintPermissions[0].addresses[0],
+			bp.mintPermissions[0].addresses[0]
+		)
+		assert.equal(
+			baseProperties.mintPermissions[0].costWei,
+			bp.mintPermissions[0].costWei
+		)
+		assert.equal(
+			baseProperties.mintPermissions[0].lockedBy,
+			bp.mintPermissions[0].lockedBy
+		)
+		assert.equal(
+			baseProperties.mintPermissionsLockedBy,
+			bp.mintPermissionsLockedBy
+		)
+		assert.equal(baseProperties.splits[0].toAddress, bp.splits[0].toAddress)
+		assert.equal(baseProperties.splits[0].amount, bp.splits[0].amount)
+		assert.equal(baseProperties.splits[0].lockedBy, bp.splits[0].lockedBy)
+		assert.equal(baseProperties.splitsLockedBy, bp.splitsLockedBy)
+		assert.equal(baseProperties.originalsPerWallet, bp.originalsPerWallet)
+		assert.equal(
+			baseProperties.originalsPerWalletLockedBy,
+			bp.originalsPerWalletLockedBy
+		)
+		assert.equal(baseProperties.isTransferrable, bp.isTransferrable)
+		assert.equal(
+			baseProperties.isTransferrableLockedBy,
+			bp.isTransferrableLockedBy
+		)
+		assert.equal(baseProperties.mintStartTimestamp, bp.mintStartTimestamp)
+		assert.equal(baseProperties.mintEndTimestamp, bp.mintEndTimestamp)
+		assert.equal(baseProperties.mintDatesLockedBy, bp.mintDatesLockedBy)
+		assert.equal(baseProperties.transferLockupUntil, bp.transferLockupUntil)
+		assert.equal(
+			baseProperties.transferLockupUntilLockedBy,
+			bp.transferLockupUntilLockedBy
+		)
+
+		const contractInfo = await queryFacet.getContractInfo()
+		assert.equal(contractInfo.symbol, params[0].symbol)
+		assert.equal(contractInfo.symbol, params[0].symbol)
+		assert.equal(contractInfo.name, params[0].name)
+		const contractURI = Buffer.from(
+			contractInfo.contractURI.substring(29),
+			'base64'
+		).toString()
+		assert.equal(contractURI, params[0].contractURI)
+		assert.equal(contractInfo.childDepth, params[0].childDepth)
+		assert.equal(
+			contractInfo.nonOwnerSplitAllocationAmount,
+			params[0].nonOwnerSplitAllocationAmount
+		)
 	})
 })
