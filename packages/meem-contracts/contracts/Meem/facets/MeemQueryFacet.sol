@@ -141,7 +141,12 @@ contract MeemQueryFacet is IMeemQueryStandard {
 		return LibProperties.getProperties(0, propertyType);
 	}
 
-	function getContractInfo() external view returns (ContractInfo memory) {
+	function getContractInfo()
+		external
+		view
+		override
+		returns (ContractInfo memory)
+	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return
 			ContractInfo({
@@ -162,7 +167,12 @@ contract MeemQueryFacet is IMeemQueryStandard {
 			});
 	}
 
-	function getRoles(bytes32 role) external view returns (address[] memory) {
+	function getRoles(bytes32 role)
+		external
+		view
+		override
+		returns (address[] memory)
+	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		return s.rolesList[role];
 	}

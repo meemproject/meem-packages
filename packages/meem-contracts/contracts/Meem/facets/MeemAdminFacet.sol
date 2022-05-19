@@ -210,7 +210,7 @@ contract MeemAdminFacet is IMeemAdminStandard {
 		LibProperties.setProperties(propertyType, props);
 	}
 
-	function reInitialize(InitParams memory params) external {
+	function reInitialize(InitParams memory params) external override {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		LibAccessControl.requireRole(s.ADMIN_ROLE);
 		LibContract.initialize(params);
