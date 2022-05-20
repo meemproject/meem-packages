@@ -9,6 +9,7 @@ import type {
 	BasePropertiesStruct
 } from '../typechain/contracts/Meem/interfaces/MeemStandard.sol/IInitDiamondStandard'
 import type { MeemPropertiesStruct } from '../typechain/contracts/Meem/interfaces/MeemStandard.sol/IMeemBaseStandard'
+import { IVersion, facets } from './facets.generated'
 import { FacetCutAction, IFacetCut } from './lib/diamond'
 import log from './lib/log'
 import {
@@ -17,7 +18,7 @@ import {
 } from './lib/meemProperties'
 import { Chain } from './lib/meemStandard'
 import { zeroAddress } from './lib/utils'
-import { IVersion, versions } from './versions'
+import { versions } from './versions'
 
 export interface ICut {
 	facetAddress: string
@@ -71,18 +72,16 @@ export async function initProxy(options: {
 	const defaultChildProperties =
 		options.defaultChildProperties ?? defaultMeemProperties
 
-	let version = versions[chain].history[versions[chain].latest]
+	let version = facets[chain][versions[chain].latest]
 	if (options.customVersion) {
 		version = options.customVersion
 	} else if (options.version) {
 		// @ts-ignore
 		version = versions[chain][options.version]
 			? // @ts-ignore
-			  versions[chain].history[versions[chain][options.version]]
-			: versions[chain].history[options.version]
+			  facets[chain][versions[chain][options.version]]
+			: facets[chain][options.version]
 	}
-
-	// console.log({ versions, chain, opt: options.version, version })
 
 	const cuts =
 		options.cuts ??
@@ -144,12 +143,12 @@ export async function upgrade(options: {
 	const tags = ['latest', 'beta', 'alpha']
 	const from = tags.includes(fromVersion)
 		? // @ts-ignore
-		  versions[chain].history[versions[chain][fromVersion]]
-		: versions[chain].history[fromVersion]
+		  facets[chain][versions[chain][fromVersion]]
+		: facets[chain][fromVersion]
 	const to = tags.includes(toVersion)
 		? // @ts-ignore
-		  versions[chain].history[versions[chain][toVersion]]
-		: versions[chain].history[toVersion]
+		  facets[chain][versions[chain][toVersion]]
+		: facets[chain][toVersion]
 
 	if (!from) {
 		log.crit(`Invalid from version specified: ${fromVersion}`)

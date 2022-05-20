@@ -2,8 +2,7 @@ import { ERC20, MeemAPI } from '@meemproject/api'
 import erc20ABI from '@meemproject/api/build/abis/ERC20.json'
 // import type { MeemMarket } from '@meemproject/market-contracts'
 import auctionABI from '@meemproject/market-contracts/types/MeemMarket.json'
-import type { Meem } from '@meemproject/meem-contracts'
-import meemABI from '@meemproject/meem-contracts/types/Meem.json'
+import { Chain, Meem, getMeemContract } from '@meemproject/meem-contracts'
 import type { MeemId } from '@meemproject/meem-id-contracts'
 import meemIdABI from '@meemproject/meem-id-contracts/types/MeemId.json'
 import WalletConnectProvider from '@walletconnect/web3-provider'
@@ -112,6 +111,8 @@ export interface IWalletContextProps {
 	contractAddressMeem: string
 
 	contractAddressMeemId?: string
+
+	meemVersion?: string
 }
 
 export const WalletProvider: React.FC<IWalletContextProps> = ({
@@ -121,6 +122,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	contractAddressAuction,
 	contractAddressMeem,
 	contractAddressMeemId,
+	meemVersion,
 	...props
 }: IWalletContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
@@ -421,16 +423,23 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	}, [accounts])
 
 	useEffect(() => {
-		if (!contractAddressMeem) {
-			log.debug('Invalid Meem contract address. Check env vars.')
-			return
+		async function initMeemContract() {
+			if (!contractAddressMeem) {
+				log.debug('Invalid Meem contract address. Check env vars.')
+				return
+			}
+
+			const contract = await getMeemContract({
+				contractAddress: contractAddressMeem,
+				signer,
+				chain: networkName === 'rinkeby' ? Chain.Rinkeby : Chain.Polygon,
+				version: meemVersion ?? 'latest'
+			})
+
+			setMeemContract(contract)
 		}
-		const contract = new Contract(
-			contractAddressMeem,
-			meemABI,
-			signer
-		) as unknown as Meem
-		setMeemContract(contract)
+
+		initMeemContract()
 	}, [contractAddressMeem, signer])
 
 	useEffect(() => {

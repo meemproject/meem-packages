@@ -2,7 +2,8 @@
   "extends": "./tsconfig.json",
   "exclude": ["**/dist"],
   "include": [
-    "./src"
+    "./src",
+    "./versions"
   ],
   "files": ["./index.ts"]
 }
