@@ -28,7 +28,8 @@
     "./test",
     "./scripts",
     "./types",
-    "./src"
+    "./src",
+    "./versions"
   ],
   "files": ["./hardhat.config.ts", "./index.ts"]
 }

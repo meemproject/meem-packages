@@ -2,7 +2,7 @@ import { ERC20, MeemAPI } from '@meemproject/api'
 import erc20ABI from '@meemproject/api/build/abis/ERC20.json'
 // import type { MeemMarket } from '@meemproject/market-contracts'
 import auctionABI from '@meemproject/market-contracts/types/MeemMarket.json'
-import { Chain, Meem, getMeemContract } from '@meemproject/meem-contracts'
+import { Meem, getMeemContract } from '@meemproject/meem-contracts'
 import type { MeemId } from '@meemproject/meem-id-contracts'
 import meemIdABI from '@meemproject/meem-id-contracts/types/MeemId.json'
 import WalletConnectProvider from '@walletconnect/web3-provider'
@@ -111,8 +111,6 @@ export interface IWalletContextProps {
 	contractAddressMeem: string
 
 	contractAddressMeemId?: string
-
-	meemVersion?: string
 }
 
 export const WalletProvider: React.FC<IWalletContextProps> = ({
@@ -122,7 +120,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	contractAddressAuction,
 	contractAddressMeem,
 	contractAddressMeemId,
-	meemVersion,
 	...props
 }: IWalletContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
@@ -431,9 +428,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 
 			const contract = await getMeemContract({
 				contractAddress: contractAddressMeem,
-				signer,
-				chain: networkName === 'rinkeby' ? Chain.Rinkeby : Chain.Polygon,
-				version: meemVersion ?? 'latest'
+				signer
 			})
 
 			setMeemContract(contract)

@@ -15,7 +15,7 @@ export async function createVersion(options: {
 	ethers: HardhatEthersHelpers
 	hardhatArguments?: HardhatArguments
 }) {
-	const { args, ethers, hardhatArguments } = options
+	const { args } = options
 	const chainName = args?.chain ?? 'rinkeby'
 	let chain = Chain.Rinkeby
 	let filename = '4.json'

@@ -106,7 +106,10 @@ describe('Purchase Original', function Test() {
 		assert.equal(props.mintPermissions[0].costWei.toNumber(), 1000)
 		assert.equal(props.mintPermissions[0].numTokens.toNumber(), 0)
 
-		const signer1 = getMeemContract({ contractAddress, signer: signers[1] })
+		const signer1 = await getMeemContract({
+			contractAddress,
+			signer: signers[1]
+		})
 		await assert.isRejected(
 			signer1.mint(
 				{
