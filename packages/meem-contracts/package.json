@@ -13,12 +13,13 @@
 		"package.json",
 		"README.md",
 		"CHANGELOG.md",
-		"dist"
+		"dist",
+		"versions"
 	],
 	"scripts": {
 		"build": "yarn build:sol && yarn build:ts",
 		"test:build": "waffle",
-		"clean": "rm -rf cache artifacts abi dist typechain types",
+		"clean": "rm -rf cache artifacts dist typechain types",
 		"clean:modules": "rm -rf node_modules",
 		"build:sol": "TS_NODE_TRANSPILE_ONLY=true hardhat compile && yarn createABI && yarn generateTypes && echo 'build:sol Finished'",
 		"build:ts": "tsc -p ./tsconfig.build.json && echo 'build:ts Finished'",
@@ -33,6 +34,7 @@
 		"console": "hardhat console",
 		"watch": "concurrently -r --kill-others \"chokidar 'contracts/**/*.sol' -c 'yarn build:sol'\" \"chokidar 'src/**/*.ts' -c 'yarn build:ts'\"",
 		"verify": "hardhat verify",
+		"createVersion": "DEBUG=@meemproject/* hardhat createVersion",
 		"lint": "concurrently \"yarn lint:ts\" \"yarn lint:sol\" \"yarn lint:tsc\"",
 		"lint:ts": "eslint --max-warnings=0 --ext=.ts,.tsx .",
 		"lint:tsc": "tsc -p ./tsconfig.json --noEmit",
