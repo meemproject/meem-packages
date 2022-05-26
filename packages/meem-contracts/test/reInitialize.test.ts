@@ -41,13 +41,13 @@ describe('Reinitialization', function Test() {
 
 	it('Can reinitialize', async () => {
 		await mint({
-			proxyContractAddress: contractAddress,
+			contractAddress,
 			signer: signers[0],
 			shouldWaitforTransaction: true
 		})
 
 		await mint({
-			proxyContractAddress: contractAddress,
+			contractAddress,
 			signer: signers[0],
 			shouldWaitforTransaction: true
 		})
@@ -74,7 +74,7 @@ describe('Reinitialization', function Test() {
 		assert.equal(balance.toNumber(), 2)
 
 		await mint({
-			proxyContractAddress: contractAddress,
+			contractAddress,
 			signer: signers[0],
 			shouldWaitforTransaction: true
 		})

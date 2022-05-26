@@ -12,14 +12,14 @@ import { NetworkChainId } from './utils'
 
 export type IMintOptions = Partial<MeemMintParametersStruct> & {
 	signer: ethers.Signer
-	proxyContractAddress: string
+	contractAddress: string
 	shouldWaitforTransaction?: boolean
 	properties?: Partial<MeemPropertiesStruct>
 	childProperties?: Partial<MeemPropertiesStruct>
 }
 
 export async function mint(options: IMintOptions): Promise<Transaction> {
-	const { signer, proxyContractAddress, shouldWaitforTransaction } = options
+	const { signer, contractAddress, shouldWaitforTransaction } = options
 
 	const [minterAddress, chainId] = await Promise.all([
 		signer.getAddress(),
@@ -50,7 +50,7 @@ export async function mint(options: IMintOptions): Promise<Transaction> {
 		...options.childProperties
 	}
 
-	const contract = new Contract(proxyContractAddress, meemABI, signer) as Meem
+	const contract = new Contract(contractAddress, meemABI, signer) as Meem
 
 	const tx = await contract.mint(mintParams, properties, childProperties)
 
