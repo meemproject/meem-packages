@@ -129,6 +129,11 @@ export async function initProxy(options: {
 	return tx
 }
 
+export type IReinitializeOptions = InitParamsStruct & {
+	signer: ethers.Signer
+	proxyContractAddress: string
+}
+
 export async function upgrade(options: {
 	signer: ethers.Signer
 	proxyContractAddress: string

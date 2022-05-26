@@ -12,7 +12,9 @@ import {BaseProperties, PropertyType, MeemProperties, InitParams} from '../inter
 import '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
 
 library LibContract {
-	function initialize(InitParams memory params) internal {
+	function initialize(InitParams memory params, bool isReinitialize)
+		internal
+	{
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 		ERC721MetadataStorage.Layout storage erc721 = ERC721MetadataStorage
 			.layout();
@@ -23,14 +25,18 @@ library LibContract {
 		s.symbol = params.symbol;
 		s.childDepth = params.childDepth;
 		s.nonOwnerSplitAllocationAmount = params.nonOwnerSplitAllocationAmount;
-		s.tokenCounter = params.tokenCounterStart;
-		s.contractURI = params.contractURI;
-		if (params.tokenCounterStart < 1) {
-			revert(Error.InvalidTokenCounter);
+		if (!isReinitialize) {
+			s.tokenCounter = params.tokenCounterStart;
+			if (params.tokenCounterStart < 1) {
+				revert(Error.InvalidTokenCounter);
+			}
+			LibAccessControl._setRole(s.ADMIN_ROLE, params.admins);
+		} else {
+			for (uint256 i = 0; i < params.admins.length; i++) {
+				LibAccessControl._grantRole(s.ADMIN_ROLE, params.admins[i]);
+			}
 		}
-		s.tokenCounter = params.tokenCounterStart;
-
-		LibAccessControl._setRole(s.ADMIN_ROLE, params.admins);
+		s.contractURI = params.contractURI;
 
 		LibContract.setBaseProperties(params.baseProperties);
 		LibProperties.setProperties(
