@@ -52,13 +52,6 @@ contract MeemAdminFacet is IMeemAdminStandard {
 		s.nonOwnerSplitAllocationAmount = amount;
 	}
 
-	function setMeemIDAddress(address meemID) external override {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibAccessControl.requireRole(s.ADMIN_ROLE);
-
-		s.meemIDContractAddress = meemID;
-	}
-
 	function setTokenRoot(
 		uint256 tokenId,
 		Chain rootChain,

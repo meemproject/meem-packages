@@ -38,10 +38,9 @@ export async function mint(options: IMintOptions): Promise<Transaction> {
 		parent: options.parent ?? zeroAddress,
 		parentTokenId: options.parentTokenId ?? 0,
 		meemType: options.meemType ?? MeemType.Original,
-		data: options.data ?? '',
 		isURILocked: options.isURILocked ?? false,
 		mintedBy: minterAddress,
-		uriSource: options.uriSource ?? UriSource.Data,
+		uriSource: options.uriSource ?? UriSource.TokenUri,
 		reactionTypes: []
 	}
 	const properties = { ...defaultMeemProperties, ...options.properties }

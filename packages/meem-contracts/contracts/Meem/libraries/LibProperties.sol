@@ -462,17 +462,6 @@ library LibProperties {
 			revert(Error.URILocked);
 		}
 
-		// Require IPFS uri or URI type to be data
-		if (
-			s.meems[tokenId].uriSource != URISource.Data &&
-			!Strings.compareStrings(
-				'ipfs://',
-				Strings.substring(s.tokenURIs[tokenId], 0, 7)
-			)
-		) {
-			revert(Error.InvalidURI);
-		}
-
 		s.meems[tokenId].uriLockedBy = msg.sender;
 
 		emit MeemEvents.MeemURILockedBySet(

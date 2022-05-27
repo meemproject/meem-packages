@@ -37,8 +37,8 @@ enum MeemType {
 }
 
 enum URISource {
-	TokenURI,
-	Data
+	Url,
+	JSON
 }
 
 struct Split {
@@ -145,7 +145,6 @@ struct Meem {
 	MeemProperties properties;
 	MeemProperties childProperties;
 	uint256 mintedAt;
-	string data;
 	address uriLockedBy;
 	MeemType meemType;
 	address mintedBy;
@@ -166,7 +165,6 @@ struct MeemMintParameters {
 	address parent;
 	uint256 parentTokenId;
 	MeemType meemType;
-	string data;
 	bool isURILocked;
 	address mintedBy;
 	URISource uriSource;
@@ -303,8 +301,6 @@ interface IMeemAdminStandard {
 	function setTokenCounter(uint256 tokenCounter) external;
 
 	function setContractURI(string memory newContractURI) external;
-
-	function setMeemIDAddress(address meemID) external;
 
 	function setTokenRoot(
 		uint256 tokenId,

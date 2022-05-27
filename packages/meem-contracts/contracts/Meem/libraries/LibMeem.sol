@@ -27,18 +27,6 @@ library LibMeem {
 			params.parentTokenId
 		);
 
-		// Require IPFS uri
-		if (
-			params.uriSource != URISource.Data &&
-			params.isURILocked &&
-			!Strings.compareStrings(
-				'ipfs://',
-				Strings.substring(params.tokenURI, 0, 7)
-			)
-		) {
-			revert(Error.InvalidURI);
-		}
-
 		uint256 tokenId = s.tokenCounter;
 		LibERC721._safeMint(params.to, tokenId);
 
@@ -54,7 +42,6 @@ library LibMeem {
 		s.meems[tokenId].parentTokenId = params.parentTokenId;
 		s.meems[tokenId].owner = params.to;
 		s.meems[tokenId].mintedAt = block.timestamp;
-		s.meems[tokenId].data = params.data;
 		s.meems[tokenId].reactionTypes = params.reactionTypes;
 		s.meems[tokenId].uriSource = params.uriSource;
 
@@ -240,9 +227,6 @@ library LibMeem {
 				? s.meemChildProperties[s.meems[tokenId].parentTokenId]
 				: s.meemChildProperties[tokenId],
 			s.meems[tokenId].mintedAt,
-			isCopy
-				? s.meems[s.meems[tokenId].parentTokenId].data
-				: s.meems[tokenId].data,
 			s.meems[tokenId].uriLockedBy,
 			s.meems[tokenId].meemType,
 			s.meems[tokenId].mintedBy,

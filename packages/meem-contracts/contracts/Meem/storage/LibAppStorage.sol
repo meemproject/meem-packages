@@ -9,21 +9,13 @@ library LibAppStorage {
 
 	struct RoleData {
 		mapping(address => bool) members;
-		/** DEPRECATED */
-		bytes32 adminRole;
 	}
 
 	struct AppStorage {
-		/** DEPRECATED */
-		address proxyRegistryAddress;
 		/** AccessControl Role: Admin */
 		bytes32 ADMIN_ROLE;
-		/** DEPRECATED */
-		bytes32 PAUSER_ROLE;
 		/** AccessControl Role: Minter */
 		bytes32 MINTER_ROLE;
-		/** DEPRECATED */
-		bytes32 UPGRADER_ROLE;
 		/** Counter of next incremental token */
 		uint256 tokenCounter;
 		/** ERC721 Name */
@@ -74,8 +66,6 @@ library LibAppStorage {
 		uint256[] originalMeemTokens;
 		/** Index of tokenId => allTokens index */
 		mapping(uint256 => uint256) originalMeemTokensIndex;
-		/** MeemID contract address */
-		address meemIDContractAddress;
 		mapping(uint256 => uint256[]) copies;
 		mapping(uint256 => mapping(address => uint256[])) copiesOwnerTokens;
 		/** Keep track of "clipped" meems */
