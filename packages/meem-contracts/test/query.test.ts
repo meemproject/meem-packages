@@ -57,7 +57,7 @@ describe('Query Meems', function Test() {
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties

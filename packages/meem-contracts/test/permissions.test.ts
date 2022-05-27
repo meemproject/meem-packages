@@ -61,7 +61,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -87,7 +87,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -110,7 +110,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token1,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -135,7 +135,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -155,7 +155,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token1,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -177,7 +177,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token2,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -198,7 +198,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -218,7 +218,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -238,7 +238,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -259,7 +259,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -279,7 +279,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -299,7 +299,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -319,7 +319,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -340,7 +340,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -371,7 +371,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -391,7 +391,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -412,7 +412,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -443,7 +443,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -463,7 +463,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -483,7 +483,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -504,7 +504,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -542,7 +542,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -562,7 +562,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -582,7 +582,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: false,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -603,7 +603,7 @@ describe('Minting Permissions', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},

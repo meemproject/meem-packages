@@ -192,7 +192,7 @@ describe('BaseProperties', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: false,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					mintedBy: signers[0].address
 				},
 				{

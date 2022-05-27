@@ -66,7 +66,7 @@ describe('Mint Dates', function Test() {
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				{
 					...defaultOpenProperties,
@@ -89,7 +89,7 @@ describe('Mint Dates', function Test() {
 					isURILocked: true,
 					mintedBy: signers[2].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -125,7 +125,7 @@ describe('Mint Dates', function Test() {
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				{
 					...defaultOpenProperties,
@@ -148,7 +148,7 @@ describe('Mint Dates', function Test() {
 					isURILocked: true,
 					mintedBy: signers[2].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties

@@ -9,16 +9,8 @@
 			"path": "./packages/api"
 		},
 		{
-			"name": "@meemproject/market-contracts",
-			"path": "./packages/market-contracts"
-		},
-		{
 			"name": "@meemproject/meem-contracts",
 			"path": "./packages/meem-contracts"
-		},
-		{
-			"name": "@meemproject/meem-id-contracts",
-			"path": "./packages/meem-id-contracts"
 		},
 		{
 			"name": "@meemproject/react",
@@ -34,9 +26,7 @@
 			"packages/api",
 			"packages/react",
 			"packages/utils",
-			"packages/market-contracts",
-			"packages/meem-contracts",
-			"packages/meem-id-contracts"
+			"packages/meem-contracts"
 		],
 		"typescript.tsdk": "node_modules/typescript/lib",
 		"typescript.preferences.importModuleSpecifier": "relative",

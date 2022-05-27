@@ -52,7 +52,7 @@ describe('Child Meem Minting', function Test() {
 					meemType: MeemType.Wrapped,
 					isURILocked: false,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					mintedBy: signers[0].address
 				},
 				{
@@ -107,7 +107,7 @@ describe('Child Meem Minting', function Test() {
 					meemType: MeemType.Remix,
 					isURILocked: false,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					mintedBy: signers[0].address
 				},
 				defaultOpenProperties,
@@ -144,7 +144,7 @@ describe('Child Meem Minting', function Test() {
 					meemType: MeemType.Remix,
 					isURILocked: false,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					mintedBy: signers[0].address
 				},
 				mintData,
@@ -182,7 +182,7 @@ describe('Child Meem Minting', function Test() {
 				meemType: MeemType.Remix,
 				isURILocked: false,
 				reactionTypes: [],
-				uriSource: UriSource.TokenUri,
+				uriSource: UriSource.Url,
 				mintedBy: signers[0].address
 			},
 			mintData,
@@ -218,7 +218,7 @@ describe('Child Meem Minting', function Test() {
 					meemType: MeemType.Remix,
 					isURILocked: false,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					mintedBy: signers[0].address
 				},
 				mintData,
@@ -256,7 +256,7 @@ describe('Child Meem Minting', function Test() {
 					meemType: MeemType.Copy,
 					isURILocked: false,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					mintedBy: signers[0].address
 				},
 				mintData,
@@ -293,7 +293,7 @@ describe('Child Meem Minting', function Test() {
 				meemType: MeemType.Remix,
 				isURILocked: true,
 				reactionTypes: [],
-				uriSource: UriSource.TokenUri,
+				uriSource: UriSource.Url,
 				mintedBy: signers[0].address
 			},
 			mintData,

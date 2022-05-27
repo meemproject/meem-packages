@@ -1,12 +1,7 @@
 import { ERC20, MeemAPI } from '@meemproject/api'
-import erc20ABI from '@meemproject/api/build/abis/ERC20.json'
-// import type { MeemMarket } from '@meemproject/market-contracts'
-import auctionABI from '@meemproject/market-contracts/types/MeemMarket.json'
 import { Meem, getMeemContract } from '@meemproject/meem-contracts'
-import type { MeemId } from '@meemproject/meem-id-contracts'
-import meemIdABI from '@meemproject/meem-id-contracts/types/MeemId.json'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { providers, Contract, BigNumber, ethers } from 'ethers'
+import { providers, BigNumber, ethers } from 'ethers'
 import Cookies from 'js-cookie'
 import React, {
 	createContext,
@@ -71,8 +66,6 @@ interface IWalletContextState {
 
 	erc20Contract?: ERC20
 
-	meemIdContract?: MeemId
-
 	meemId?: MeemAPI.IMeemId
 
 	loginState?: LoginState
@@ -116,22 +109,16 @@ export interface IWalletContextProps {
 export const WalletProvider: React.FC<IWalletContextProps> = ({
 	infuraId,
 	networkName,
-	auctionCurrencyAddress,
-	contractAddressAuction,
 	contractAddressMeem,
-	contractAddressMeemId,
 	...props
 }: IWalletContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
 	const [meemContract, setMeemContract] = useState<Meem | undefined>()
-	const [meemIdContract, setMeemIdContract] = useState<MeemId | undefined>()
 	const [signature, setSignature] = useState('')
 	const [jwt, setJwt] = useState<string>()
 	const [loginState, setLoginState] = useState<LoginState>(LoginState.Unknown)
 	const [isAdmin, setIsAdmin] = useState(false)
 	const [meemId, setMeemId] = useState<MeemAPI.IMeemId | undefined>()
-	const [erc20Contract, setERC20Contract] = useState<ERC20 | undefined>()
-	const [auctionContract, setAuctionContract] = useState<any | undefined>()
 	const [isConnected, setIsConnected] = useState<boolean>(false)
 	const [isConnectedToWrongNetwork, setIsConnectedToWrongNetwork] =
 		useState(false)
@@ -437,58 +424,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		initMeemContract()
 	}, [contractAddressMeem, signer])
 
-	useEffect(() => {
-		if (!contractAddressMeemId) {
-			log.debug('Invalid Meem id contract address. Check env vars.')
-			return
-		}
-		const contract = new Contract(
-			contractAddressMeemId,
-			meemIdABI,
-			signer
-		) as unknown as MeemId
-		setMeemIdContract(contract)
-	}, [contractAddressMeemId, signer])
-
-	useEffect(() => {
-		if (!contractAddressAuction) {
-			log.debug('Invalid Auction contract address. Check env vars.')
-			return
-		}
-		const contract = new Contract(
-			contractAddressAuction,
-			auctionABI,
-			signer
-		) as unknown as any
-		setAuctionContract(contract)
-	}, [contractAddressAuction, signer])
-
-	useEffect(() => {
-		if (!auctionCurrencyAddress) {
-			log.debug('Invalid Auction contract address. Check env vars.')
-			return
-		}
-		const contract = new Contract(
-			auctionCurrencyAddress,
-			erc20ABI,
-			signer
-		) as ERC20
-		setERC20Contract(contract)
-	}, [auctionCurrencyAddress, signer])
-
-	useEffect(() => {
-		if (!auctionCurrencyAddress) {
-			log.debug('Invalid Auction contract address. Check env vars.')
-			return
-		}
-		const contract = new Contract(
-			auctionCurrencyAddress,
-			erc20ABI,
-			signer
-		) as ERC20
-		setERC20Contract(contract)
-	}, [auctionCurrencyAddress, signer])
-
 	const value = useMemo(
 		() => ({
 			web3Provider,
@@ -498,10 +433,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			connectWallet,
 			disconnectWallet,
 			isConnected,
-			auctionContract,
-			erc20Contract,
 			meemContract,
-			meemIdContract,
 			meemId,
 			setJwt: setMeemJwt,
 			isMeemIdLoading,
@@ -522,10 +454,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			connectWallet,
 			disconnectWallet,
 			isConnected,
-			auctionContract,
-			erc20Contract,
 			meemContract,
-			meemIdContract,
 			meemId,
 			setMeemJwt,
 			isMeemIdLoading,

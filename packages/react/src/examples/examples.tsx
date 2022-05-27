@@ -15,7 +15,7 @@
 // 				signer,
 // 				to,
 // 				tokenURI: 'ipfs://example',
-// 				uriSource: UriSource.TokenUri
+// 				uriSource: UriSource.Url
 // 			})
 
 // 			console.log(`Minted token with tx: ${tx.hash}`)

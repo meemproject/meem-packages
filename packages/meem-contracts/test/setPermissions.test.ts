@@ -82,7 +82,7 @@ describe('Set Permissions', function Test() {
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -104,7 +104,7 @@ describe('Set Permissions', function Test() {
 					isURILocked: false,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				{
 					...defaultOpenProperties,
@@ -164,7 +164,7 @@ describe('Set Permissions', function Test() {
 					isURILocked: false,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				{
 					...defaultOpenProperties,
@@ -218,7 +218,7 @@ describe('Set Permissions', function Test() {
 					isURILocked: false,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				{
 					...defaultOpenProperties,
@@ -271,7 +271,7 @@ describe('Set Permissions', function Test() {
 					isURILocked: false,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				{
 					...defaultOpenProperties,
@@ -347,7 +347,7 @@ describe('Set Permissions', function Test() {
 					isURILocked: false,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				{
 					...defaultOpenProperties,
