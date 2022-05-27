@@ -54,7 +54,6 @@ describe('Query Meems', function Test() {
 					parent,
 					parentTokenId: 50,
 					meemType: MeemType.Wrapped,
-					data: '',
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],

@@ -150,8 +150,14 @@ library LibERC721 {
 			revert(Error.TokenNotFound);
 		}
 
-		if (s.meems[tokenId].uriSource == URISource.Data) {
-			return s.meems[tokenId].data;
+		if (s.meems[tokenId].uriSource == URISource.JSON) {
+			return
+				string(
+					abi.encodePacked(
+						'data:application/json;base64,',
+						Base64.encode(bytes(s.tokenURIs[tokenId]))
+					)
+				);
 		}
 
 		return s.tokenURIs[tokenId];

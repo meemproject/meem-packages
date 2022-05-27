@@ -190,7 +190,6 @@ describe('BaseProperties', function Test() {
 					parent: zeroAddress,
 					parentTokenId: token0,
 					meemType: MeemType.Original,
-					data: '',
 					isURILocked: false,
 					reactionTypes: [],
 					uriSource: UriSource.TokenUri,

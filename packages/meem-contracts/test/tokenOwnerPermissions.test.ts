@@ -63,7 +63,6 @@ describe('Token Owner Permissions', function Test() {
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
-					data: '',
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],

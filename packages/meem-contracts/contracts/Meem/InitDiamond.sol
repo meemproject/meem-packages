@@ -58,7 +58,7 @@ contract InitDiamond is IInitDiamondStandard {
 			childDepth: params.childDepth,
 			nonOwnerSplitAllocationAmount: params.nonOwnerSplitAllocationAmount
 		});
-		LibContract.initialize(newParams);
+		LibContract.initialize(newParams, false);
 
 		ERC165Storage.Layout storage erc165 = ERC165Storage.layout();
 		erc165.setSupportedInterface(type(IERC721).interfaceId, true);

@@ -67,7 +67,6 @@ describe('Reactions', function Test() {
 					parent: zeroAddress,
 					parentTokenId: 0,
 					meemType: MeemType.Original,
-					data: '',
 					isURILocked: true,
 					uriSource: UriSource.TokenUri,
 					reactionTypes: ['upvote'],
