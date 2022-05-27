@@ -54,7 +54,7 @@ export async function initProxy(options: {
 	version?: string
 	customVersion?: IVersion
 	cuts?: IFacetCut[]
-}): Promise<Transaction> {
+}) {
 	const {
 		signer,
 		proxyContractAddress,
