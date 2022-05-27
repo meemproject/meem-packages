@@ -40,7 +40,7 @@ export async function mint(options: IMintOptions): Promise<Transaction> {
 		meemType: options.meemType ?? MeemType.Original,
 		isURILocked: options.isURILocked ?? false,
 		mintedBy: minterAddress,
-		uriSource: options.uriSource ?? UriSource.TokenUri,
+		uriSource: options.uriSource ?? UriSource.Url,
 		reactionTypes: []
 	}
 	const properties = { ...defaultMeemProperties, ...options.properties }
