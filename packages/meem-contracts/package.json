@@ -7,7 +7,7 @@
 	"license": "MIT",
 	"main": "./dist/index.js",
 	"files": [
-		"abi",
+		"artifacts",
 		"typechain",
 		"types",
 		"package.json",
