@@ -14,7 +14,7 @@ export async function mintExample() {
 		signer,
 		to: '0x...',
 		tokenURI: 'ipfs://example',
-		uriSource: UriSource.TokenUri
+		uriSource: UriSource.Url
 	})
 
 	console.log(`Minted meem with tx: ${tx.hash}`)
