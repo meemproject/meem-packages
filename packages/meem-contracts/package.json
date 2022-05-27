@@ -19,7 +19,7 @@
 	"scripts": {
 		"build": "yarn build:sol && yarn build:ts",
 		"test:build": "waffle",
-		"clean": "concurrently \"rm -rf cache artifacts dist typechain types\" \"TS_NODE_TRANSPILE_ONLY=1 hardhat clean --global\"",
+		"clean": "concurrently \"rm -rf cache artifacts dist typechain types\"",
 		"clean:modules": "rm -rf node_modules",
 		"build:sol": "TS_NODE_TRANSPILE_ONLY=true hardhat compile && yarn createABI && yarn generateTypes && echo 'build:sol Finished'",
 		"build:ts": "tsc -p ./tsconfig.build.json && echo 'build:ts Finished'",
