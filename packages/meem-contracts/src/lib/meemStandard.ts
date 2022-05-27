@@ -34,6 +34,6 @@ export enum MeemType {
 }
 
 export enum UriSource {
-	TokenUri,
-	Data
+	Url,
+	Json
 }
