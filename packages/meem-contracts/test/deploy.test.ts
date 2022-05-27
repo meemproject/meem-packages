@@ -168,6 +168,8 @@ describe('Deploy', function Test() {
 			baseProperties: bp
 		})
 
+		await tx.wait()
+
 		assert.isOk(tx.hash)
 
 		const contract = new Contract(
