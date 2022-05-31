@@ -394,7 +394,10 @@ library LibMeem {
 
 		BaseProperties storage baseProperties = s.baseProperties;
 
+		// Allow admins to bypass mint start / end checks
+		bool isAdmin = LibAccessControl.hasRole(s.ADMIN_ROLE, msg.sender);
 		if (
+			!isAdmin &&
 			baseProperties.mintStartTimestamp > 0 &&
 			block.timestamp < uint256(baseProperties.mintStartTimestamp)
 		) {
@@ -402,6 +405,7 @@ library LibMeem {
 		}
 
 		if (
+			!isAdmin &&
 			baseProperties.mintEndTimestamp > 0 &&
 			block.timestamp > uint256(baseProperties.mintEndTimestamp)
 		) {

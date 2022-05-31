@@ -63,7 +63,7 @@ describe('Minting Curation', function Test() {
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -86,7 +86,7 @@ describe('Minting Curation', function Test() {
 					isURILocked: true,
 					mintedBy: copyAddress,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				{ ...defaultOpenProperties, totalCopies: 1 },
 				defaultOpenProperties,
@@ -119,7 +119,7 @@ describe('Minting Curation', function Test() {
 					isURILocked: true,
 					mintedBy: copyAddress,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties,
@@ -133,7 +133,7 @@ describe('Minting Curation', function Test() {
 					isURILocked: true,
 					mintedBy: copyAddress,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties

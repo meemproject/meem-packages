@@ -64,7 +64,7 @@ describe('Minting', function Test() {
 					isURILocked: false,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -85,7 +85,7 @@ describe('Minting', function Test() {
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -126,7 +126,7 @@ describe('Minting', function Test() {
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -183,7 +183,7 @@ describe('Minting', function Test() {
 					isURILocked: false,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -228,7 +228,7 @@ describe('Minting', function Test() {
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -262,7 +262,7 @@ describe('Minting', function Test() {
 					isURILocked: false,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -283,7 +283,7 @@ describe('Minting', function Test() {
 					isURILocked: false,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -324,7 +324,7 @@ describe('Minting', function Test() {
 					isURILocked: false,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -344,7 +344,7 @@ describe('Minting', function Test() {
 					isURILocked: false,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties

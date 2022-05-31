@@ -65,7 +65,7 @@ describe('Purchasing', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: false,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					mintedBy: signers[0].address
 				},
 				{
@@ -96,7 +96,7 @@ describe('Purchasing', function Test() {
 					meemType: MeemType.Remix,
 					isURILocked: false,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					mintedBy: signers[2].address
 				},
 				{
@@ -128,7 +128,7 @@ describe('Purchasing', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: false,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					mintedBy: signers[0].address
 				},
 				{
@@ -159,7 +159,7 @@ describe('Purchasing', function Test() {
 					meemType: MeemType.Remix,
 					isURILocked: false,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					mintedBy: signers[2].address
 				},
 				{
@@ -194,7 +194,7 @@ describe('Purchasing', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: false,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					mintedBy: signers[0].address
 				},
 				{
@@ -225,7 +225,7 @@ describe('Purchasing', function Test() {
 					meemType: MeemType.Remix,
 					isURILocked: false,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					mintedBy: signers[2].address
 				},
 				{
@@ -261,7 +261,7 @@ describe('Purchasing', function Test() {
 	// 				meemType: MeemType.Original,
 	// 				data: '',
 	// 				isURILocked: false,
-	// 				uriSource: UriSource.TokenUri,
+	// 				uriSource: UriSource.Url,
 	// 				mintedBy: signers[1].address,
 	// 				reactionTypes: []
 	// 			},
@@ -287,7 +287,7 @@ describe('Purchasing', function Test() {
 	// 				meemType: MeemType.Remix,
 	// 				data: '',
 	// 				isURILocked: false,
-	// 				uriSource: UriSource.TokenUri,
+	// 				uriSource: UriSource.Url,
 	// 				mintedBy: signers[1].address,
 	// 				reactionTypes: []
 	// 			},

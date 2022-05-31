@@ -62,7 +62,7 @@ describe('Transfer Lockup', function Test() {
 				isURILocked: true,
 				mintedBy: signers[0].address,
 				reactionTypes: [],
-				uriSource: UriSource.TokenUri
+				uriSource: UriSource.Url
 			},
 			defaultOpenProperties,
 			defaultOpenProperties
@@ -95,7 +95,7 @@ describe('Transfer Lockup', function Test() {
 				isURILocked: true,
 				mintedBy: signers[0].address,
 				reactionTypes: [],
-				uriSource: UriSource.TokenUri
+				uriSource: UriSource.Url
 			},
 			defaultOpenProperties,
 			defaultOpenProperties
@@ -122,7 +122,7 @@ describe('Transfer Lockup', function Test() {
 				isURILocked: true,
 				mintedBy: signers[0].address,
 				reactionTypes: [],
-				uriSource: UriSource.TokenUri
+				uriSource: UriSource.Url
 			},
 			{ ...defaultOpenProperties, transferLockupUntil: lockupUntil },
 			defaultOpenProperties
@@ -140,7 +140,7 @@ describe('Transfer Lockup', function Test() {
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -169,7 +169,7 @@ describe('Transfer Lockup', function Test() {
 				isURILocked: true,
 				mintedBy: signers[0].address,
 				reactionTypes: [],
-				uriSource: UriSource.TokenUri
+				uriSource: UriSource.Url
 			},
 			{ ...defaultOpenProperties, transferLockupUntil: lockupUntil },
 			defaultOpenProperties
@@ -187,7 +187,7 @@ describe('Transfer Lockup', function Test() {
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -213,7 +213,7 @@ describe('Transfer Lockup', function Test() {
 				isURILocked: true,
 				mintedBy: signers[0].address,
 				reactionTypes: [],
-				uriSource: UriSource.TokenUri
+				uriSource: UriSource.Url
 			},
 			{ ...defaultOpenProperties, isTransferrable: false },
 			defaultOpenProperties
@@ -231,7 +231,7 @@ describe('Transfer Lockup', function Test() {
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties
@@ -257,7 +257,7 @@ describe('Transfer Lockup', function Test() {
 				isURILocked: true,
 				mintedBy: signers[0].address,
 				reactionTypes: [],
-				uriSource: UriSource.TokenUri
+				uriSource: UriSource.Url
 			},
 			{ ...defaultOpenProperties, isTransferrable: true },
 			defaultOpenProperties
@@ -275,7 +275,7 @@ describe('Transfer Lockup', function Test() {
 					isURILocked: true,
 					mintedBy: signers[0].address,
 					reactionTypes: [],
-					uriSource: UriSource.TokenUri
+					uriSource: UriSource.Url
 				},
 				defaultOpenProperties,
 				defaultOpenProperties

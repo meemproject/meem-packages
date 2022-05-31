@@ -88,7 +88,7 @@ describe('Child root properties', function Test() {
 					parentTokenId: 0,
 					meemType: MeemType.Original,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -111,7 +111,7 @@ describe('Child root properties', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -138,7 +138,7 @@ describe('Child root properties', function Test() {
 					parentTokenId: 2000,
 					meemType: MeemType.Wrapped,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},
@@ -158,7 +158,7 @@ describe('Child root properties', function Test() {
 					parentTokenId: token0,
 					meemType: MeemType.Remix,
 					isURILocked: true,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: [],
 					mintedBy: signers[0].address
 				},

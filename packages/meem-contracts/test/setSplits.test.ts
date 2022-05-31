@@ -79,7 +79,7 @@ describe('Set Splits', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: true,
 					mintedBy: signers[0].address,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: []
 				},
 				{
@@ -135,7 +135,7 @@ describe('Set Splits', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: true,
 					mintedBy: signers[0].address,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: []
 				},
 				{
@@ -191,7 +191,7 @@ describe('Set Splits', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: true,
 					mintedBy: signers[0].address,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: []
 				},
 				{
@@ -260,7 +260,7 @@ describe('Set Splits', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: true,
 					mintedBy: signers[0].address,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: []
 				},
 				{
@@ -305,7 +305,7 @@ describe('Set Splits', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: true,
 					mintedBy: signers[0].address,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: []
 				},
 				{
@@ -345,7 +345,7 @@ describe('Set Splits', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: true,
 					mintedBy: signers[0].address,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: []
 				},
 				{
@@ -385,7 +385,7 @@ describe('Set Splits', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: true,
 					mintedBy: signers[0].address,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: []
 				},
 				{
@@ -431,7 +431,7 @@ describe('Set Splits', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: true,
 					mintedBy: signers[0].address,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: []
 				},
 				{
@@ -476,7 +476,7 @@ describe('Set Splits', function Test() {
 					meemType: MeemType.Original,
 					isURILocked: true,
 					mintedBy: signers[0].address,
-					uriSource: UriSource.TokenUri,
+					uriSource: UriSource.Url,
 					reactionTypes: []
 				},
 				{

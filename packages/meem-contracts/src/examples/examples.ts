@@ -1,7 +1,9 @@
 import { ethers } from 'ethers'
 import { deployProxy, initProxy } from '../deploy'
 import { getMeemContract } from '../lib/contract'
-import { Chain, UriSource } from '../lib/meemStandard'
+import { defaultBaseProperties } from '../lib/meemProperties'
+import { Chain, Permission, UriSource } from '../lib/meemStandard'
+import { zeroAddress } from '../lib/utils'
 import { mint } from '../mint'
 
 export async function mintExample() {
@@ -56,4 +58,57 @@ export async function callContractMethods(options: {
 	const meem = await contract.getMeem(1)
 
 	console.log({ meem })
+}
+
+export async function variedMinting(options: {
+	contractAddress: string
+	signer: ethers.Wallet
+}) {
+	const { contractAddress, signer } = options
+
+	const tx = await initProxy({
+		signer,
+		proxyContractAddress: contractAddress,
+		chain: Chain.Polygon,
+		name: 'Test Meem',
+		symbol: 'TME',
+		contractURI:
+			'{"name": "Test","description": "testing","image": "","external_link": ""}',
+		baseProperties: {
+			...defaultBaseProperties,
+			mintPermissions: [
+				// Holders of WETH can mint for a price of 0.1 MATIC
+				{
+					permission: Permission.Holders,
+					addresses: ['0x7ceb23fd6bc0add59e62ac25578270cff1b9f619'],
+					costWei: ethers.utils.parseEther('0.1'),
+					numTokens: 1,
+					lockedBy: zeroAddress
+				},
+				// Everyone else can mint for 2 MATIC
+				{
+					permission: Permission.Anyone,
+					addresses: [],
+					costWei: ethers.utils.parseEther('2'),
+					numTokens: 0,
+					lockedBy: zeroAddress
+				}
+			],
+			// Split proceeds between 2 wallets. 25% and 75%
+			splits: [
+				{
+					toAddress: '0x...',
+					amount: 2500,
+					lockedBy: zeroAddress
+				},
+				{
+					toAddress: '0x...',
+					amount: 7500,
+					lockedBy: zeroAddress
+				}
+			]
+		}
+	})
+
+	console.log(`Initialized contract with tx: ${tx.hash}`)
 }
