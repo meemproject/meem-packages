@@ -1,5 +1,10 @@
 import { ethers, Contract, Signer } from 'ethers'
-import { ERC165 } from '../../typechain'
+import {
+	ERC165,
+	IERC721,
+	IERC721Enumerable,
+	IERC721Metadata
+} from '../../typechain'
 import type { erc721 } from '../../typechain/@solidstate/contracts/token'
 import { Meem } from '../../types'
 import meemABI from '../../types/Meem.json'
@@ -39,7 +44,7 @@ export async function getERC721Contract(options: {
 		contractAddress,
 		erc721ABI,
 		signer
-	) as unknown as erc721.IERC721
+	) as unknown as IERC721 & IERC721Metadata & IERC721Enumerable
 
 	return contract
 }
