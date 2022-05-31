@@ -50,7 +50,7 @@ export async function getERC721Contract(options: {
 }
 
 /**
- * Get an instance of an ERC721 contract
+ * Get an instance of an ERC165 contract
  * */
 export async function getERC165Contract(options: {
 	contractAddress: string
