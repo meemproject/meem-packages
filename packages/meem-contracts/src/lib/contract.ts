@@ -5,7 +5,6 @@ import {
 	IERC721Enumerable,
 	IERC721Metadata
 } from '../../typechain'
-import type { erc721 } from '../../typechain/@solidstate/contracts/token'
 import { Meem } from '../../types'
 import meemABI from '../../types/Meem.json'
 import erc165ABI from '../abi/ERC165.json'
