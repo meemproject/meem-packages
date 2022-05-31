@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/meemproject/meem-packages/compare/v0.4.3...v0.5.0) (2022-05-31)
+
+
+### Features
+
+* allow contract admins to bypass timestamp checks when minting originals ([6d72449](https://github.com/meemproject/meem-packages/commit/6d72449))
+
+
+
+
+
 ## [0.4.3](https://github.com/meemproject/meem-packages/compare/v0.4.2...v0.4.3) (2022-05-27)
 
 
