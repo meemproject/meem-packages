@@ -13,9 +13,9 @@ export const versions: {
 } = {
 	1: { latest: '1', beta: '1', alpha: '1' },
 	4: {
-		latest: '3',
-		beta: '3',
-		alpha: '3'
+		latest: '4',
+		beta: '4',
+		alpha: '4'
 	}
 }
 
