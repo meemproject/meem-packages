@@ -134,26 +134,61 @@ export type IReinitializeOptions = InitParamsStruct & {
 	proxyContractAddress: string
 }
 
+function findFacet(options: {
+	facet: {
+		address: string
+		functionSelectors: string[]
+	}
+	searchVersion: IVersion
+}) {
+	const { facet, searchVersion } = options
+	const facetVersions = Object.values(searchVersion)
+
+	for (let i = 0; i < facetVersions.length; i += 1) {
+		const facetVersion = facetVersions[i]
+		const matches = facetVersion.functionSelectors.filter(v =>
+			facet.functionSelectors.includes(v)
+		)
+
+		if (matches.length > 0) {
+			// console.log('Found facet!', { matches })
+			return facetVersion
+		} else {
+			// console.log('not found yet...')
+		}
+	}
+}
+
 export async function upgrade(options: {
 	signer: ethers.Signer
 	proxyContractAddress: string
 	chain: Chain.Rinkeby | Chain.Polygon
-	fromVersion: string
-	toVersion: string
+	fromVersion: string | IVersion
+	toVersion: string | IVersion
 }): Promise<Transaction | undefined> {
 	const { signer, proxyContractAddress, chain, fromVersion, toVersion } =
 		options
 
 	const cuts: ICut[] = []
 	const tags = ['latest', 'beta', 'alpha']
-	const from = tags.includes(fromVersion)
-		? // @ts-ignore
-		  facets[chain][versions[chain][fromVersion]]
-		: facets[chain][fromVersion]
-	const to = tags.includes(toVersion)
-		? // @ts-ignore
-		  facets[chain][versions[chain][toVersion]]
-		: facets[chain][toVersion]
+	let from: IVersion
+	let to: IVersion
+	if (typeof fromVersion === 'string') {
+		from = tags.includes(fromVersion)
+			? // @ts-ignore
+			  facets[chain][versions[chain][fromVersion]]
+			: facets[chain][fromVersion]
+	} else {
+		from = fromVersion
+	}
+	if (typeof toVersion === 'string') {
+		to = tags.includes(toVersion)
+			? // @ts-ignore
+			  facets[chain][versions[chain][toVersion]]
+			: facets[chain][toVersion]
+	} else {
+		to = toVersion
+	}
 
 	if (!from) {
 		log.crit(`Invalid from version specified: ${fromVersion}`)
@@ -164,40 +199,65 @@ export async function upgrade(options: {
 		throw new Error('INVALID_TO_VERSION')
 	}
 
-	const toFacetNames = Object.keys(to)
-	const fromFacetNames = Object.keys(from)
-	const diffFacetNames: string[] = []
+	const diffFacets: {
+		from: {
+			address: string
+			functionSelectors: string[]
+		}
+		to: {
+			address: string
+			functionSelectors: string[]
+		}
+	}[] = []
+
+	const toFacets = Object.values(to)
+	const fromFacets = Object.values(from)
 
 	// Find new facets and add them
-	toFacetNames.forEach(facetName => {
-		const fromFacetName = fromFacetNames.find(f => f === facetName)
-		if (!fromFacetName) {
+	toFacets.forEach(toFacet => {
+		const fromFacet = findFacet({
+			facet: toFacet,
+			searchVersion: from
+		})
+
+		if (!fromFacet) {
 			cuts.push({
-				facetAddress: to[facetName].address,
+				facetAddress: toFacet.address,
 				action: FacetCutAction.Add,
-				functionSelectors: to[facetName].functionSelectors
+				functionSelectors: toFacet.functionSelectors
 			})
 		} else {
-			diffFacetNames.push(facetName)
+			diffFacets.push({
+				from: fromFacet,
+				to: toFacet
+			})
 		}
 	})
 
 	// Find removed facets and remove them
-	fromFacetNames.forEach(facetName => {
-		const toFacetName = toFacetNames.find(f => f === facetName)
-		if (!toFacetName) {
-			cuts.push({
-				facetAddress: to[facetName].address,
-				action: FacetCutAction.Remove,
-				functionSelectors: to[facetName].functionSelectors
+	fromFacets.forEach(fromFacet => {
+		if (
+			fromFacet.address.toLowerCase() !== proxyContractAddress.toLowerCase()
+		) {
+			const toFacet = findFacet({
+				facet: fromFacet,
+				searchVersion: to
 			})
+			if (!toFacet) {
+				console.log('NOT FOUND', { fromFacet, to })
+				cuts.push({
+					facetAddress: zeroAddress,
+					action: FacetCutAction.Remove,
+					functionSelectors: fromFacet.functionSelectors
+				})
+			}
 		}
 	})
 
 	// Perform diff of remaining facets
-	diffFacetNames.forEach(facetName => {
-		const facetSelectors = to[facetName].functionSelectors
-		const previousSelectors = from[facetName].functionSelectors
+	diffFacets.forEach(diffFacet => {
+		const facetSelectors = diffFacet.to.functionSelectors
+		const previousSelectors = diffFacet.from.functionSelectors
 		const replaceSelectors: string[] = []
 		const addSelectors: string[] = []
 		const removeSelectors: string[] = []
@@ -228,7 +288,7 @@ export async function upgrade(options: {
 
 		if (replaceSelectors.length > 0) {
 			cuts.push({
-				facetAddress: to[facetName].address,
+				facetAddress: diffFacet.to.address,
 				action: FacetCutAction.Replace,
 				functionSelectors: replaceSelectors
 			})
@@ -236,7 +296,7 @@ export async function upgrade(options: {
 
 		if (addSelectors.length > 0) {
 			cuts.push({
-				facetAddress: to[facetName].address,
+				facetAddress: diffFacet.to.address,
 				action: FacetCutAction.Add,
 				functionSelectors: addSelectors
 			})
