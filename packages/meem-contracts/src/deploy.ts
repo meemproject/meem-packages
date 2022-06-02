@@ -151,10 +151,7 @@ function findFacet(options: {
 		)
 
 		if (matches.length > 0) {
-			// console.log('Found facet!', { matches })
 			return facetVersion
-		} else {
-			// console.log('not found yet...')
 		}
 	}
 }
