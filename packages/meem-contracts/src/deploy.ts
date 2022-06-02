@@ -241,7 +241,6 @@ export async function upgrade(options: {
 				searchVersion: to
 			})
 			if (!toFacet) {
-				console.log('NOT FOUND', { fromFacet, to })
 				cuts.push({
 					facetAddress: zeroAddress,
 					action: FacetCutAction.Remove,
