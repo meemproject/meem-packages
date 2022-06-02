@@ -48,8 +48,6 @@ export async function createVersion(options: {
 			? +versionNumbers.sort()[versionNumbers.length - 1] + 1
 			: 1
 
-	console.log({ latestVersion, nextVersionNumber })
-
 	const newFacets = facets
 	newFacets[chain] = {
 		[nextVersionNumber]: latestVersion,

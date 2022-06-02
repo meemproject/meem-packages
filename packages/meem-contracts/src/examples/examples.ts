@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ethers } from 'ethers'
 import { deployProxy, initProxy } from '../deploy'
 import { getMeemContract } from '../lib/contract'
