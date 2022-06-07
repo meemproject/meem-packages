@@ -26,6 +26,7 @@ export async function createVersion(options: {
 			filename = '4.json'
 			break
 
+		case 'matic':
 		case 'polygon':
 			chain = Chain.Polygon
 			filename = '137.json'
