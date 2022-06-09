@@ -96,6 +96,10 @@ export interface IWalletContextProps {
 
 	infuraId: string
 
+	polygonRpcUrl: string
+
+	rinkebyRpcUrl: string
+
 	networkName: string
 
 	auctionCurrencyAddress?: string
@@ -111,6 +115,8 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	infuraId,
 	networkName,
 	contractAddressMeem,
+	polygonRpcUrl,
+	rinkebyRpcUrl,
 	...props
 }: IWalletContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
@@ -244,9 +250,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 							symbol: 'MATIC',
 							decimals: 18
 						},
-						rpcUrls: [
-							'https://polygon-mainnet.g.alchemy.com/v2/xLwwfjFEFLvv_mRhnv7ZW3qM8f3K8MHE'
-						],
+						rpcUrls: [polygonRpcUrl],
 						blockExplorerUrls: ['https://explorer.matic.network/']
 					}
 				]
@@ -315,10 +319,8 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 						options: {
 							infuraId, // required
 							rpc: {
-								[networkChainIds.matic]:
-									'https://polygon-mainnet.g.alchemy.com/v2/xLwwfjFEFLvv_mRhnv7ZW3qM8f3K8MHE',
-								[networkChainIds.rinkeby]:
-									'https://eth-rinkeby.alchemyapi.io/v2/lcOdvJ5FJvsjTT3ZzyeWSMfpy6ILx-1s'
+								[networkChainIds.matic]: polygonRpcUrl,
+								[networkChainIds.rinkeby]: rinkebyRpcUrl
 							}
 						}
 					}
