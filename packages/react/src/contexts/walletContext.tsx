@@ -1,3 +1,4 @@
+/* eslint-disable import/named */
 import { ERC20, MeemAPI } from '@meemproject/api'
 import { Meem, getMeemContract } from '@meemproject/meem-contracts'
 import WalletConnectProvider from '@walletconnect/web3-provider'
@@ -243,7 +244,9 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 							symbol: 'MATIC',
 							decimals: 18
 						},
-						rpcUrls: ['https://rpc-mainnet.maticvigil.com/'],
+						rpcUrls: [
+							'https://polygon-mainnet.g.alchemy.com/v2/xLwwfjFEFLvv_mRhnv7ZW3qM8f3K8MHE'
+						],
 						blockExplorerUrls: ['https://explorer.matic.network/']
 					}
 				]
@@ -312,8 +315,10 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 						options: {
 							infuraId, // required
 							rpc: {
-								[networkChainIds.matic]: 'https://rpc-mainnet.maticvigil.com',
-								[networkChainIds.mumbai]: 'https://rpc-mumbai.matic.today'
+								[networkChainIds.matic]:
+									'https://polygon-mainnet.g.alchemy.com/v2/xLwwfjFEFLvv_mRhnv7ZW3qM8f3K8MHE',
+								[networkChainIds.rinkeby]:
+									'https://eth-rinkeby.alchemyapi.io/v2/lcOdvJ5FJvsjTT3ZzyeWSMfpy6ILx-1s'
 							}
 						}
 					}
