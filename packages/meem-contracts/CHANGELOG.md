@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.4](https://github.com/meemproject/meem-packages/compare/v0.6.3...v0.6.4) (2022-06-14)
+
+
+### Bug Fixes
+
+* re-init not removing admins ([69ed2e7](https://github.com/meemproject/meem-packages/commit/69ed2e7))
+
+
+
+
+
 ## [0.6.3](https://github.com/meemproject/meem-packages/compare/v0.6.2...v0.6.3) (2022-06-09)
 
 **Note:** Version bump only for package @meemproject/meem-contracts
