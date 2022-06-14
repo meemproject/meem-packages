@@ -11,11 +11,11 @@ export const versions: {
 	[Chain.Polygon]: IVersions
 	[Chain.Rinkeby]: IVersions
 } = {
-	1: { latest: '1', beta: '1', alpha: '1' },
+	1: { latest: '2', beta: '2', alpha: '2' },
 	4: {
-		latest: '4',
-		beta: '4',
-		alpha: '4'
+		latest: '6',
+		beta: '6',
+		alpha: '6'
 	}
 }
 

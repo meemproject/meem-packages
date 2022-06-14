@@ -62,7 +62,7 @@ describe('Reinitialization', function Test() {
 				childDepth: -1,
 				nonOwnerSplitAllocationAmount: 0,
 				contractURI: ipfsURL,
-				admins: [],
+				admins: [signers[3].address],
 				baseProperties: defaultBaseProperties,
 				defaultProperties: defaultMeemProperties,
 				defaultChildProperties: defaultMeemProperties,
@@ -81,5 +81,27 @@ describe('Reinitialization', function Test() {
 
 		const o2 = await contracts.eRC721Facet.ownerOf(token2)
 		assert.equal(o2, signers[0].address)
+
+		const adminRole = await contracts.accessControlFacet.ADMIN_ROLE()
+		let roles = await contracts.meemQueryFacet.getRoles(adminRole)
+		assert.equal(roles.length, 2)
+
+		await (
+			await contracts.meemAdminFacet.reInitialize({
+				name: 'test',
+				symbol: 'TEST',
+				childDepth: -1,
+				nonOwnerSplitAllocationAmount: 0,
+				contractURI: ipfsURL,
+				admins: [],
+				baseProperties: defaultBaseProperties,
+				defaultProperties: defaultMeemProperties,
+				defaultChildProperties: defaultMeemProperties,
+				tokenCounterStart: 1
+			})
+		).wait()
+
+		roles = await contracts.meemQueryFacet.getRoles(adminRole)
+		assert.equal(roles.length, 1)
 	})
 })

@@ -114,6 +114,7 @@ export async function deployDiamond(options: {
 		const facet = await Facet.deploy({
 			gasPrice: wei
 		})
+		log.info(`${facetName} deploying w/ tx: ${facet.deployTransaction.hash}`)
 		await facet.deployed()
 		facets[facetName] = facet
 		log.info(

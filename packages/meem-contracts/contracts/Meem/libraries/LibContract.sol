@@ -30,12 +30,16 @@ library LibContract {
 			if (params.tokenCounterStart < 1) {
 				revert(Error.InvalidTokenCounter);
 			}
-			LibAccessControl._setRole(s.ADMIN_ROLE, params.admins);
-		} else {
-			for (uint256 i = 0; i < params.admins.length; i++) {
-				LibAccessControl._grantRole(s.ADMIN_ROLE, params.admins[i]);
-			}
+			// LibAccessControl._setRole(s.ADMIN_ROLE, params.admins);
 		}
+		// else {
+		// 	LibAccessControl._deleteAllWithRole(s.ADMIN_ROLE);
+		// 	LibAccessControl._grantRole(s.ADMIN_ROLE, msg.sender);
+		// 	for (uint256 i = 0; i < params.admins.length; i++) {
+		// 		LibAccessControl._grantRole(s.ADMIN_ROLE, params.admins[i]);
+		// 	}
+		// }
+		LibAccessControl._setRole(s.ADMIN_ROLE, params.admins);
 		s.contractURI = params.contractURI;
 
 		LibContract.setBaseProperties(params.baseProperties);
