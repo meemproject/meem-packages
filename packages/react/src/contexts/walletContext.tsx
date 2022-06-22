@@ -2,7 +2,7 @@
 import { ERC20, MeemAPI } from '@meemproject/api'
 import { Meem, getMeemContract } from '@meemproject/meem-contracts'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { providers, BigNumber, ethers } from 'ethers'
+import { providers, ethers } from 'ethers'
 import Cookies from 'js-cookie'
 import React, {
 	createContext,
@@ -15,27 +15,51 @@ import React, {
 } from 'react'
 import useSWR from 'swr'
 import Web3Modal from 'web3modal'
+import chains from '../lib/chains.json'
 import { makeFetcher } from '../lib/fetcher'
 import log from '../lib/log'
 
 // Suppress warnings
 ethers.utils.Logger.setLogLevel(ethers.utils.Logger.levels.ERROR)
 
-const networkChainIds: Record<string, number> = {
-	mainnet: 1,
-	ropsten: 3,
-	rinkeby: 4,
-	goerli: 5,
-	kovan: 42,
-	matic: 137,
-	mumbai: 80001,
-	local: 31337
-}
+// const networkChainIds: Record<string, number> = {
+// 	mainnet: 1,
+// 	ropsten: 3,
+// 	rinkeby: 4,
+// 	goerli: 5,
+// 	kovan: 42,
+// 	matic: 137,
+// 	mumbai: 80001,
+// 	local: 31337
+// }
 
 export enum LoginState {
 	LoggedIn = 'loggedIn',
 	NotLoggedIn = 'notLoggedIn',
 	Unknown = 'unknown'
+}
+
+export interface IChain {
+	name: string
+	chain: string
+	rpc: string[]
+	faucets: string[]
+	nativeCurrency: {
+		name: string
+		symbol: string
+		decimals: number
+	}
+	infoUrl: string
+	shortName: string
+	chainId: number
+	ens?: {
+		registry?: string
+	}
+	explorers: {
+		name: string
+		url: string
+		standard: string
+	}[]
 }
 
 interface IWalletContextState {
@@ -57,27 +81,18 @@ interface IWalletContextState {
 	/** Convenience to check whether a wallet is connected */
 	isConnected: boolean
 
-	/** Whether the wallet is connected to the wrong network */
-	isConnectedToWrongNetwork: boolean
-
-	meemContract?: Meem
+	// meemContract?: Meem
 
 	// auctionContract?: MeemMarket
 	auctionContract?: any
 
 	erc20Contract?: ERC20
 
-	meemId?: MeemAPI.IMeemId
-
 	loginState?: LoginState
 
 	isMeemIdError: boolean
 
 	isMeemIdLoading: boolean
-
-	isAdmin: boolean
-
-	updateMeemId: (meemId: MeemAPI.IMeemId) => void
 
 	signature: string
 
@@ -86,6 +101,10 @@ interface IWalletContextState {
 	setJwt: (jwt: string) => void
 
 	jwt?: string
+
+	setChain: (chainId: number) => Promise<void>
+
+	chainId: number
 }
 
 const WalletContext = createContext({} as IWalletContextState)
@@ -94,41 +113,37 @@ WalletContext.displayName = 'WalletContext'
 export interface IWalletContextProps {
 	children?: ReactNode
 
-	infuraId: string
+	// infuraId: string
 
-	polygonRpcUrl: string
+	// polygonRpcUrl: string
 
-	rinkebyRpcUrl: string
+	// rinkebyRpcUrl: string
 
-	networkName: string
+	// networkName: string
 
-	auctionCurrencyAddress?: string
-
-	contractAddressAuction?: string
-
-	contractAddressMeem: string
-
-	contractAddressMeemId?: string
+	/** Use custom RPC endpoints for a chain */
+	rpcs?: {
+		[chainId: number]: string[]
+	}
+	explorers?: {
+		[chainId: number]: {
+			name: string
+			url: string
+			standard: string
+		}[]
+	}
 }
 
 export const WalletProvider: React.FC<IWalletContextProps> = ({
-	infuraId,
-	networkName,
-	contractAddressMeem,
-	polygonRpcUrl,
-	rinkebyRpcUrl,
 	...props
 }: IWalletContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
-	const [meemContract, setMeemContract] = useState<Meem | undefined>()
+	// const [meemContract, setMeemContract] = useState<Meem | undefined>()
 	const [signature, setSignature] = useState('')
 	const [jwt, setJwt] = useState<string>()
+	const [chainId, setChainId] = useState<number>(4)
 	const [loginState, setLoginState] = useState<LoginState>(LoginState.Unknown)
-	const [isAdmin, setIsAdmin] = useState(false)
-	const [meemId, setMeemId] = useState<MeemAPI.IMeemId | undefined>()
 	const [isConnected, setIsConnected] = useState<boolean>(false)
-	const [isConnectedToWrongNetwork, setIsConnectedToWrongNetwork] =
-		useState(false)
 	const [web3Modal, setWeb3Modal] = useState<Web3Modal | undefined>(undefined)
 	const [provider, setProvider] = useState<any | undefined>(undefined)
 	const [web3Provider, setWeb3Provider] = useState<
@@ -136,6 +151,17 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	>()
 	const [network, setNetwork] = useState<providers.Network | undefined>()
 	const [signer, setSigner] = useState<providers.JsonRpcSigner | undefined>()
+	const initialRpcUrls: {
+		[chainId: number]: string
+	} = {}
+	chains.forEach(chain => {
+		initialRpcUrls[chain.chainId] = chain.rpc[0]
+	})
+	const [rpcUrls, setRpcUrls] = useState<{
+		[chainId: number]: string
+	}>(initialRpcUrls)
+
+	console.log({ rpcUrls })
 
 	const getMeFetcher = makeFetcher<
 		MeemAPI.v1.GetMe.IQueryParams,
@@ -157,8 +183,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	})
 
 	useEffect(() => {
-		setMeemId(meData?.meemId)
-		setIsAdmin(meData?.isAdmin ?? false)
 		if (meData) {
 			setLoginState(LoginState.LoggedIn)
 		}
@@ -179,7 +203,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	useEffect(() => {
 		if (isMeemIdError) {
 			Cookies.remove('meemJwtToken')
-			setMeemId(undefined)
+			// setMeemId(undefined)
 			setLoginState(LoginState.NotLoggedIn)
 		}
 	}, [isMeemIdError])
@@ -219,83 +243,84 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 
 		const n = await w3p.getNetwork()
 		setNetwork(n)
+		setChainId(n.chainId)
 		setProvider(p)
 
-		const requiredNetworkName = networkName
-		const currentNetworkName = n.name
+		// const requiredNetworkName = networkName
+		// const currentNetworkName = n.name
 
-		if (requiredNetworkName !== currentNetworkName) {
-			log.debug('Not using correct network. Switching...')
-			const { ethereum } = window
+		// if (requiredNetworkName !== currentNetworkName) {
+		// 	log.debug('Not using correct network. Switching...')
+		// 	const { ethereum } = window
 
-			if (requiredNetworkName === 'rinkeby') {
-				// If network should be rinkeby, switch to rinkeby
+		// 	if (requiredNetworkName === 'rinkeby') {
+		// 		// If network should be rinkeby, switch to rinkeby
 
-				if (ethereum !== undefined) {
-					const tx = await window.ethereum.request({
-						method: 'wallet_switchEthereumChain',
-						params: [{ chainId: '0x4' }]
-					})
-					log.warn(tx)
-				}
-			} else if (requiredNetworkName === 'matic') {
-				// If network should be matic, switch to matic
+		// 		if (ethereum !== undefined) {
+		// 			const tx = await window.ethereum.request({
+		// 				method: 'wallet_switchEthereumChain',
+		// 				params: [{ chainId: '0x4' }]
+		// 			})
+		// 			log.warn(tx)
+		// 		}
+		// 	} else if (requiredNetworkName === 'matic') {
+		// 		// If network should be matic, switch to matic
 
-				const data = [
-					{
-						chainId: '0x89',
-						chainName: 'Polygon Mainnet',
-						nativeCurrency: {
-							name: 'Matic',
-							symbol: 'MATIC',
-							decimals: 18
-						},
-						rpcUrls: [polygonRpcUrl],
-						blockExplorerUrls: ['https://explorer.matic.network/']
-					}
-				]
-				if (ethereum !== undefined) {
-					const tx = await ethereum.request({
-						method: 'wallet_addEthereumChain',
-						params: data
-					})
-					log.warn(tx)
-				}
-			} else if (requiredNetworkName === 'localhost') {
-				// If network should be matic, switch to matic
+		// 		const data = [
+		// 			{
+		// 				chainId: '0x89',
+		// 				chainName: 'Polygon Mainnet',
+		// 				nativeCurrency: {
+		// 					name: 'Matic',
+		// 					symbol: 'MATIC',
+		// 					decimals: 18
+		// 				},
+		// 				rpcUrls: [polygonRpcUrl],
+		// 				blockExplorerUrls: ['https://explorer.matic.network/']
+		// 			}
+		// 		]
+		// 		if (ethereum !== undefined) {
+		// 			const tx = await ethereum.request({
+		// 				method: 'wallet_addEthereumChain',
+		// 				params: data
+		// 			})
+		// 			log.warn(tx)
+		// 		}
+		// 	} else if (requiredNetworkName === 'localhost') {
+		// 		// If network should be matic, switch to matic
 
-				const data = [
-					{
-						chainId: '0x7A69',
-						chainName: 'Localhost:8545',
-						nativeCurrency: {
-							name: 'Local',
-							symbol: 'LOCAL',
-							decimals: 18
-						},
-						rpcUrls: ['https://localhost:8545/']
-					}
-				]
-				if (ethereum !== undefined) {
-					const tx = await ethereum.request({
-						method: 'wallet_addEthereumChain',
-						params: data
-					})
-					log.warn(tx)
-				}
-			}
-		} else {
-			log.debug(`required network name = ${requiredNetworkName}`)
-			log.debug(`current network name = ${currentNetworkName}`)
-		}
+		// 		const data = [
+		// 			{
+		// 				chainId: '0x7A69',
+		// 				chainName: 'Localhost:8545',
+		// 				nativeCurrency: {
+		// 					name: 'Local',
+		// 					symbol: 'LOCAL',
+		// 					decimals: 18
+		// 				},
+		// 				rpcUrls: ['https://localhost:8545/']
+		// 			}
+		// 		]
+		// 		if (ethereum !== undefined) {
+		// 			const tx = await ethereum.request({
+		// 				method: 'wallet_addEthereumChain',
+		// 				params: data
+		// 			})
+		// 			log.warn(tx)
+		// 		}
+		// 	}
+		// } else {
+		// 	log.debug(`required network name = ${requiredNetworkName}`)
+		// 	log.debug(`current network name = ${currentNetworkName}`)
+		// }
 
 		setSigner(s)
 		setAccounts([address])
 		Cookies.set('walletAddress', address)
 		setWeb3Provider(w3p)
 		setIsConnected(true)
-		setIsConnectedToWrongNetwork(false)
-	}, [networkName, web3Modal])
+		// setIsConnectedToWrongNetwork(false)
+	}, [web3Modal])
 
 	const disconnectWallet = useCallback(async () => {
 		web3Modal?.clearCachedProvider()
@@ -317,18 +342,15 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 					walletconnect: {
 						package: WalletConnectProvider, // required
 						options: {
-							infuraId, // required
-							rpc: {
-								[networkChainIds.matic]: polygonRpcUrl,
-								[networkChainIds.rinkeby]: rinkebyRpcUrl
-							}
+							rpc: rpcUrls
 						}
 					}
 				}
 			})
+			console.log('setweb3')
 			setWeb3Modal(w3m)
 		}
-	}, [infuraId])
+	}, [])
 
 	// Auto connect to the cached provider
 	useEffect(() => {
@@ -339,7 +361,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 
 	const updateMeemId = useCallback((id: MeemAPI.IMeemId) => {
 		log.debug('setMeemId', id)
-		setMeemId(id)
+		// setMeemId(id)
 	}, [])
 
 	const updateSignature = useCallback((sig: string) => {
@@ -358,29 +380,78 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	}, [])
 
 	const handleChainChanged = useCallback(
-		(chainId: string) => {
-			const expectedChainId = networkName && networkChainIds[networkName]
-
-			if (!expectedChainId) {
-				log.fatal('Invalid chain set in env')
-				return
-			}
-
-			const bigExpectedChainId = BigNumber.from(expectedChainId)
-			const bigChainId = BigNumber.from(chainId)
-
-			if (bigChainId.toHexString() === bigExpectedChainId.toHexString()) {
-				log.debug('Connecting wallet')
-				connectWallet()
-				setIsConnectedToWrongNetwork(true)
-			} else {
-				log.debug('Disconnecting wallet')
-				disconnectWallet()
-				setIsConnectedToWrongNetwork(false)
-			}
+		(chainHex: string) => {
+			const newChainId = ethers.BigNumber.from(chainHex)
+			setChainId(newChainId.toNumber())
+			// const expectedChainId = networkName && networkChainIds[networkName]
+			// if (!expectedChainId) {
+			// 	log.fatal('Invalid chain set in env')
+			// 	return
+			// }
+			// const bigExpectedChainId = BigNumber.from(expectedChainId)
+			// const bigChainId = BigNumber.from(chainId)
+			// if (bigChainId.toHexString() === bigExpectedChainId.toHexString()) {
+			// 	log.debug('Connecting wallet')
+			// 	connectWallet()
+			// 	setIsConnectedToWrongNetwork(true)
+			// } else {
+			// 	log.debug('Disconnecting wallet')
+			// 	disconnectWallet()
+			// 	setIsConnectedToWrongNetwork(false)
+			// }
 		},
-		[connectWallet, disconnectWallet, networkName]
+		[connectWallet, disconnectWallet]
 	)
+
+	const setChain = useCallback(async (newChainId: number) => {
+		if (network?.chainId === newChainId) {
+			return
+		}
+		const { ethereum } = window
+
+		const chain = chains.find(c => +c.chainId === +newChainId)
+		if (!chain) {
+			throw new Error(`Unsupported chain with id: ${newChainId}`)
+		}
+
+		// Must be 0x prefixed, non 0-padded
+		const formattedChainId = ethers.BigNumber.from(chain.chainId)
+			.toHexString()
+			.replace(/0x0+/, '0x')
+
+		const data = [
+			{
+				chainId: formattedChainId,
+				chainName: chain.name,
+				nativeCurrency: {
+					name: chain.nativeCurrency.name,
+					symbol: chain.nativeCurrency.symbol,
+					decimals: chain.nativeCurrency.decimals
+				},
+				rpcUrls: chain.rpc
+			}
+		]
+		if (ethereum !== undefined) {
+			try {
+				await ethereum.request({
+					method: 'wallet_addEthereumChain',
+					params: data
+				})
+			} catch (e) {
+				log.warn(e)
+			}
+
+			try {
+				await window.ethereum.request({
+					method: 'wallet_switchEthereumChain',
+					params: [{ chainId: formattedChainId }]
+				})
+			} catch (e) {
+				log.warn(e)
+			}
+			setChainId(chain.chainId)
+		}
+	}, [])
 
 	// A `provider` should come with EIP-1193 events. We'll listen for those events
 	// here so that when a user switches accounts or networks, we can update the
@@ -413,24 +484,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		}
 	}, [accounts])
 
-	useEffect(() => {
-		async function initMeemContract() {
-			if (!contractAddressMeem) {
-				log.debug('Invalid Meem contract address. Check env vars.')
-				return
-			}
-
-			const contract = await getMeemContract({
-				contractAddress: contractAddressMeem,
-				signer
-			})
-
-			setMeemContract(contract)
-		}
-
-		initMeemContract()
-	}, [contractAddressMeem, signer])
-
 	const value = useMemo(
 		() => ({
 			web3Provider,
@@ -440,18 +493,16 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			connectWallet,
 			disconnectWallet,
 			isConnected,
-			meemContract,
-			meemId,
 			setJwt: setMeemJwt,
 			isMeemIdLoading,
 			isMeemIdError,
 			loginState,
-			isAdmin,
 			updateMeemId,
 			signature,
 			updateSignature,
-			isConnectedToWrongNetwork,
-			jwt
+			jwt,
+			setChain,
+			chainId
 		}),
 		[
 			web3Provider,
@@ -461,26 +512,28 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			connectWallet,
 			disconnectWallet,
 			isConnected,
-			meemContract,
-			meemId,
 			setMeemJwt,
 			isMeemIdLoading,
 			isMeemIdError,
 			loginState,
-			isAdmin,
 			updateMeemId,
 			signature,
 			updateSignature,
-			isConnectedToWrongNetwork,
-			jwt
+			jwt,
+			setChain,
+			chainId
 		]
 	)
+
+	console.log({ value })
 
 	return <WalletContext.Provider value={value} {...props} />
 }
 
 export function useWallet() {
 	const context = useContext(WalletContext)
+
+	console.log('!!!!!!!!!!!!!!!!!!!!!!!!!')
 
 	if (typeof context === 'undefined') {
 		throw new Error(`useWallet must be used within a WalletProvider`)

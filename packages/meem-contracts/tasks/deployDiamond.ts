@@ -12,6 +12,7 @@ import { zeroAddress } from '../src/lib/utils'
 import { InitParamsStruct } from '../types/Meem'
 import {
 	FacetCutAction,
+	getSelector,
 	getSelectors,
 	IDeployHistoryFacet
 } from './lib/diamond'
@@ -47,6 +48,7 @@ export async function deployDiamond(options: {
 	hardhatArguments?: HardhatArguments
 }) {
 	const { args, ethers, hardhatArguments } = options
+
 	const deployedContracts: Record<string, string> = {}
 	const network = await ethers.provider.getNetwork()
 	const { chainId } = network
