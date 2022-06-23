@@ -161,8 +161,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		[chainId: number]: string
 	}>(initialRpcUrls)
 
-	console.log({ rpcUrls })
-
 	const getMeFetcher = makeFetcher<
 		MeemAPI.v1.GetMe.IQueryParams,
 		MeemAPI.v1.GetMe.IRequestBody,
@@ -347,7 +345,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 					}
 				}
 			})
-			console.log('setweb3')
 			setWeb3Modal(w3m)
 		}
 	}, [])
@@ -383,22 +380,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		(chainHex: string) => {
 			const newChainId = ethers.BigNumber.from(chainHex)
 			setChainId(newChainId.toNumber())
-			// const expectedChainId = networkName && networkChainIds[networkName]
-			// if (!expectedChainId) {
-			// 	log.fatal('Invalid chain set in env')
-			// 	return
-			// }
-			// const bigExpectedChainId = BigNumber.from(expectedChainId)
-			// const bigChainId = BigNumber.from(chainId)
-			// if (bigChainId.toHexString() === bigExpectedChainId.toHexString()) {
-			// 	log.debug('Connecting wallet')
-			// 	connectWallet()
-			// 	setIsConnectedToWrongNetwork(true)
-			// } else {
-			// 	log.debug('Disconnecting wallet')
-			// 	disconnectWallet()
-			// 	setIsConnectedToWrongNetwork(false)
-			// }
 		},
 		[connectWallet, disconnectWallet]
 	)
@@ -525,15 +506,11 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		]
 	)
 
-	console.log({ value })
-
 	return <WalletContext.Provider value={value} {...props} />
 }
 
 export function useWallet() {
 	const context = useContext(WalletContext)
-
-	console.log('!!!!!!!!!!!!!!!!!!!!!!!!!')
 
 	if (typeof context === 'undefined') {
 		throw new Error(`useWallet must be used within a WalletProvider`)

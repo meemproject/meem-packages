@@ -26,8 +26,6 @@ export interface ICut {
 	functionSelectors: string[]
 }
 
-export async function getCuts() {}
-
 export async function deployProxy(options: { signer: ethers.Signer }) {
 	const { signer } = options
 	const proxy = new ethers.ContractFactory(aft.abi, aft.bytecode, signer)
@@ -156,45 +154,15 @@ function findFacet(options: {
 	}
 }
 
-export async function upgrade(options: {
-	signer: ethers.Signer
+export function getCuts(options: {
 	proxyContractAddress: string
-	chain: Chain.Rinkeby | Chain.Polygon
-	fromVersion: string | IVersion
-	toVersion: string | IVersion
-}): Promise<Transaction | undefined> {
-	const { signer, proxyContractAddress, chain, fromVersion, toVersion } =
-		options
+	fromVersion: IVersion
+	toVersion: IVersion
+}) {
+	const { proxyContractAddress, fromVersion, toVersion } = options
 
 	const cuts: ICut[] = []
 	const tags = ['latest', 'beta', 'alpha']
-	let from: IVersion
-	let to: IVersion
-	if (typeof fromVersion === 'string') {
-		from = tags.includes(fromVersion)
-			? // @ts-ignore
-			  facets[chain][versions[chain][fromVersion]]
-			: facets[chain][fromVersion]
-	} else {
-		from = fromVersion
-	}
-	if (typeof toVersion === 'string') {
-		to = tags.includes(toVersion)
-			? // @ts-ignore
-			  facets[chain][versions[chain][toVersion]]
-			: facets[chain][toVersion]
-	} else {
-		to = toVersion
-	}
-
-	if (!from) {
-		log.crit(`Invalid from version specified: ${fromVersion}`)
-		throw new Error('INVALID_FROM_VERSION')
-	}
-	if (!to) {
-		log.crit(`Invalid to version specified: ${toVersion}`)
-		throw new Error('INVALID_TO_VERSION')
-	}
 
 	const diffFacets: {
 		from: {
@@ -207,14 +175,14 @@ export async function upgrade(options: {
 		}
 	}[] = []
 
-	const toFacets = Object.values(to)
-	const fromFacets = Object.values(from)
+	const toFacets = Object.values(toVersion)
+	const fromFacets = Object.values(fromVersion)
 
 	// Find new facets and add them
 	toFacets.forEach(toFacet => {
 		const fromFacet = findFacet({
 			facet: toFacet,
-			searchVersion: from
+			searchVersion: fromVersion
 		})
 
 		if (!fromFacet) {
@@ -238,7 +206,7 @@ export async function upgrade(options: {
 		) {
 			const toFacet = findFacet({
 				facet: fromFacet,
-				searchVersion: to
+				searchVersion: toVersion
 			})
 			if (!toFacet) {
 				cuts.push({
@@ -260,7 +228,9 @@ export async function upgrade(options: {
 
 		facetSelectors.forEach(f => {
 			const prev = previousSelectors.find(ps => ps === f)
-			if (prev) {
+			if (diffFacet.to.address === diffFacet.from.address) {
+				// Do nothing
+			} else if (prev) {
 				replaceSelectors.push(f)
 			} else {
 				addSelectors.push(f)
@@ -298,6 +268,25 @@ export async function upgrade(options: {
 			})
 		}
 	})
+
+	return cuts
+}
+
+export async function upgrade(options: {
+	signer: ethers.Signer
+	proxyContractAddress: string
+	chain: Chain.Rinkeby | Chain.Polygon
+	fromVersion: string | IVersion
+	toVersion: string | IVersion
+}): Promise<Transaction | undefined> {
+	const { signer, proxyContractAddress, chain, fromVersion, toVersion } =
+		options
+
+	const cuts = getCuts({ proxyContractAddress, chain, fromVersion, toVersion })
+
+	if (cuts.length === 0) {
+		throw new Error('NO_CHANGES')
+	}
 
 	const diamondCut = new Contract(
 		proxyContractAddress,
