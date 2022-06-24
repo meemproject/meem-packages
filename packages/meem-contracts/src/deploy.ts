@@ -275,14 +275,12 @@ export function getCuts(options: {
 export async function upgrade(options: {
 	signer: ethers.Signer
 	proxyContractAddress: string
-	chain: Chain.Rinkeby | Chain.Polygon
-	fromVersion: string | IVersion
-	toVersion: string | IVersion
+	fromVersion: IVersion
+	toVersion: IVersion
 }): Promise<Transaction | undefined> {
-	const { signer, proxyContractAddress, chain, fromVersion, toVersion } =
-		options
+	const { signer, proxyContractAddress, fromVersion, toVersion } = options
 
-	const cuts = getCuts({ proxyContractAddress, chain, fromVersion, toVersion })
+	const cuts = getCuts({ proxyContractAddress, fromVersion, toVersion })
 
 	if (cuts.length === 0) {
 		throw new Error('NO_CHANGES')
