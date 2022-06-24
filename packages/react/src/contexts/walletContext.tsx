@@ -233,7 +233,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		// We plug the initial `provider` into ethers.js and get back
 		// a Web3Provider. This will add on methods from ethers.js and
 		// event listeners such as `.on()` will be different.
-		const w3p = new providers.Web3Provider(p)
+		const w3p = new providers.Web3Provider(p, 'any')
 
 		const s = w3p.getSigner()
 
@@ -244,80 +244,11 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		setChainId(n.chainId)
 		setProvider(p)
 
-		// const requiredNetworkName = networkName
-		// const currentNetworkName = n.name
-
-		// if (requiredNetworkName !== currentNetworkName) {
-		// 	log.debug('Not using correct network. Switching...')
-		// 	const { ethereum } = window
-
-		// 	if (requiredNetworkName === 'rinkeby') {
-		// 		// If network should be rinkeby, switch to rinkeby
-
-		// 		if (ethereum !== undefined) {
-		// 			const tx = await window.ethereum.request({
-		// 				method: 'wallet_switchEthereumChain',
-		// 				params: [{ chainId: '0x4' }]
-		// 			})
-		// 			log.warn(tx)
-		// 		}
-		// 	} else if (requiredNetworkName === 'matic') {
-		// 		// If network should be matic, switch to matic
-
-		// 		const data = [
-		// 			{
-		// 				chainId: '0x89',
-		// 				chainName: 'Polygon Mainnet',
-		// 				nativeCurrency: {
-		// 					name: 'Matic',
-		// 					symbol: 'MATIC',
-		// 					decimals: 18
-		// 				},
-		// 				rpcUrls: [polygonRpcUrl],
-		// 				blockExplorerUrls: ['https://explorer.matic.network/']
-		// 			}
-		// 		]
-		// 		if (ethereum !== undefined) {
-		// 			const tx = await ethereum.request({
-		// 				method: 'wallet_addEthereumChain',
-		// 				params: data
-		// 			})
-		// 			log.warn(tx)
-		// 		}
-		// 	} else if (requiredNetworkName === 'localhost') {
-		// 		// If network should be matic, switch to matic
-
-		// 		const data = [
-		// 			{
-		// 				chainId: '0x7A69',
-		// 				chainName: 'Localhost:8545',
-		// 				nativeCurrency: {
-		// 					name: 'Local',
-		// 					symbol: 'LOCAL',
-		// 					decimals: 18
-		// 				},
-		// 				rpcUrls: ['https://localhost:8545/']
-		// 			}
-		// 		]
-		// 		if (ethereum !== undefined) {
-		// 			const tx = await ethereum.request({
-		// 				method: 'wallet_addEthereumChain',
-		// 				params: data
-		// 			})
-		// 			log.warn(tx)
-		// 		}
-		// 	}
-		// } else {
-		// 	log.debug(`required network name = ${requiredNetworkName}`)
-		// 	log.debug(`current network name = ${currentNetworkName}`)
-		// }
-
 		setSigner(s)
 		setAccounts([address])
 		Cookies.set('walletAddress', address)
 		setWeb3Provider(w3p)
 		setIsConnected(true)
-		// setIsConnectedToWrongNetwork(false)
 	}, [web3Modal])
 
 	const disconnectWallet = useCallback(async () => {
