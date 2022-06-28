@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {Array} from '../utils/Array.sol';
-import {Error} from './Errors.sol';
-import {AccessControlEvents} from './Events.sol';
+import {Error} from '../libraries/Errors.sol';
+import {AccessControlEvents} from '../libraries/Events.sol';
+import {AccessControlStorage} from './AccessControlStorage.sol';
 
 library LibAccessControl {
 	/**
@@ -35,8 +35,7 @@ library LibAccessControl {
 		view
 		returns (bool)
 	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.roles[role].members[account];
+		return AccessControlStorage.dataStore().roles[role].members[account];
 	}
 
 	/**
@@ -50,8 +49,7 @@ library LibAccessControl {
 	 * - the caller must have ``role``'s admin role.
 	 */
 	function grantRole(bytes32 role, address account) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireRole(s.ADMIN_ROLE);
+		requireRole(AccessControlStorage.ADMIN_ROLE);
 		_grantRole(role, account);
 	}
 
@@ -65,8 +63,7 @@ library LibAccessControl {
 	 * - the caller must have ``role``'s admin role.
 	 */
 	function revokeRole(bytes32 role, address account) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireRole(s.ADMIN_ROLE);
+		requireRole(AccessControlStorage.ADMIN_ROLE);
 		_revokeRole(role, account);
 	}
 
@@ -149,7 +146,8 @@ library LibAccessControl {
 	}
 
 	function _grantRole(bytes32 role, address account) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		AccessControlStorage.DataStore storage s = AccessControlStorage
+			.dataStore();
 		if (!hasRole(role, account)) {
 			s.roles[role].members[account] = true;
 			s.rolesList[role].push(account);
@@ -159,7 +157,8 @@ library LibAccessControl {
 	}
 
 	function _revokeRole(bytes32 role, address account) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+		AccessControlStorage.DataStore storage s = AccessControlStorage
+			.dataStore();
 		if (hasRole(role, account)) {
 			s.roles[role].members[account] = false;
 			uint256 idx = s.rolesListIndex[role][account];
@@ -170,8 +169,9 @@ library LibAccessControl {
 	}
 
 	function _setRole(bytes32 role, address[] memory accounts) internal {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		requireRole(s.ADMIN_ROLE);
+		AccessControlStorage.DataStore storage s = AccessControlStorage
+			.dataStore();
+		requireRole(AccessControlStorage.ADMIN_ROLE);
 		for (uint256 i = 0; i < s.rolesList[role].length; i++) {
 			address addy = s.rolesList[role][i];
 			delete s.rolesListIndex[role][addy];

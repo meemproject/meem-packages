@@ -7,15 +7,15 @@ library LibAppStorage {
 	bytes32 constant DIAMOND_STORAGE_POSITION =
 		keccak256('meemproject.app.storage');
 
-	struct RoleData {
-		mapping(address => bool) members;
-	}
+	// struct RoleData {
+	// 	mapping(address => bool) members;
+	// }
 
 	struct AppStorage {
 		/** AccessControl Role: Admin */
-		bytes32 ADMIN_ROLE;
+		// bytes32 ADMIN_ROLE;
 		/** AccessControl Role: Minter */
-		bytes32 MINTER_ROLE;
+		// bytes32 MINTER_ROLE;
 		/** Counter of next incremental token */
 		uint256 tokenCounter;
 		/** ERC721 Name */
@@ -47,7 +47,7 @@ library LibAppStorage {
 		/** Mapping of token to all decendants */
 		mapping(uint256 => uint256[]) decendants;
 		/** Keeps track of assigned roles */
-		mapping(bytes32 => RoleData) roles;
+		// mapping(bytes32 => RoleData) roles;
 		/** Mapping from token ID to approved address */
 		mapping(uint256 => address) tokenApprovals;
 		/** Mapping from owner to operator approvals */
@@ -97,8 +97,8 @@ library LibAppStorage {
 		mapping(address => mapping(uint256 => uint256)) copiesOwnerTokenIndexes;
 		mapping(address => mapping(uint256 => uint256)) remixesOwnerTokenIndexes;
 		/** role -> addresses[] */
-		mapping(bytes32 => address[]) rolesList;
-		mapping(bytes32 => mapping(address => uint256)) rolesListIndex;
+		// mapping(bytes32 => address[]) rolesList;
+		// mapping(bytes32 => mapping(address => uint256)) rolesListIndex;
 		bool isInitialized;
 	}
 

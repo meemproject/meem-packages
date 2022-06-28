@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
-import {LibAccessControl} from '../libraries/LibAccessControl.sol';
+import {LibAccessControl} from '../AccessControl/LibAccessControl.sol';
 import {LibPermissions} from '../libraries/LibPermissions.sol';
 import {LibProperties} from '../libraries/LibProperties.sol';
 import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemPermissionsStandard, URISource} from '../interfaces/MeemStandard.sol';

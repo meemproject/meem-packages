@@ -6,7 +6,7 @@ import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibProperties} from '../libraries/LibProperties.sol';
 import {LibMeem, WrappedItem} from '../libraries/LibMeem.sol';
-import {LibAccessControl} from '../libraries/LibAccessControl.sol';
+import {LibAccessControl} from '../AccessControl/LibAccessControl.sol';
 import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemQueryStandard, BaseProperties, ContractInfo} from '../interfaces/MeemStandard.sol';
 import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
@@ -165,15 +165,5 @@ contract MeemQueryFacet is IMeemQueryStandard {
 				childDepth: s.childDepth,
 				nonOwnerSplitAllocationAmount: s.nonOwnerSplitAllocationAmount
 			});
-	}
-
-	function getRoles(bytes32 role)
-		external
-		view
-		override
-		returns (address[] memory)
-	{
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		return s.rolesList[role];
 	}
 }

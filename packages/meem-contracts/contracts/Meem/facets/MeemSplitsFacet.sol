@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 import {LibERC721} from '../libraries/LibERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibSplits} from '../libraries/LibSplits.sol';
-import {LibAccessControl} from '../libraries/LibAccessControl.sol';
+import {LibAccessControl} from '../AccessControl/LibAccessControl.sol';
 import {Meem, Chain, MeemProperties, PropertyType, PermissionType, MeemPermission, Split, IMeemSplitsStandard} from '../interfaces/MeemStandard.sol';
 import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
 import {RoyaltiesV2} from '../../royalties/RoyaltiesV2.sol';

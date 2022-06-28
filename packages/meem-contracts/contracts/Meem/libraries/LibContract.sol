@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import {LibAccessControl} from './LibAccessControl.sol';
+import {AccessControlStorage} from '../AccessControl/AccessControlStorage.sol';
+import {LibAccessControl} from '../AccessControl/LibAccessControl.sol';
 import {MeemBaseEvents, InitEvents} from './Events.sol';
 import {Error} from './Errors.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
-import {LibAccessControl} from './LibAccessControl.sol';
 import {LibContract} from './LibContract.sol';
 import {LibProperties} from './LibProperties.sol';
 import {BaseProperties, PropertyType, MeemProperties, InitParams} from '../interfaces/MeemStandard.sol';
@@ -39,7 +39,10 @@ library LibContract {
 		// 		LibAccessControl._grantRole(s.ADMIN_ROLE, params.admins[i]);
 		// 	}
 		// }
-		LibAccessControl._setRole(s.ADMIN_ROLE, params.admins);
+		LibAccessControl._setRole(
+			AccessControlStorage.ADMIN_ROLE,
+			params.admins
+		);
 		s.contractURI = params.contractURI;
 
 		LibContract.setBaseProperties(params.baseProperties);
@@ -59,7 +62,7 @@ library LibContract {
 
 	function setBaseProperties(BaseProperties memory props) internal {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibAccessControl.requireRole(s.ADMIN_ROLE);
+		LibAccessControl.requireRole(AccessControlStorage.ADMIN_ROLE);
 
 		if (s.baseProperties.totalOriginalsSupplyLockedBy == address(0)) {
 			s.baseProperties.totalOriginalsSupply = props.totalOriginalsSupply;

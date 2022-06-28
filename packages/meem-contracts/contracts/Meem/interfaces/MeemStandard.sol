@@ -211,21 +211,21 @@ interface IMeemBaseStandard {
 		MeemProperties memory childProperties
 	) external payable;
 
-	function mintAndCopy(
-		MeemMintParameters memory params,
-		MeemProperties memory properties,
-		MeemProperties memory childProperties,
-		address toCopyAddress
-	) external payable;
+	// function mintAndCopy(
+	// 	MeemMintParameters memory params,
+	// 	MeemProperties memory properties,
+	// 	MeemProperties memory childProperties,
+	// 	address toCopyAddress
+	// ) external payable;
 
-	function mintAndRemix(
-		MeemMintParameters memory params,
-		MeemProperties memory properties,
-		MeemProperties memory childProperties,
-		MeemMintParameters memory remixParams,
-		MeemProperties memory remixProperties,
-		MeemProperties memory remixChildProperties
-	) external payable;
+	// function mintAndRemix(
+	// 	MeemMintParameters memory params,
+	// 	MeemProperties memory properties,
+	// 	MeemProperties memory childProperties,
+	// 	MeemMintParameters memory remixParams,
+	// 	MeemProperties memory remixProperties,
+	// 	MeemProperties memory remixChildProperties
+	// ) external payable;
 
 	// TODO: Implement child minting
 	// function mintChild(
@@ -289,8 +289,6 @@ interface IMeemQueryStandard {
 		returns (MeemProperties memory);
 
 	function getContractInfo() external view returns (ContractInfo memory);
-
-	function getRoles(bytes32 role) external view returns (address[] memory);
 }
 
 interface IMeemAdminStandard {

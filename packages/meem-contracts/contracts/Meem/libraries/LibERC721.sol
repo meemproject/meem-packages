@@ -2,9 +2,10 @@
 pragma solidity ^0.8.13;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
+import {AccessControlStorage} from '../AccessControl/AccessControlStorage.sol';
 import {Array} from '../utils/Array.sol';
 import {LibMeem} from '../libraries/LibMeem.sol';
-import {LibAccessControl} from '../libraries/LibAccessControl.sol';
+import {LibAccessControl} from '../AccessControl/LibAccessControl.sol';
 import {Meem, MeemType, URISource} from '../interfaces/MeemStandard.sol';
 import {Error} from '../libraries/Errors.sol';
 import {MeemERC721Events} from '../libraries/Events.sol';
@@ -656,7 +657,10 @@ library LibERC721 {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
 
 		Meem memory meem = LibMeem.getMeem(tokenId);
-		bool isAdmin = LibAccessControl.hasRole(s.ADMIN_ROLE, user);
+		bool isAdmin = LibAccessControl.hasRole(
+			AccessControlStorage.ADMIN_ROLE,
+			user
+		);
 		if (
 			!isAdmin ||
 			(meem.parent == address(0) && meem.owner != address(this)) ||

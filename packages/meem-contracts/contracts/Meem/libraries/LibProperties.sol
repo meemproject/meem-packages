@@ -3,9 +3,10 @@ pragma solidity ^0.8.13;
 
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {PropertyType, MeemProperties, URISource} from '../interfaces/MeemStandard.sol';
+import {AccessControlStorage} from '../AccessControl/AccessControlStorage.sol';
+import {LibAccessControl} from '../AccessControl/LibAccessControl.sol';
 import {LibERC721} from './LibERC721.sol';
 import {LibPermissions} from './LibPermissions.sol';
-import {LibAccessControl} from './LibAccessControl.sol';
 import {LibSplits} from './LibSplits.sol';
 import {Strings} from '../utils/Strings.sol';
 import {Error} from './Errors.sol';
@@ -27,7 +28,7 @@ library LibProperties {
 			propertyType == PropertyType.DefaultChild
 		) {
 			LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-			LibAccessControl.requireRole(s.ADMIN_ROLE);
+			LibAccessControl.requireRole(AccessControlStorage.ADMIN_ROLE);
 		} else {
 			revert(Error.MissingRequiredRole);
 		}

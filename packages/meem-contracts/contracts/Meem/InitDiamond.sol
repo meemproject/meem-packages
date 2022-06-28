@@ -2,7 +2,8 @@
 pragma solidity ^0.8.13;
 
 import {LibAppStorage} from './storage/LibAppStorage.sol';
-import {LibAccessControl} from './libraries/LibAccessControl.sol';
+import {LibAccessControl} from './AccessControl/LibAccessControl.sol';
+import {AccessControlStorage} from './AccessControl/AccessControlStorage.sol';
 import {LibContract} from './libraries/LibContract.sol';
 import {LibProperties} from './libraries/LibProperties.sol';
 import {IDiamondCut} from './interfaces/IDiamondCut.sol';
@@ -33,11 +34,10 @@ contract InitDiamond is IInitDiamondStandard {
 			revert(Error.AlreadyInitialized);
 		}
 
-		s.ADMIN_ROLE = keccak256('ADMIN_ROLE');
-		s.MINTER_ROLE = keccak256('MINTER_ROLE');
-
-		LibAccessControl._grantRole(s.ADMIN_ROLE, msg.sender);
-		LibAccessControl._grantRole(s.MINTER_ROLE, msg.sender);
+		LibAccessControl._grantRole(
+			AccessControlStorage.ADMIN_ROLE,
+			msg.sender
+		);
 
 		address[] memory admins = new address[](params.admins.length + 1);
 		for (uint256 i = 0; i < params.admins.length; i++) {

@@ -6,15 +6,18 @@ import {WrappedItem, PropertyType, PermissionType, MeemPermission, MeemPropertie
 import {IERC721} from '../interfaces/IERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from './LibERC721.sol';
-import {LibAccessControl} from './LibAccessControl.sol';
+import {LibAccessControl} from '../AccessControl/LibAccessControl.sol';
 import {Array} from '../utils/Array.sol';
 import {LibProperties} from './LibProperties.sol';
 import {LibPermissions} from './LibPermissions.sol';
 import {Strings} from '../utils/Strings.sol';
 import {Error} from '../libraries/Errors.sol';
 import {MeemEvents} from '../libraries/Events.sol';
+import {AccessControlStorage} from '../AccessControl/AccessControlStorage.sol';
 
 library LibMeem {
+	bytes32 constant MINTER_ROLE = keccak256('MINTER_ROLE');
+
 	function mint(
 		MeemMintParameters memory params,
 		MeemProperties memory mProperties,
@@ -47,7 +50,7 @@ library LibMeem {
 
 		if (
 			params.mintedBy != address(0) &&
-			LibAccessControl.hasRole(s.MINTER_ROLE, msg.sender)
+			LibAccessControl.hasRole(MINTER_ROLE, msg.sender)
 		) {
 			s.meems[tokenId].mintedBy = params.mintedBy;
 		} else {
@@ -124,7 +127,7 @@ library LibMeem {
 				s.meems[tokenId].meemType = MeemType.Original;
 			} else {
 				// Only trusted minter can mint a wNFT
-				LibAccessControl.requireRole(s.MINTER_ROLE);
+				LibAccessControl.requireRole(MINTER_ROLE);
 				if (params.meemType != MeemType.Wrapped) {
 					revert(Error.InvalidMeemType);
 				}
@@ -395,7 +398,10 @@ library LibMeem {
 		BaseProperties storage baseProperties = s.baseProperties;
 
 		// Allow admins to bypass mint start / end checks
-		bool isAdmin = LibAccessControl.hasRole(s.ADMIN_ROLE, msg.sender);
+		bool isAdmin = LibAccessControl.hasRole(
+			AccessControlStorage.ADMIN_ROLE,
+			msg.sender
+		);
 		if (
 			!isAdmin &&
 			baseProperties.mintStartTimestamp > 0 &&
