@@ -1,24 +1,10 @@
 import { Contract, ethers } from 'ethers'
 import type { Transaction } from 'ethers'
-import InitDiamondABI from '../artifacts/contracts/Meem/InitDiamond.sol/InitDiamond.json'
 import IDiamondCutABI from '../artifacts/contracts/Meem/interfaces/IDiamondCut.sol/IDiamondCut.json'
 import aft from '../artifacts/contracts/MeemDiamond.sol/MeemDiamond.json'
-import { IDiamondCut, InitDiamond } from '../typechain'
-import type {
-	InitParamsStruct,
-	BasePropertiesStruct
-} from '../typechain/contracts/Meem/interfaces/MeemStandard.sol/IInitDiamondStandard'
-import type { MeemPropertiesStruct } from '../typechain/contracts/Meem/interfaces/MeemStandard.sol/IMeemBaseStandard'
-import { IVersion, facets } from './facets.generated'
-import { FacetCutAction, IFacetCut } from './lib/diamond'
-import log from './lib/log'
-import {
-	defaultBaseProperties,
-	defaultMeemProperties
-} from './lib/meemProperties'
-import { Chain } from './lib/meemStandard'
+import { IDiamondCut } from '../typechain'
+import { FacetCutAction } from './lib/diamond'
 import { zeroAddress } from './lib/utils'
-import { versions } from './versions'
 
 export interface ICut {
 	facetAddress: string
@@ -35,115 +21,22 @@ export async function deployProxy(options: { signer: ethers.Signer }) {
 	return deployedProxy
 }
 
-export async function initProxy(options: {
-	signer: ethers.Signer
-	proxyContractAddress: string
-	chain: Chain.Rinkeby | Chain.Polygon
-	name: string
-	symbol: string
-	contractURI: string
-	baseProperties?: BasePropertiesStruct
-	defaultProperties?: MeemPropertiesStruct
-	defaultChildProperties?: MeemPropertiesStruct
-	admins?: string[]
-	childDepth?: number
-	nonOwnerSplitAllocationAmount?: number
-	tokenCounterStart?: number
-	version?: string
-	customVersion?: IVersion
-	cuts?: IFacetCut[]
-}) {
-	const {
-		signer,
-		proxyContractAddress,
-		name,
-		symbol,
-		contractURI,
-		childDepth,
-		chain,
-		admins,
-		tokenCounterStart
-	} = options
-
-	const baseProperties = options.baseProperties ?? defaultBaseProperties
-	const defaultProperties = options.defaultProperties ?? defaultMeemProperties
-	const defaultChildProperties =
-		options.defaultChildProperties ?? defaultMeemProperties
-
-	let version = facets[chain][versions[chain].latest]
-	if (options.customVersion) {
-		version = options.customVersion
-	} else if (options.version) {
-		// @ts-ignore
-		version = versions[chain][options.version]
-			? // @ts-ignore
-			  facets[chain][versions[chain][options.version]]
-			: facets[chain][options.version]
-	}
-
-	const cuts =
-		options.cuts ??
-		Object.values(version).map(f => ({
-			facetAddress: f.address,
-			action: FacetCutAction.Add,
-			functionSelectors: f.functionSelectors
-		}))
-
-	const diamondCut = new Contract(
-		proxyContractAddress,
-		IDiamondCutABI.abi,
-		signer
-	) as IDiamondCut
-	const initDiamond = new Contract(
-		proxyContractAddress,
-		InitDiamondABI.abi,
-		signer
-	) as InitDiamond
-
-	const initParams: InitParamsStruct = {
-		name,
-		symbol,
-		childDepth: ethers.BigNumber.from(childDepth ?? 0),
-		nonOwnerSplitAllocationAmount: 0,
-		contractURI,
-		admins: admins ?? [],
-		baseProperties,
-		defaultProperties,
-		defaultChildProperties,
-		tokenCounterStart: tokenCounterStart ?? 1
-	}
-
-	const functionCall = initDiamond.interface.encodeFunctionData('init', [
-		initParams
-	])
-
-	const tx = await diamondCut.diamondCut(
-		cuts,
-		proxyContractAddress,
-		functionCall
-	)
-	log.debug(`Initiating diamond cut tx: ${tx.hash}`)
-	// await tx.wait()
-	return tx
+export interface IFacetVersion {
+	address: string
+	functionSelectors: string[]
 }
 
-export type IReinitializeOptions = InitParamsStruct & {
-	signer: ethers.Signer
-	proxyContractAddress: string
-}
-
-function findFacet(options: {
+export function findFacet(options: {
 	facet: {
 		address: string
 		functionSelectors: string[]
 	}
-	searchVersion: IVersion
+	searchVersions: IFacetVersion[]
 }) {
-	const { facet, searchVersion } = options
-	const facetVersions = Object.values(searchVersion)
+	const { facet, searchVersions } = options
 
-	for (let i = 0; i < facetVersions.length; i += 1) {
-		const facetVersion = facetVersions[i]
+	for (let i = 0; i < searchVersions.length; i += 1) {
+		const facetVersion = searchVersions[i]
 		const matches = facetVersion.functionSelectors.filter(v =>
 			facet.functionSelectors.includes(v)
 		)
@@ -156,13 +49,14 @@ function findFacet(options: {
 
 export function getCuts(options: {
 	proxyContractAddress: string
-	fromVersion: IVersion
-	toVersion: IVersion
+	fromVersion: IFacetVersion[]
+	toVersion: IFacetVersion[]
 }) {
 	const { proxyContractAddress, fromVersion, toVersion } = options
 
 	const cuts: ICut[] = []
-	const tags = ['latest', 'beta', 'alpha']
+
+	const usedFunctionSelectors: { [address: string]: string } = {}
 
 	const diffFacets: {
 		from: {
@@ -175,21 +69,39 @@ export function getCuts(options: {
 		}
 	}[] = []
 
-	const toFacets = Object.values(toVersion)
-	const fromFacets = Object.values(fromVersion)
+	// Find the proxy base selectors since they are immutable
+	const filteredFrom = fromVersion.filter(
+		f => f.address.toLowerCase() !== proxyContractAddress.toLowerCase()
+	)
+	const filteredTo = toVersion.filter(
+		t => t.address.toLowerCase() !== proxyContractAddress.toLowerCase()
+	)
+
+	const proxyVersion = fromVersion.find(
+		f => f.address.toLowerCase() === proxyContractAddress.toLowerCase()
+	)
+	proxyVersion?.functionSelectors.forEach(
+		s => (usedFunctionSelectors[s] = proxyContractAddress)
+	)
 
 	// Find new facets and add them
-	toFacets.forEach(toFacet => {
+	filteredTo.forEach(toFacet => {
 		const fromFacet = findFacet({
 			facet: toFacet,
-			searchVersion: fromVersion
+			searchVersions: filteredFrom
 		})
 
 		if (!fromFacet) {
+			const filteredFunctionSelectors: string[] = []
+			toFacet.functionSelectors.forEach(functionSelector => {
+				if (typeof usedFunctionSelectors[functionSelector] === 'undefined') {
+					filteredFunctionSelectors.push(functionSelector)
+				}
+			})
 			cuts.push({
 				facetAddress: toFacet.address,
 				action: FacetCutAction.Add,
-				functionSelectors: toFacet.functionSelectors
+				functionSelectors: filteredFunctionSelectors
 			})
 		} else {
 			diffFacets.push({
@@ -200,13 +112,13 @@ export function getCuts(options: {
 	})
 
 	// Find removed facets and remove them
-	fromFacets.forEach(fromFacet => {
+	filteredFrom.forEach(fromFacet => {
 		if (
 			fromFacet.address.toLowerCase() !== proxyContractAddress.toLowerCase()
 		) {
 			const toFacet = findFacet({
 				facet: fromFacet,
-				searchVersion: toVersion
+				searchVersions: filteredTo
 			})
 			if (!toFacet) {
 				cuts.push({
@@ -275,8 +187,8 @@ export function getCuts(options: {
 export async function upgrade(options: {
 	signer: ethers.Signer
 	proxyContractAddress: string
-	fromVersion: IVersion
-	toVersion: IVersion
+	fromVersion: IFacetVersion[]
+	toVersion: IFacetVersion[]
 }): Promise<Transaction | undefined> {
 	const { signer, proxyContractAddress, fromVersion, toVersion } = options
 

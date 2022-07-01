@@ -1,12 +1,10 @@
-import { ethers, Contract, Signer } from 'ethers'
+import { Contract, Signer } from 'ethers'
 import {
 	ERC165,
 	IERC721,
 	IERC721Enumerable,
 	IERC721Metadata
 } from '../../typechain'
-import { Meem } from '../../types'
-import meemABI from '../../types/Meem.json'
 import erc165ABI from '../abi/ERC165.json'
 import erc721ABI from '../abi/ERC721.json'
 
@@ -16,19 +14,19 @@ import erc721ABI from '../abi/ERC721.json'
  * If you're using an older version you'll need to cast it by importing the types
  * from @meemproject/meem-contracts/versions/<chainName>/<version>/Meem.ts
  * */
-export async function getMeemContract(options: {
-	contractAddress: string
-	meemABI?: ethers.ContractInterface
-	signer?: Signer
-}) {
-	const { contractAddress, signer } = options
+// export async function getMeemContract(options: {
+// 	contractAddress: string
+// 	meemABI?: ethers.ContractInterface
+// 	signer?: Signer
+// }) {
+// 	const { contractAddress, signer } = options
 
-	const abi = options.meemABI ?? meemABI
+// 	const abi = options.meemABI ?? meemABI
 
-	const contract = new Contract(contractAddress, abi, signer) as unknown as Meem
+// 	const contract = new Contract(contractAddress, abi, signer) as unknown as Meem
 
-	return contract
-}
+// 	return contract
+// }
 
 /**
  * Get an instance of an ERC721 contract

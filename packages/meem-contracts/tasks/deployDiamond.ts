@@ -9,10 +9,10 @@ import log from '../src/lib/log'
 import { defaultMeemProperties } from '../src/lib/meemProperties'
 import { Permission } from '../src/lib/meemStandard'
 import { zeroAddress } from '../src/lib/utils'
-import { InitParamsStruct } from '../types/Meem'
+// import { InitParamsStruct } from '../types/Meem'
 import {
 	FacetCutAction,
-	getSelector,
+	// getSelector,
 	getSelectors,
 	IDeployHistoryFacet
 } from './lib/diamond'
@@ -183,7 +183,8 @@ export async function deployDiamond(options: {
 				break
 		}
 
-		const params: InitParamsStruct = {
+		// const params: InitParamsStruct = {
+		const params: any = {
 			name: 'Meem',
 			symbol: 'MEEM',
 			childDepth: -1,

@@ -55,7 +55,7 @@
 		"@nomiclabs/hardhat-ethers": "^2.0.2",
 		"@nomiclabs/hardhat-etherscan": "^2.1.2",
 		"@nomiclabs/hardhat-waffle": "^2.0.1",
-		"@solidstate/contracts": "^0.0.27",
+		"@solidstate/contracts": "^0.0.35",
 		"@typechain/ethers-v5": "^10.0.0",
 		"@typechain/hardhat": "^6.0.0",
 		"@types/chai": "^4.2.22",

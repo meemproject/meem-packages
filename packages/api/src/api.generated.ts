@@ -681,13 +681,45 @@ export namespace CreateContract {
 		name: string
 		description: string
 		contractType: ContractType
-		functionSelectors: string[]
 		abi: any[]
 		bytecode: string
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
 		status: 'success'
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
+/** Create Meem Image */
+export namespace CreateMeemContract {
+	export interface IPathParams {}
+
+	export const path = () => `/meemContracts`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		clubContractAddress: string
+		name: string
+		description: string
+		admins: string[]
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		address: string
 	}
 
 	export interface IDefinition {
@@ -831,6 +863,38 @@ export namespace CreateOrUpdateMeemId {
 
 	export interface IResponseBody extends IApiResponseBody {
 		status: 'success'
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
+export namespace GenerateTypes {
+	export interface IPathParams {}
+
+	export const path = () => '/api/1.0/generateTypes'
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		abi?: Record<string, any>[]
+		bundleId?: string
+		name?: string
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		abi: Record<string, any>[]
+		types: string
 	}
 
 	export interface IDefinition {

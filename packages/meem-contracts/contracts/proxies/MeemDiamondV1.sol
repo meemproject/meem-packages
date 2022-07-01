@@ -18,10 +18,10 @@ MMMMMMMM               MMMMMMMMEEEEEEEEEEEE https://meem.wtf EEEEEEEEEEEEEEMMMMM
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import {Diamond} from '@solidstate/contracts/proxy/diamond/Diamond.sol';
-import {OwnableStorage} from '@solidstate/contracts/access/SafeOwnable.sol';
+import {SolidStateDiamond} from '@solidstate/contracts/proxy/diamond/SolidStateDiamond.sol';
+import {OwnableStorage} from '@solidstate/contracts/access/ownable/SafeOwnable.sol';
 
-contract MeemDiamondV1 is Diamond {
+contract MeemDiamondV1 is SolidStateDiamond {
 	using OwnableStorage for OwnableStorage.Layout;
 
 	event MeemDiamondCreated();
