@@ -54,7 +54,7 @@ library LibSplits {
 
 		validateSplits(props, tokenOwner, s.nonOwnerSplitAllocationAmount);
 
-		emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
+		// emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
 		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
@@ -100,7 +100,7 @@ library LibSplits {
 			: address(0);
 
 		validateSplits(props, tokenOwner, s.nonOwnerSplitAllocationAmount);
-		emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
+		// emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
 		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
@@ -131,7 +131,7 @@ library LibSplits {
 		}
 
 		props.splits.pop();
-		emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
+		// emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
 		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
@@ -163,7 +163,7 @@ library LibSplits {
 			: address(0);
 
 		validateSplits(props, tokenOwner, s.nonOwnerSplitAllocationAmount);
-		emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
+		// emit MeemEvents.MeemSplitsSet(tokenId, propertyType, props.splits);
 		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 

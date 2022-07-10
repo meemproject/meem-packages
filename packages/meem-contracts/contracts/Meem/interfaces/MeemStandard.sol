@@ -36,6 +36,13 @@ enum MeemType {
 	Wrapped
 }
 
+enum TokenType {
+	Original,
+	Copy,
+	Remix,
+	Wrapped
+}
+
 enum URISource {
 	Url,
 	JSON
@@ -158,17 +165,17 @@ struct WrappedItem {
 	uint256 tokenId;
 }
 
-struct MeemMintParameters {
+struct MintParameters {
 	address to;
 	string tokenURI;
-	Chain parentChain;
-	address parent;
-	uint256 parentTokenId;
-	MeemType meemType;
-	bool isURILocked;
-	address mintedBy;
+	// Chain parentChain;
+	// address parent;
+	// uint256 parentTokenId;
+	TokenType tokenType;
 	URISource uriSource;
-	string[] reactionTypes;
+	// bool isURILocked;
+	// address mintedBy;
+	// string[] reactionTypes;
 }
 
 struct Reaction {
@@ -205,11 +212,7 @@ interface IInitDiamondStandard {
 }
 
 interface IMeemBaseStandard {
-	function mint(
-		MeemMintParameters memory params,
-		MeemProperties memory properties,
-		MeemProperties memory childProperties
-	) external payable;
+	function mint(MintParameters memory params) external payable;
 
 	// function mintAndCopy(
 	// 	MeemMintParameters memory params,

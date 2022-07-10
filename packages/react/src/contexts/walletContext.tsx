@@ -1,6 +1,5 @@
 /* eslint-disable import/named */
 import { ERC20, MeemAPI } from '@meemproject/api'
-import { Meem, getMeemContract } from '@meemproject/meem-contracts'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers, ethers } from 'ethers'
 import Cookies from 'js-cookie'
@@ -51,7 +50,7 @@ export interface IChain {
 	}
 	infoUrl: string
 	shortName: string
-	chainId: number
+	chainId?: number
 	ens?: {
 		registry?: string
 	}
@@ -104,7 +103,7 @@ interface IWalletContextState {
 
 	setChain: (chainId: number) => Promise<void>
 
-	chainId: number
+	chainId?: number
 }
 
 const WalletContext = createContext({} as IWalletContextState)
@@ -112,14 +111,6 @@ WalletContext.displayName = 'WalletContext'
 
 export interface IWalletContextProps {
 	children?: ReactNode
-
-	// infuraId: string
-
-	// polygonRpcUrl: string
-
-	// rinkebyRpcUrl: string
-
-	// networkName: string
 
 	/** Use custom RPC endpoints for a chain */
 	rpcs?: {
@@ -135,6 +126,7 @@ export interface IWalletContextProps {
 }
 
 export const WalletProvider: React.FC<IWalletContextProps> = ({
+	rpcs,
 	...props
 }: IWalletContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
@@ -152,14 +144,13 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	const [network, setNetwork] = useState<providers.Network | undefined>()
 	const [signer, setSigner] = useState<providers.JsonRpcSigner | undefined>()
 	const initialRpcUrls: {
-		[chainId: number]: string
+		[chainId: number]: string[]
 	} = {}
 	chains.forEach(chain => {
-		initialRpcUrls[chain.chainId] = chain.rpc[0]
+		const c = (rpcs && rpcs[chain.chainId]) ?? chain.rpc
+		initialRpcUrls[chain.chainId] = c
 	})
-	const [rpcUrls, setRpcUrls] = useState<{
-		[chainId: number]: string
-	}>(initialRpcUrls)
+	const [rpcUrls] = useState(initialRpcUrls)
 
 	const getMeFetcher = makeFetcher<
 		MeemAPI.v1.GetMe.IQueryParams,

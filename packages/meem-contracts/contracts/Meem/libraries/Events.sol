@@ -197,11 +197,7 @@ library MeemEvents {
 
 	event MeemTokenReactionTypesSet(uint256 tokenId, string[] reactionTypes);
 
-	event MeemSplitsSet(
-		uint256 tokenId,
-		PropertyType propertyType,
-		Split[] splits
-	);
+	event MeemSplitsSet(uint256 tokenId, Split[] splits);
 	// Rarible royalties event
 	event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
 }

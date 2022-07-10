@@ -47,6 +47,24 @@ export function findFacet(options: {
 	}
 }
 
+export function findFacetBySelector(options: {
+	selector: string
+	searchVersions: IFacetVersion[]
+}) {
+	const { selector, searchVersions } = options
+
+	for (let i = 0; i < searchVersions.length; i += 1) {
+		const facetVersion = searchVersions[i]
+		const selectorMatch = facetVersion.functionSelectors.find(
+			v => v === selector
+		)
+
+		if (selectorMatch) {
+			return facetVersion
+		}
+	}
+}
+
 export function getCuts(options: {
 	proxyContractAddress: string
 	fromVersion: IFacetVersion[]
@@ -58,16 +76,16 @@ export function getCuts(options: {
 
 	const usedFunctionSelectors: { [address: string]: string } = {}
 
-	const diffFacets: {
-		from: {
-			address: string
-			functionSelectors: string[]
-		}
-		to: {
-			address: string
-			functionSelectors: string[]
-		}
-	}[] = []
+	// const diffFacets: {
+	// 	from: {
+	// 		address: string
+	// 		functionSelectors: string[]
+	// 	}
+	// 	to: {
+	// 		address: string
+	// 		functionSelectors: string[]
+	// 	}
+	// }[] = []
 
 	// Find the proxy base selectors since they are immutable
 	const filteredFrom = fromVersion.filter(
@@ -80,35 +98,89 @@ export function getCuts(options: {
 	const proxyVersion = fromVersion.find(
 		f => f.address.toLowerCase() === proxyContractAddress.toLowerCase()
 	)
+
+	console.log({
+		filteredFrom,
+		filteredTo,
+		proxyVersion
+	})
+
 	proxyVersion?.functionSelectors.forEach(
 		s => (usedFunctionSelectors[s] = proxyContractAddress)
 	)
 
 	// Find new facets and add them
 	filteredTo.forEach(toFacet => {
-		const fromFacet = findFacet({
-			facet: toFacet,
-			searchVersions: filteredFrom
+		// const fromFacet = findFacet({
+		// 	facet: toFacet,
+		// 	searchVersions: filteredFrom
+		// })
+
+		const newSelectors: string[] = []
+		const replaceSelectors: string[] = []
+
+		toFacet?.functionSelectors.forEach(selector => {
+			if (!usedFunctionSelectors[selector]) {
+				const oldFacet = findFacetBySelector({
+					selector,
+					searchVersions: fromVersion
+				})
+
+				if (!oldFacet) {
+					// Add the selector
+					newSelectors.push(selector)
+					usedFunctionSelectors[selector] = toFacet.address
+				} else if (
+					oldFacet &&
+					oldFacet.address !== proxyVersion?.address &&
+					oldFacet.address !== toFacet.address
+				) {
+					replaceSelectors.push(selector)
+					usedFunctionSelectors[selector] = toFacet.address
+				}
+			}
 		})
 
-		if (!fromFacet) {
-			const filteredFunctionSelectors: string[] = []
-			toFacet.functionSelectors.forEach(functionSelector => {
-				if (typeof usedFunctionSelectors[functionSelector] === 'undefined') {
-					filteredFunctionSelectors.push(functionSelector)
-				}
-			})
+		if (newSelectors.length > 0) {
 			cuts.push({
 				facetAddress: toFacet.address,
 				action: FacetCutAction.Add,
-				functionSelectors: filteredFunctionSelectors
-			})
-		} else {
-			diffFacets.push({
-				from: fromFacet,
-				to: toFacet
+				functionSelectors: newSelectors
 			})
 		}
+
+		if (replaceSelectors.length > 0) {
+			cuts.push({
+				facetAddress: toFacet.address,
+				action: FacetCutAction.Replace,
+				functionSelectors: replaceSelectors
+			})
+		}
+
+		// if (!fromFacet) {
+		// 	const filteredFunctionSelectors: string[] = []
+		// 	toFacet.functionSelectors.forEach(functionSelector => {
+		// 		if (typeof usedFunctionSelectors[functionSelector] === 'undefined') {
+		// 			filteredFunctionSelectors.push(functionSelector)
+		// 			usedFunctionSelectors[functionSelector] = toFacet.address
+		// 		}
+		// 	})
+		// 	cuts.push({
+		// 		facetAddress: toFacet.address,
+		// 		action: FacetCutAction.Add,
+		// 		functionSelectors: filteredFunctionSelectors
+		// 	})
+		// } else if (fromFacet.address !== toFacet.address) {
+		// 	// diffFacets.push({
+		// 	// 	from: fromFacet,
+		// 	// 	to: toFacet
+		// 	// })
+		// 	cuts.push({
+		// 		facetAddress: toFacet.address,
+		// 		action: FacetCutAction.Add,
+		// 		functionSelectors: filteredFunctionSelectors
+		// 	})
+		// }
 	})
 
 	// Find removed facets and remove them
@@ -116,70 +188,115 @@ export function getCuts(options: {
 		if (
 			fromFacet.address.toLowerCase() !== proxyContractAddress.toLowerCase()
 		) {
-			const toFacet = findFacet({
-				facet: fromFacet,
-				searchVersions: filteredTo
+			const removeSelectors: string[] = []
+
+			fromFacet.functionSelectors.forEach(selector => {
+				const newFacet = findFacetBySelector({
+					selector,
+					searchVersions: toVersion
+				})
+
+				if (!newFacet) {
+					removeSelectors.push(selector)
+				}
 			})
-			if (!toFacet) {
+			// const toFacet = findFacet({
+			// 	facet: fromFacet,
+			// 	searchVersions: filteredTo
+			// })
+			// if (!toFacet) {
+			// 	cuts.push({
+			// 		facetAddress: zeroAddress,
+			// 		action: FacetCutAction.Remove,
+			// 		functionSelectors: fromFacet.functionSelectors
+			// 	})
+			// }
+			if (removeSelectors.length > 0) {
 				cuts.push({
-					facetAddress: zeroAddress,
+					facetAddress: fromFacet.address,
 					action: FacetCutAction.Remove,
-					functionSelectors: fromFacet.functionSelectors
+					functionSelectors: removeSelectors
 				})
 			}
 		}
 	})
 
-	// Perform diff of remaining facets
-	diffFacets.forEach(diffFacet => {
-		const facetSelectors = diffFacet.to.functionSelectors
-		const previousSelectors = diffFacet.from.functionSelectors
-		const replaceSelectors: string[] = []
-		const addSelectors: string[] = []
-		const removeSelectors: string[] = []
+	// console.log({ diffFacets })
 
-		facetSelectors.forEach(f => {
-			const prev = previousSelectors.find(ps => ps === f)
-			if (diffFacet.to.address === diffFacet.from.address) {
-				// Do nothing
-			} else if (prev) {
-				replaceSelectors.push(f)
-			} else {
-				addSelectors.push(f)
-			}
-		})
+	// // Perform diff of remaining facets
+	// diffFacets.forEach(diffFacet => {
+	// 	const facetSelectors = diffFacet.to.functionSelectors
+	// 	const previousSelectors = diffFacet.from.functionSelectors
+	// 	const replaceSelectors: string[] = []
+	// 	const addSelectors: string[] = []
+	// 	const removeSelectors: string[] = []
+	// 	const otherFacets = diffFacets.filter(
+	// 		df => df.from.address !== diffFacet.from.address
+	// 	)
 
-		previousSelectors.forEach(ps => {
-			const curr = facetSelectors.find(f => f === ps)
-			if (!curr) {
-				removeSelectors.push(ps)
-			}
-		})
+	// 	facetSelectors.forEach(f => {
+	// 		const prev = previousSelectors.find(
+	// 			ps => ps === f && diffFacet.to.address !== diffFacet.from.address
+	// 		)
+	// 		const otherFacet = otherFacets.find(other => {
+	// 			console.log({ other, f })
+	// 			const sel = other.from.functionSelectors.find(s => s === f)
+	// 			if (sel) {
+	// 				return true
+	// 			}
 
-		if (removeSelectors.length > 0) {
-			cuts.push({
-				facetAddress: zeroAddress,
-				action: FacetCutAction.Remove,
-				functionSelectors: removeSelectors
-			})
-		}
+	// 			return false
+	// 		})
 
-		if (replaceSelectors.length > 0) {
-			cuts.push({
-				facetAddress: diffFacet.to.address,
-				action: FacetCutAction.Replace,
-				functionSelectors: replaceSelectors
-			})
-		}
+	// 		console.log({ otherFacet })
 
-		if (addSelectors.length > 0) {
-			cuts.push({
-				facetAddress: diffFacet.to.address,
-				action: FacetCutAction.Add,
-				functionSelectors: addSelectors
-			})
-		}
-	})
+	// 		if (prev) {
+	// 			console.log('replace')
+	// 			replaceSelectors.push(f)
+	// 		} else if (diffFacet.to.address === diffFacet.from.address) {
+	// 			// Do nothing
+	// 			console.log('nothing')
+	// 		} else {
+	// 			console.log('add')
+	// 			addSelectors.push(f)
+	// 		}
+	// 	})
+
+	// 	previousSelectors.forEach(ps => {
+	// 		const curr = facetSelectors.find(f => f === ps)
+	// 		if (!curr) {
+	// 			removeSelectors.push(ps)
+	// 		}
+	// 	})
+
+	// 	if (removeSelectors.length > 0) {
+	// 		cuts.push({
+	// 			facetAddress: zeroAddress,
+	// 			action: FacetCutAction.Remove,
+	// 			functionSelectors: removeSelectors
+	// 		})
+	// 	}
+
+	// 	if (replaceSelectors.length > 0) {
+	// 		cuts.push({
+	// 			facetAddress: diffFacet.to.address,
+	// 			action: FacetCutAction.Replace,
+	// 			functionSelectors: replaceSelectors
+	// 		})
+	// 	}
+
+	// 	if (addSelectors.length > 0) {
+	// 		cuts.push({
+	// 			facetAddress: diffFacet.to.address,
+	// 			action: FacetCutAction.Add,
+	// 			functionSelectors: addSelectors
+	// 		})
+	// 	}
+
+	// 	console.log({ removeSelectors, replaceSelectors, addSelectors })
+	// })
+
+	console.log({ cuts })
 
 	return cuts
 }

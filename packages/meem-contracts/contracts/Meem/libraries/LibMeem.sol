@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 pragma experimental ABIEncoderV2;
 
-import {WrappedItem, PropertyType, PermissionType, MeemPermission, MeemProperties, URISource, MeemMintParameters, Meem, Chain, MeemType, MeemBase, Permission, BaseProperties, Split} from '../interfaces/MeemStandard.sol';
+import {WrappedItem, PropertyType, PermissionType, MeemPermission, MeemProperties, URISource, MintParameters, Meem, Chain, MeemType, MeemBase, Permission, BaseProperties, Split} from '../interfaces/MeemStandard.sol';
 import {IERC721} from '../interfaces/IERC721.sol';
 import {LibAppStorage} from '../storage/LibAppStorage.sol';
 import {LibERC721} from './LibERC721.sol';
@@ -18,197 +18,197 @@ import {AccessControlStorage} from '../AccessControl/AccessControlStorage.sol';
 library LibMeem {
 	bytes32 constant MINTER_ROLE = keccak256('MINTER_ROLE');
 
-	function mint(
-		MeemMintParameters memory params,
-		MeemProperties memory mProperties,
-		MeemProperties memory mChildProperties
-	) internal returns (uint256 tokenId_) {
-		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		LibMeem.requireValidMeem(
-			params.parentChain,
-			params.parent,
-			params.parentTokenId
-		);
+	// function mint(
+	// 	MintParameters memory params,
+	// 	MeemProperties memory mProperties,
+	// 	MeemProperties memory mChildProperties
+	// ) internal returns (uint256 tokenId_) {
+	// 	LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
+	// 	LibMeem.requireValidMeem(
+	// 		params.parentChain,
+	// 		params.parent,
+	// 		params.parentTokenId
+	// 	);
 
-		uint256 tokenId = s.tokenCounter;
-		LibERC721._safeMint(params.to, tokenId);
+	// 	uint256 tokenId = s.tokenCounter;
+	// 	LibERC721._safeMint(params.to, tokenId);
 
-		// Initializes mapping w/ default values
-		delete s.meems[tokenId];
+	// 	// Initializes mapping w/ default values
+	// 	delete s.meems[tokenId];
 
-		if (params.isURILocked) {
-			s.meems[tokenId].uriLockedBy = msg.sender;
-		}
+	// 	if (params.isURILocked) {
+	// 		s.meems[tokenId].uriLockedBy = msg.sender;
+	// 	}
 
-		s.meems[tokenId].parentChain = params.parentChain;
-		s.meems[tokenId].parent = params.parent;
-		s.meems[tokenId].parentTokenId = params.parentTokenId;
-		s.meems[tokenId].owner = params.to;
-		s.meems[tokenId].mintedAt = block.timestamp;
-		s.meems[tokenId].reactionTypes = params.reactionTypes;
-		s.meems[tokenId].uriSource = params.uriSource;
+	// 	s.meems[tokenId].parentChain = params.parentChain;
+	// 	s.meems[tokenId].parent = params.parent;
+	// 	s.meems[tokenId].parentTokenId = params.parentTokenId;
+	// 	s.meems[tokenId].owner = params.to;
+	// 	s.meems[tokenId].mintedAt = block.timestamp;
+	// 	s.meems[tokenId].reactionTypes = params.reactionTypes;
+	// 	s.meems[tokenId].uriSource = params.uriSource;
 
-		if (
-			params.mintedBy != address(0) &&
-			LibAccessControl.hasRole(MINTER_ROLE, msg.sender)
-		) {
-			s.meems[tokenId].mintedBy = params.mintedBy;
-		} else {
-			s.meems[tokenId].mintedBy = msg.sender;
-		}
+	// 	if (
+	// 		params.mintedBy != address(0) &&
+	// 		LibAccessControl.hasRole(MINTER_ROLE, msg.sender)
+	// 	) {
+	// 		s.meems[tokenId].mintedBy = params.mintedBy;
+	// 	} else {
+	// 		s.meems[tokenId].mintedBy = msg.sender;
+	// 	}
 
-		// Handle creating child meem
-		if (params.parent == address(this)) {
-			// Verify token exists
-			if (s.meems[params.parentTokenId].owner == address(0)) {
-				revert(Error.TokenNotFound);
-			}
-			// Verify we can mint based on permissions
-			requireCanMintChildOf(
-				params.to,
-				params.meemType,
-				params.parentTokenId
-			);
-			handleSaleDistribution(params.parentTokenId);
+	// 	// Handle creating child meem
+	// 	if (params.parent == address(this)) {
+	// 		// Verify token exists
+	// 		if (s.meems[params.parentTokenId].owner == address(0)) {
+	// 			revert(Error.TokenNotFound);
+	// 		}
+	// 		// Verify we can mint based on permissions
+	// 		requireCanMintChildOf(
+	// 			params.to,
+	// 			params.meemType,
+	// 			params.parentTokenId
+	// 		);
+	// 		handleSaleDistribution(params.parentTokenId);
 
-			if (params.meemType == MeemType.Copy) {
-				s.tokenURIs[tokenId] = s.tokenURIs[params.parentTokenId];
-				s.meems[tokenId].meemType = MeemType.Copy;
-			} else {
-				s.tokenURIs[tokenId] = params.tokenURI;
-				s.meems[tokenId].meemType = MeemType.Remix;
-			}
+	// 		if (params.meemType == MeemType.Copy) {
+	// 			s.tokenURIs[tokenId] = s.tokenURIs[params.parentTokenId];
+	// 			s.meems[tokenId].meemType = MeemType.Copy;
+	// 		} else {
+	// 			s.tokenURIs[tokenId] = params.tokenURI;
+	// 			s.meems[tokenId].meemType = MeemType.Remix;
+	// 		}
 
-			if (s.meems[params.parentTokenId].root != address(0)) {
-				s.meems[tokenId].root = s.meems[params.parentTokenId].root;
-				s.meems[tokenId].rootTokenId = s
-					.meems[params.parentTokenId]
-					.rootTokenId;
-				s.meems[tokenId].rootChain = s
-					.meems[params.parentTokenId]
-					.rootChain;
-			} else {
-				s.meems[tokenId].root = params.parent;
-				s.meems[tokenId].rootTokenId = params.parentTokenId;
-				s.meems[tokenId].rootChain = params.parentChain;
-			}
+	// 		if (s.meems[params.parentTokenId].root != address(0)) {
+	// 			s.meems[tokenId].root = s.meems[params.parentTokenId].root;
+	// 			s.meems[tokenId].rootTokenId = s
+	// 				.meems[params.parentTokenId]
+	// 				.rootTokenId;
+	// 			s.meems[tokenId].rootChain = s
+	// 				.meems[params.parentTokenId]
+	// 				.rootChain;
+	// 		} else {
+	// 			s.meems[tokenId].root = params.parent;
+	// 			s.meems[tokenId].rootTokenId = params.parentTokenId;
+	// 			s.meems[tokenId].rootChain = params.parentChain;
+	// 		}
 
-			s.meems[tokenId].generation =
-				s.meems[params.parentTokenId].generation +
-				1;
+	// 		s.meems[tokenId].generation =
+	// 			s.meems[params.parentTokenId].generation +
+	// 			1;
 
-			// Merge parent childProperties into this child
-			LibProperties.setProperties(
-				tokenId,
-				PropertyType.Meem,
-				mProperties,
-				params.parentTokenId,
-				true
-			);
-			LibProperties.setProperties(
-				tokenId,
-				PropertyType.Child,
-				mChildProperties,
-				params.parentTokenId,
-				true
-			);
-		} else {
-			requireCanMintOriginal(params.to);
-			handleSaleDistribution(0);
-			s.meems[tokenId].generation = 0;
-			s.meems[tokenId].root = params.parent;
-			s.meems[tokenId].rootTokenId = params.parentTokenId;
-			s.meems[tokenId].rootChain = params.parentChain;
-			s.tokenURIs[tokenId] = params.tokenURI;
-			if (params.parent == address(0)) {
-				if (params.meemType != MeemType.Original) {
-					revert(Error.InvalidMeemType);
-				}
-				s.meems[tokenId].meemType = MeemType.Original;
-			} else {
-				// Only trusted minter can mint a wNFT
-				LibAccessControl.requireRole(MINTER_ROLE);
-				if (params.meemType != MeemType.Wrapped) {
-					revert(Error.InvalidMeemType);
-				}
-				s.meems[tokenId].meemType = MeemType.Wrapped;
-			}
-			LibProperties.setProperties(
-				tokenId,
-				PropertyType.Meem,
-				mProperties,
-				s.defaultProperties,
-				true
-			);
-			LibProperties.setProperties(
-				tokenId,
-				PropertyType.Child,
-				mChildProperties,
-				s.defaultChildProperties,
-				true
-			);
-		}
+	// 		// Merge parent childProperties into this child
+	// 		LibProperties.setProperties(
+	// 			tokenId,
+	// 			PropertyType.Meem,
+	// 			mProperties,
+	// 			params.parentTokenId,
+	// 			true
+	// 		);
+	// 		LibProperties.setProperties(
+	// 			tokenId,
+	// 			PropertyType.Child,
+	// 			mChildProperties,
+	// 			params.parentTokenId,
+	// 			true
+	// 		);
+	// 	} else {
+	// 		requireCanMintOriginal(params.to);
+	// 		handleSaleDistribution(0);
+	// 		s.meems[tokenId].generation = 0;
+	// 		s.meems[tokenId].root = params.parent;
+	// 		s.meems[tokenId].rootTokenId = params.parentTokenId;
+	// 		s.meems[tokenId].rootChain = params.parentChain;
+	// 		s.tokenURIs[tokenId] = params.tokenURI;
+	// 		if (params.parent == address(0)) {
+	// 			if (params.meemType != MeemType.Original) {
+	// 				revert(Error.InvalidMeemType);
+	// 			}
+	// 			s.meems[tokenId].meemType = MeemType.Original;
+	// 		} else {
+	// 			// Only trusted minter can mint a wNFT
+	// 			LibAccessControl.requireRole(MINTER_ROLE);
+	// 			if (params.meemType != MeemType.Wrapped) {
+	// 				revert(Error.InvalidMeemType);
+	// 			}
+	// 			s.meems[tokenId].meemType = MeemType.Wrapped;
+	// 		}
+	// 		LibProperties.setProperties(
+	// 			tokenId,
+	// 			PropertyType.Meem,
+	// 			mProperties,
+	// 			s.defaultProperties,
+	// 			true
+	// 		);
+	// 		LibProperties.setProperties(
+	// 			tokenId,
+	// 			PropertyType.Child,
+	// 			mChildProperties,
+	// 			s.defaultChildProperties,
+	// 			true
+	// 		);
+	// 	}
 
-		if (
-			s.childDepth > -1 &&
-			s.meems[tokenId].generation > uint256(s.childDepth)
-		) {
-			revert(Error.ChildDepthExceeded);
-		}
+	// 	if (
+	// 		s.childDepth > -1 &&
+	// 		s.meems[tokenId].generation > uint256(s.childDepth)
+	// 	) {
+	// 		revert(Error.ChildDepthExceeded);
+	// 	}
 
-		// Keep track of children Meems
-		if (params.parent == address(this)) {
-			if (s.meems[tokenId].meemType == MeemType.Copy) {
-				s.copies[params.parentTokenId].push(tokenId);
-				s.copiesOwnerTokens[params.parentTokenId][params.to].push(
-					tokenId
-				);
-				s.copiesOwnerTokenIndexes[params.to][tokenId] =
-					s
-					.copiesOwnerTokens[params.parentTokenId][params.to].length -
-					1;
-			} else if (s.meems[tokenId].meemType == MeemType.Remix) {
-				s.remixes[params.parentTokenId].push(tokenId);
-				s.remixesOwnerTokens[params.parentTokenId][params.to].push(
-					tokenId
-				);
-				s.remixesOwnerTokenIndexes[params.to][tokenId] =
-					s
-					.remixesOwnerTokens[params.parentTokenId][params.to]
-						.length -
-					1;
-			}
-		} else if (params.parent != address(0)) {
-			// Keep track of wrapped NFTs
-			s.chainWrappedNFTs[params.parentChain][params.parent][
-				params.parentTokenId
-			] = tokenId;
-		} else if (params.parent == address(0)) {
-			s.originalMeemTokensIndex[tokenId] = s.originalMeemTokens.length;
-			s.originalMeemTokens.push(tokenId);
-			s.originalOwnerTokens[params.to][tokenId] = true;
-			s.originalOwnerCount[params.to]++;
-		}
+	// 	// Keep track of children Meems
+	// 	if (params.parent == address(this)) {
+	// 		if (s.meems[tokenId].meemType == MeemType.Copy) {
+	// 			s.copies[params.parentTokenId].push(tokenId);
+	// 			s.copiesOwnerTokens[params.parentTokenId][params.to].push(
+	// 				tokenId
+	// 			);
+	// 			s.copiesOwnerTokenIndexes[params.to][tokenId] =
+	// 				s
+	// 				.copiesOwnerTokens[params.parentTokenId][params.to].length -
+	// 				1;
+	// 		} else if (s.meems[tokenId].meemType == MeemType.Remix) {
+	// 			s.remixes[params.parentTokenId].push(tokenId);
+	// 			s.remixesOwnerTokens[params.parentTokenId][params.to].push(
+	// 				tokenId
+	// 			);
+	// 			s.remixesOwnerTokenIndexes[params.to][tokenId] =
+	// 				s
+	// 				.remixesOwnerTokens[params.parentTokenId][params.to]
+	// 					.length -
+	// 				1;
+	// 		}
+	// 	} else if (params.parent != address(0)) {
+	// 		// Keep track of wrapped NFTs
+	// 		s.chainWrappedNFTs[params.parentChain][params.parent][
+	// 			params.parentTokenId
+	// 		] = tokenId;
+	// 	} else if (params.parent == address(0)) {
+	// 		s.originalMeemTokensIndex[tokenId] = s.originalMeemTokens.length;
+	// 		s.originalMeemTokens.push(tokenId);
+	// 		s.originalOwnerTokens[params.to][tokenId] = true;
+	// 		s.originalOwnerCount[params.to]++;
+	// 	}
 
-		if (s.meems[tokenId].root == address(this)) {
-			s.decendants[s.meems[tokenId].rootTokenId].push(tokenId);
-		}
+	// 	if (s.meems[tokenId].root == address(this)) {
+	// 		s.decendants[s.meems[tokenId].rootTokenId].push(tokenId);
+	// 	}
 
-		s.tokenCounter += 1;
+	// 	s.tokenCounter += 1;
 
-		if (
-			!LibERC721._checkOnERC721Received(
-				address(0),
-				params.to,
-				tokenId,
-				''
-			)
-		) {
-			revert(Error.ERC721ReceiverNotImplemented);
-		}
+	// 	if (
+	// 		!LibERC721._checkOnERC721Received(
+	// 			address(0),
+	// 			params.to,
+	// 			tokenId,
+	// 			''
+	// 		)
+	// 	) {
+	// 		revert(Error.ERC721ReceiverNotImplemented);
+	// 	}
 
-		return tokenId;
-	}
+	// 	return tokenId;
+	// }
 
 	function getMeem(uint256 tokenId) internal view returns (Meem memory) {
 		LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
