@@ -16,12 +16,16 @@ import {SolidStateERC721} from '@solidstate/contracts/token/ERC721/SolidStateERC
 import {ERC721MetadataStorage} from '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
 
 contract MeemBaseERC721Facet is SolidStateERC721 {
-	/** Mint a Meem */
+	/**
+	 * @notice Mint a Meem
+	 * @param params The minting parameters
+	 */
 	function mint(MintParameters memory params) public payable virtual {
 		uint256 tokenId = MeemBaseStorage.dataStore().tokenCounter++;
 
-		_requireCanMint(msg.sender);
-		_requireCanMintTo(params.to);
+		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
+		facet.requireCanMint(msg.sender);
+		facet.requireCanMintTo(params.to);
 
 		_safeMint(params.to, tokenId);
 		ERC721MetadataStorage.Layout storage l = ERC721MetadataStorage.layout();
@@ -29,36 +33,54 @@ contract MeemBaseERC721Facet is SolidStateERC721 {
 		MeemBaseStorage.dataStore().tokenTypes[tokenId] = params.tokenType;
 		MeemBaseStorage.dataStore().uriSources[tokenId] = params.uriSource;
 
-		_handleSaleDistribution(0);
+		facet.handleSaleDistribution(0);
 	}
 
-	function test1() public view virtual returns (string memory) {
-		return 'test1';
-	}
-
-	function test2() public view virtual returns (string memory) {
-		return test1();
-	}
-
-	function _handleSaleDistribution(uint256 tokenId) internal virtual {
+	/**
+	 * @notice When a token is sold, distribute the royalties
+	 * @param tokenId The token that is being sold. This function will also be called when a token is minted with tokenId=0.
+	 */
+	function handleSaleDistribution(uint256 tokenId) public payable {
 		if (msg.value == 0) {
 			return;
 		}
 
+		// By default, send the funds back
 		payable(msg.sender).transfer(msg.value);
 	}
 
-	function _requireCanMint(address minter) internal virtual returns (bool) {
-		return true;
-	}
+	/**
+	 * @notice Require that an address can mint a token
+	 * @param minter The address that is minting
+	 */
+	function requireCanMint(address minter) public {}
 
-	function _requireCanMintTo(address to) internal virtual returns (bool) {
-		return true;
-	}
+	/**
+	 * @notice Require that an address can mint to a different address
+	 * @param to The address that is minting
+	 */
+	function requireCanMintTo(address to) public {}
 
-	function _requireOwnsToken(uint256 tokenId) internal view virtual {
-		if (ownerOf(tokenId) != msg.sender) {
+	/**
+	 * @notice Require that an address is a token admin. By default only the token owner is an admin
+	 * @param addy The address to check
+	 * @param tokenId The token id to check
+	 */
+	function requireTokenAdmin(uint256 tokenId, address addy)
+		public
+		view
+		virtual
+	{
+		if (ownerOf(tokenId) != addy) {
 			revert(Error.NotTokenOwner);
 		}
+	}
+
+	function _beforeTokenTransfer(
+		address from,
+		address to,
+		uint256 tokenId
+	) internal virtual override {
+		super._beforeTokenTransfer(from, to, tokenId);
 	}
 }

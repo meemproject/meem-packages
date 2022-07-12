@@ -58,8 +58,12 @@ struct MeemPermission {
 	Permission permission;
 	address[] addresses;
 	uint256 numTokens;
-	address lockedBy;
+	bool isLocked;
 	uint256 costWei;
+	uint256 mintStartTimestamp;
+	uint256 mintEndTimestamp;
+	// !! Deprecated in favor of isLocked
+	address lockedBy;
 }
 
 struct MeemProperties {

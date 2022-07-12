@@ -10,13 +10,9 @@ import {MeemEvents} from '../libraries/Events.sol';
 import {Split} from '../interfaces/MeemStandard.sol';
 import {RoyaltiesV2} from '../../royalties/RoyaltiesV2.sol';
 import {LibPart} from '../../royalties/LibPart.sol';
-import {MeemBaseERC721Facet} from './MeemBaseERC721Facet.sol';
+import {MeemBaseERC721Facet} from '../MeemERC721/MeemBaseERC721Facet.sol';
 
-contract MeemSplitsERC721Facet is MeemBaseERC721Facet, RoyaltiesV2 {
-	function test1() public view virtual override returns (string memory) {
-		return 'override test1';
-	}
-
+contract MeemSplitsFacet is RoyaltiesV2 {
 	function getRaribleV2Royalties(uint256 tokenId)
 		public
 		view
@@ -37,8 +33,44 @@ contract MeemSplitsERC721Facet is MeemBaseERC721Facet, RoyaltiesV2 {
 		return parts;
 	}
 
+	function handleSaleDistribution(uint256 tokenId) public payable {
+		if (msg.value == 0) {
+			return;
+		}
+
+		MeemBaseERC721Facet baseContract = MeemBaseERC721Facet(address(this));
+
+		uint256 leftover = msg.value;
+		SplitsStorage.DataStore storage s = SplitsStorage.dataStore();
+
+		for (uint256 i = 0; i < s.tokenSplits[tokenId].splits.length; i++) {
+			uint256 amt = (msg.value *
+				s.tokenSplits[tokenId].splits[i].amount) / 10000;
+
+			address payable receiver = payable(
+				s.tokenSplits[tokenId].splits[i].toAddress
+			);
+
+			receiver.transfer(amt);
+			leftover = leftover - amt;
+		}
+
+		if (leftover > 0) {
+			if (tokenId == 0) {
+				// Original being minted. Refund difference back to the sender
+				payable(msg.sender).transfer(leftover);
+			} else {
+				address tokenOwner = baseContract.ownerOf(tokenId);
+				// Existing token transfer. Pay the current owner before transferring to new owner
+				payable(tokenOwner).transfer(leftover);
+			}
+		}
+	}
+
 	function lockSplits(uint256 tokenId) external {
-		_requireOwnsToken(tokenId);
+		MeemBaseERC721Facet baseContract = MeemBaseERC721Facet(address(this));
+		baseContract.requireTokenAdmin(tokenId, msg.sender);
+
 		SplitsStorage.DataStore storage s = SplitsStorage.dataStore();
 
 		if (s.tokenSplits[tokenId].lockedBy != address(0)) {
@@ -49,7 +81,9 @@ contract MeemSplitsERC721Facet is MeemBaseERC721Facet, RoyaltiesV2 {
 	}
 
 	function setSplits(uint256 tokenId, Split[] memory splits) external {
-		_requireOwnsToken(tokenId);
+		MeemBaseERC721Facet baseContract = MeemBaseERC721Facet(address(this));
+		baseContract.requireTokenAdmin(tokenId, msg.sender);
+
 		SplitsStorage.DataStore storage s = SplitsStorage.dataStore();
 
 		if (s.tokenSplits[tokenId].lockedBy != address(0)) {
@@ -62,6 +96,14 @@ contract MeemSplitsERC721Facet is MeemBaseERC721Facet, RoyaltiesV2 {
 		for (uint256 i = 0; i < splits.length; i++) {
 			s.tokenSplits[tokenId].splits.push(splits[i]);
 		}
+
+		address tokenOwner = baseContract.ownerOf(tokenId);
+
+		_validateSplits(
+			s.tokenSplits[tokenId].splits,
+			tokenOwner,
+			s.nonOwnerSplitAllocationAmount
+		);
 
 		emit MeemEvents.MeemSplitsSet(tokenId, splits);
 		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
@@ -99,46 +141,6 @@ contract MeemSplitsERC721Facet is MeemBaseERC721Facet, RoyaltiesV2 {
 			totalAmountOfNonOwner < nonOwnerSplitAllocationAmount
 		) {
 			revert(Error.InvalidNonOwnerSplitAllocationAmount);
-		}
-	}
-
-	function _handleSaleDistribution(uint256 tokenId)
-		internal
-		virtual
-		override
-	{
-		if (msg.value == 0) {
-			return;
-		}
-
-		uint256 leftover = msg.value;
-		// LibAppStorage.AppStorage storage s = LibAppStorage.diamondStorage();
-		SplitsStorage.DataStore storage s = SplitsStorage.dataStore();
-
-		// Split[] storage splits = tokenId == 0
-		// 	? s.splits
-		// 	: s.tokenSplits[tokenId].splits;
-
-		for (uint256 i = 0; i < s.tokenSplits[tokenId].splits.length; i++) {
-			uint256 amt = (msg.value *
-				s.tokenSplits[tokenId].splits[i].amount) / 10000;
-
-			address payable receiver = payable(
-				s.tokenSplits[tokenId].splits[i].toAddress
-			);
-
-			receiver.transfer(amt);
-			leftover = leftover - amt;
-		}
-
-		if (leftover > 0) {
-			if (tokenId == 0) {
-				// Original being minted. Refund difference back to the sender
-				payable(msg.sender).transfer(leftover);
-			} else {
-				// Existing token transfer. Pay the current owner before transferring to new owner
-				payable(ownerOf(tokenId)).transfer(leftover);
-			}
 		}
 	}
 }

@@ -20,6 +20,7 @@ library SplitsStorage {
 	struct DataStore {
 		address splitsLockedBy;
 		mapping(uint256 => TokenSplit) tokenSplits;
+		uint256 nonOwnerSplitAllocationAmount;
 	}
 
 	function dataStore() internal pure returns (DataStore storage l) {

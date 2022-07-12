@@ -27,6 +27,7 @@ library Error {
 	string public constant InvalidPropertyType = 'INVALID_PROPERTY_TYPE';
 	string public constant InvalidPermissionType = 'INVALID_PERMISSION_TYPE';
 	string public constant InvalidTotalCopies = 'INVALID_TOTAL_COPIES';
+	string public constant TotalSupplyExceeded = 'TOTAL_SUPPLY_EXCEEDED';
 	string public constant TotalCopiesExceeded = 'TOTAL_COPIES_EXCEEDED';
 	string public constant InvalidTotalRemixes = 'INVALID_TOTAL_REMIXES';
 	string public constant TotalRemixesExceeded = 'TOTAL_REMIXES_EXCEEDED';
