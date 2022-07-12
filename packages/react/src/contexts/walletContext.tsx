@@ -160,16 +160,21 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		method: MeemAPI.v1.GetMe.method
 	})
 
+	const cookieJwtToken = Cookies.get('meemJwtToken')
 	const {
 		data: meData,
 		error: isMeemIdError,
 		isValidating: isMeemIdLoading,
 		mutate: meMutate
-	} = useSWR(jwt ? MeemAPI.v1.GetMe.path() : null, getMeFetcher, {
-		shouldRetryOnError: !!jwt
-		// if the user is logged out, they don't have a JWT. dont retry.
-		// docs here => https://github.com/vercel/swr
-	})
+	} = useSWR(
+		cookieJwtToken && jwt ? MeemAPI.v1.GetMe.path() : null,
+		getMeFetcher,
+		{
+			shouldRetryOnError: !!jwt
+			// if the user is logged out, they don't have a JWT. dont retry.
+			// docs here => https://github.com/vercel/swr
+		}
+	)
 
 	useEffect(() => {
 		if (meData) {
@@ -189,18 +194,19 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		}
 	}, [jwt, meMutate])
 
-	useEffect(() => {
-		if (isMeemIdError) {
-			Cookies.remove('meemJwtToken')
-			// setMeemId(undefined)
-			setLoginState(LoginState.NotLoggedIn)
-		}
-	}, [isMeemIdError])
+	// useEffect(() => {
+	// 	if (isMeemIdError && jwt) {
+	// 		Cookies.remove('meemJwtToken')
+	// 		// setMeemId(undefined)
+	// 		setLoginState(LoginState.NotLoggedIn)
+	// 	}
+	// }, [isMeemIdError, jwt])
 
 	useEffect(() => {
 		const meemJwtToken = Cookies.get('meemJwtToken')
-		setJwt(meemJwtToken)
-		if (!meemJwtToken) {
+		if (meemJwtToken) {
+			setJwt(meemJwtToken)
+		} else {
 			setLoginState(LoginState.NotLoggedIn)
 		}
 	}, [])
@@ -293,10 +299,14 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		setAccounts(acc)
 	}, [])
 
-	const setMeemJwt = useCallback((meemJwt: string) => {
-		Cookies.set('meemJwtToken', meemJwt)
-		setJwt(meemJwt)
+	const setMeemJwt = useCallback((newMeemJwt: string) => {
+		setJwt(newMeemJwt)
+		Cookies.set('meemJwtToken', newMeemJwt)
 	}, [])
+
+	if (typeof window !== 'undefined') {
+		window.Cookies = Cookies
+	}
 
 	const handleChainChanged = useCallback(
 		(chainHex: string) => {
