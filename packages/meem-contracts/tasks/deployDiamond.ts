@@ -6,10 +6,9 @@ import { task, types } from 'hardhat/config'
 import { HardhatArguments } from 'hardhat/types'
 import packageJson from '../package.json'
 import log from '../src/lib/log'
-import { defaultMeemProperties } from '../src/lib/meemProperties'
 import { Permission } from '../src/lib/meemStandard'
 import { zeroAddress } from '../src/lib/utils'
-// import { InitParamsStruct } from '../types/Meem'
+import { InitParamsStruct } from '../typechain/contracts/Meem/Admin/AdminFacet.sol/AdminFacet'
 import {
 	FacetCutAction,
 	// getSelector,
@@ -19,14 +18,11 @@ import {
 
 export interface IFacets {
 	AccessControlFacet: Ethers.Contract | null
+	AdminFacet: Ethers.Contract | null
 	ClippingFacet: Ethers.Contract | null
-	ERC721Facet: Ethers.Contract | null
-	InitDiamond: Ethers.Contract | null
-	MeemAdminFacet: Ethers.Contract | null
-	MeemBaseFacet: Ethers.Contract | null
-	MeemPermissionsFacet: Ethers.Contract | null
-	MeemQueryFacet: Ethers.Contract | null
-	MeemSplitsFacet: Ethers.Contract | null
+	MeemBaseERC721Facet: Ethers.Contract | null
+	PermissionsFacet: Ethers.Contract | null
+	SplitsFacet: Ethers.Contract | null
 	ReactionFacet: Ethers.Contract | null
 	[key: string]: Ethers.Contract | null
 }
@@ -75,17 +71,19 @@ export async function deployDiamond(options: {
 	log.info('Account balance:', (await contractOwner.getBalance()).toString())
 
 	let diamondAddress = zeroAddress
+	let diamond: Ethers.Contract | undefined
 
 	if (shouldDeployProxy) {
 		// deploy Diamond
-		const Diamond = await ethers.getContractFactory('MeemDiamond')
+		const Diamond = await ethers.getContractFactory('MeemDiamondV1')
 
-		const diamond = await Diamond.deploy({
+		diamond = await Diamond.deploy(contractOwner.address, {
 			gasPrice: wei
 		})
 
 		await diamond.deployed()
 		diamondAddress = diamond.address
+		log.info(`Deployed proxy at: ${diamondAddress}`)
 	}
 	deployedContracts.DiamondProxy = diamondAddress
 
@@ -96,17 +94,21 @@ export async function deployDiamond(options: {
 
 	const facets: IFacets = {
 		AccessControlFacet: null,
+		AdminFacet: null,
 		ClippingFacet: null,
-		ERC721Facet: null,
-		InitDiamond: null,
-		MeemAdminFacet: null,
-		MeemBaseFacet: null,
-		MeemPermissionsFacet: null,
-		MeemQueryFacet: null,
-		MeemSplitsFacet: null,
-		ReactionFacet: null
+		PermissionsFacet: null,
+		SplitsFacet: null,
+		ReactionFacet: null,
+		MeemBaseERC721Facet: null
 	}
 
+	const usedSelectors: Record<string, string> = {}
+	if (diamond) {
+		const functionSelectors = getSelectors(diamond)
+		functionSelectors.forEach(selector => {
+			usedSelectors[selector] = diamond?.address ?? ''
+		})
+	}
 	const cuts = []
 	const facetNames = Object.keys(facets)
 	for (const facetName of facetNames) {
@@ -124,11 +126,22 @@ export async function deployDiamond(options: {
 		)
 		deployedContracts[facetName] = facet.address
 		const functionSelectors = getSelectors(facet)
-		cuts.push({
-			facetAddress: facet.address,
-			action: FacetCutAction.Add,
-			functionSelectors
+		const activeFunctionSelectors: string[] = []
+
+		functionSelectors.forEach(selector => {
+			if (!usedSelectors[selector]) {
+				activeFunctionSelectors.push(selector)
+				usedSelectors[selector] = facet.address
+			}
 		})
+
+		if (activeFunctionSelectors.length > 0) {
+			cuts.push({
+				facetAddress: facet.address,
+				action: FacetCutAction.Add,
+				functionSelectors: activeFunctionSelectors
+			})
+		}
 
 		const previousDeploys = history[diamondAddress][facetName]
 			? [
@@ -183,47 +196,29 @@ export async function deployDiamond(options: {
 				break
 		}
 
-		// const params: InitParamsStruct = {
-		const params: any = {
+		// const params: any = {
+
+		const params: InitParamsStruct = {
 			name: 'Meem',
 			symbol: 'MEEM',
-			childDepth: -1,
-			nonOwnerSplitAllocationAmount: 0,
 			contractURI: `{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/VTsnW6jUgE","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": ${basisPoints}, "fee_recipient": "${walletAddress}"}`,
-			baseProperties: {
-				totalOriginalsSupply: -1,
-				totalOriginalsSupplyLockedBy: zeroAddress,
-				mintPermissions: [
-					{
-						permission: Permission.Anyone,
-						addresses: [],
-						numTokens: 0,
-						lockedBy: '0x0000000000000000000000000000000000000000',
-						costWei: 0
-					}
-				],
-				mintPermissionsLockedBy: zeroAddress,
-				splits: [],
-				splitsLockedBy: zeroAddress,
-				originalsPerWallet: -1,
-				originalsPerWalletLockedBy: zeroAddress,
-				isTransferrable: true,
-				isTransferrableLockedBy: zeroAddress,
-				mintStartTimestamp: -1,
-				mintEndTimestamp: -1,
-				mintDatesLockedBy: zeroAddress,
-				transferLockupUntil: 0,
-				transferLockupUntilLockedBy: zeroAddress
-			},
-			defaultProperties: defaultMeemProperties,
-			defaultChildProperties: defaultMeemProperties,
 			admins: [],
-			tokenCounterStart: 100000
+			minters: [],
+			mintPermissions: [
+				{
+					permission: Permission.Anyone,
+					numTokens: 0,
+					addresses: [],
+					costWei: 0,
+					mintStartTimestamp: 0,
+					mintEndTimestamp: 0
+				}
+			]
 		}
 
 		// call to init function
-		const functionCall = facets.InitDiamond?.interface.encodeFunctionData(
-			'init',
+		const functionCall = facets.AdminFacet?.interface.encodeFunctionData(
+			'initialize',
 			[params]
 		)
 

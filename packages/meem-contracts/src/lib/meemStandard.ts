@@ -12,12 +12,11 @@
 // 	Read
 // }
 
-// export enum Permission {
-// 	Owner,
-// 	Anyone,
-// 	Addresses,
-// 	Holders
-// }
+export enum Permission {
+	Anyone,
+	Addresses,
+	Holders
+}
 
 // export enum PropertyType {
 // 	Meem,
@@ -26,14 +25,14 @@
 // 	DefaultChild
 // }
 
-// export enum MeemType {
-// 	Original,
-// 	Copy,
-// 	Remix,
-// 	Wrapped
-// }
+export enum TokenType {
+	Original,
+	Copy,
+	Remix,
+	Wrapped
+}
 
-// export enum UriSource {
-// 	Url,
-// 	Json
-// }
+export enum UriSource {
+	Url,
+	Json
+}

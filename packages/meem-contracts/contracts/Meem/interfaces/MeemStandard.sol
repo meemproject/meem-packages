@@ -32,7 +32,6 @@ struct MeemPermission {
 	uint256 costWei;
 	uint256 mintStartTimestamp;
 	uint256 mintEndTimestamp;
-	uint256 lockupDuration;
 }
 
 struct MintParameters {

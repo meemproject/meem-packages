@@ -14,7 +14,7 @@ library Error {
 		'INVALID_NON_OWNER_SPLIT_ALLOCATION_AMOUNT';
 }
 
-contract MeemSplitsFacet is RoyaltiesV2 {
+contract SplitsFacet is RoyaltiesV2 {
 	event SplitsSet(uint256 tokenId, Split[] splits);
 	event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
 

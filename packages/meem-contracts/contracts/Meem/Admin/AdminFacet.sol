@@ -7,6 +7,8 @@ import {AccessControlFacet} from '../AccessControl/AccessControlFacet.sol';
 import {ERC721MetadataStorage} from '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
 import {AdminStorage} from './AdminStorage.sol';
 import {PermissionsFacet} from '../Permissions/PermissionsFacet.sol';
+import {PermissionsStorage} from '../Permissions/PermissionsStorage.sol';
+import {MeemPermission} from '../interfaces/MeemStandard.sol';
 
 struct InitParams {
 	string symbol;
@@ -14,6 +16,7 @@ struct InitParams {
 	string contractURI;
 	address[] admins;
 	address[] minters;
+	MeemPermission[] mintPermissions;
 }
 
 library AdminError {
@@ -69,6 +72,15 @@ contract AdminFacet {
 
 		for (uint256 i = 0; i < params.minters.length; i++) {
 			LibAccessControl._grantRole(minterRole, params.admins[i]);
+		}
+
+		PermissionsStorage.DataStore storage permStorage = PermissionsStorage
+			.dataStore();
+
+		delete permStorage.mintPermissions;
+
+		for (uint256 i = 0; i < params.mintPermissions.length; i++) {
+			permStorage.mintPermissions.push(params.mintPermissions[i]);
 		}
 	}
 
