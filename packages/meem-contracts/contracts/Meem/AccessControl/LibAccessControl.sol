@@ -2,11 +2,45 @@
 pragma solidity ^0.8.13;
 
 import {Array} from '../utils/Array.sol';
-import {Error} from '../libraries/Errors.sol';
-import {AccessControlEvents} from '../libraries/Events.sol';
 import {AccessControlStorage} from './AccessControlStorage.sol';
 
+library AccessControlError {
+	string public constant MissingRequiredRole = 'MISSING_REQUIRED_ROLE';
+	string public constant NoRenounceOthers = 'NO_RENOUNCE_OTHERS';
+}
+
 library LibAccessControl {
+	/**
+	 * @dev Emitted when `account` is granted `role`.
+	 *
+	 * `sender` is the account that originated the contract call, an admin role
+	 * bearer except when using {AccessControl-_setupRole}.
+	 */
+	event RoleGranted(
+		bytes32 indexed role,
+		address indexed account,
+		address indexed sender
+	);
+
+	/**
+	 * @dev Emitted when `account` is revoked `role`.
+	 *
+	 * `sender` is the account that originated the contract call:
+	 *   - if using `revokeRole`, it is the admin role bearer
+	 *   - if using `renounceRole`, it is the role bearer (i.e. `account`)
+	 */
+	event RoleRevoked(
+		bytes32 indexed role,
+		address indexed account,
+		address indexed sender
+	);
+
+	event RoleSet(
+		bytes32 indexed role,
+		address[] indexed account,
+		address indexed sender
+	);
+
 	/**
 	 * @dev See {IERC165-supportsInterface}.
 	 */
@@ -23,7 +57,7 @@ library LibAccessControl {
 
 	function requireRole(bytes32 role) internal view {
 		if (!hasRole(role, msg.sender)) {
-			revert(Error.MissingRequiredRole);
+			revert(AccessControlError.MissingRequiredRole);
 		}
 	}
 
@@ -83,7 +117,7 @@ library LibAccessControl {
 	 */
 	function renounceRole(bytes32 role, address account) internal {
 		if (account != msg.sender) {
-			revert(Error.NoRenounceOthers);
+			revert(AccessControlError.NoRenounceOthers);
 		}
 
 		_revokeRole(role, account);
@@ -152,7 +186,7 @@ library LibAccessControl {
 			s.roles[role].members[account] = true;
 			s.rolesList[role].push(account);
 			s.rolesListIndex[role][account] = s.rolesList[role].length - 1;
-			emit AccessControlEvents.MeemRoleGranted(role, account, msg.sender);
+			emit RoleGranted(role, account, msg.sender);
 		}
 	}
 
@@ -164,7 +198,7 @@ library LibAccessControl {
 			uint256 idx = s.rolesListIndex[role][account];
 			Array.removeAt(s.rolesList[role], idx);
 
-			emit AccessControlEvents.MeemRoleRevoked(role, account, msg.sender);
+			emit RoleRevoked(role, account, msg.sender);
 		}
 	}
 
@@ -188,6 +222,6 @@ library LibAccessControl {
 			}
 		}
 
-		emit AccessControlEvents.MeemRoleSet(role, accounts, msg.sender);
+		emit RoleSet(role, accounts, msg.sender);
 	}
 }

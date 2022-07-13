@@ -1,19 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
-pragma experimental ABIEncoderV2;
 
-// import {LibERC721} from '../libraries/LibERC721.sol';
-// import {LibAppStorage} from '../storage/LibAppStorage.sol';
-// import {LibMeem} from '../libraries/LibMeem.sol';
-// import {LibAccessControl} from '../AccessControl/LibAccessControl.sol';
 import {MintParameters} from '../interfaces/MeemStandard.sol';
 import {MeemBaseStorage} from './MeemBaseStorage.sol';
-// import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
-// import {LibPart} from '../../royalties/LibPart.sol';
-import {Error} from '../libraries/Errors.sol';
 import {ERC721BaseInternal} from '@solidstate/contracts/token/ERC721/base/ERC721Base.sol';
 import {SolidStateERC721} from '@solidstate/contracts/token/ERC721/SolidStateERC721.sol';
 import {ERC721MetadataStorage} from '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
+
+library Error {
+	string public constant NotTokenAdmin = 'NOT_TOKEN_ADMIN';
+}
 
 contract MeemBaseERC721Facet is SolidStateERC721 {
 	/**
@@ -69,7 +65,7 @@ contract MeemBaseERC721Facet is SolidStateERC721 {
 	 */
 	function requireTokenAdmin(uint256 tokenId, address addy) public view {
 		if (ownerOf(tokenId) != addy) {
-			revert(Error.NotTokenOwner);
+			revert(Error.NotTokenAdmin);
 		}
 	}
 

@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import {LibAccessControl} from '../AccessControl/LibAccessControl.sol';
+import {LibAccessControl, AccessControlError} from '../AccessControl/LibAccessControl.sol';
 import {AccessControlStorage} from '../AccessControl/AccessControlStorage.sol';
 import {AccessControlFacet} from '../AccessControl/AccessControlFacet.sol';
-import {Error} from '../libraries/Errors.sol';
 import {ERC721MetadataStorage} from '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
 import {AdminStorage} from './AdminStorage.sol';
 import {PermissionsFacet} from '../Permissions/PermissionsFacet.sol';
@@ -76,7 +75,7 @@ contract AdminFacet {
 	function requireAdmin() internal view {
 		AccessControlFacet ac = AccessControlFacet(address(this));
 		if (!ac.hasRole(ac.ADMIN_ROLE(), msg.sender)) {
-			revert(Error.MissingRequiredRole);
+			revert(AccessControlError.MissingRequiredRole);
 		}
 	}
 }

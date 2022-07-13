@@ -3,16 +3,18 @@ pragma solidity ^0.8.13;
 
 import {Array} from '../utils/Array.sol';
 import {MeemPermission, Permission} from '../interfaces/MeemStandard.sol';
-import {IRoyaltiesProvider} from '../../royalties/IRoyaltiesProvider.sol';
-import {LibPart} from '../../royalties/LibPart.sol';
-import {Error} from '../libraries/Errors.sol';
 import {PermissionsStorage} from './PermissionsStorage.sol';
 import {AccessControlFacet} from '../AccessControl/AccessControlFacet.sol';
+import {AccessControlError} from '../AccessControl/LibAccessControl.sol';
 import {MeemBaseERC721Facet} from '../MeemERC721/MeemBaseERC721Facet.sol';
 import {IERC721} from '@solidstate/contracts/token/ERC721/IERC721.sol';
 
 library PermissionsError {
 	string public constant MaxSupplyExceeded = 'MAX_SUPPLY_EXCEEDED';
+	string public constant NoPermission = 'NO_PERMISSION';
+	string public constant IncorrectMsgValue = 'INCORRECT_MSG_VALUE';
+	string public constant PropertyLocked = 'PROPERTY_LOCKED';
+	string public constant TransfersLocked = 'TRANSFERS_LOCKED';
 }
 
 contract PermissionsFacet {
@@ -100,11 +102,11 @@ contract PermissionsFacet {
 		}
 
 		if (!hasPermission) {
-			revert(Error.NoPermission);
+			revert(PermissionsError.NoPermission);
 		}
 
 		if (costWei != msg.value) {
-			revert(Error.IncorrectMsgValue);
+			revert(PermissionsError.IncorrectMsgValue);
 		}
 	}
 
@@ -112,7 +114,7 @@ contract PermissionsFacet {
 		requireAdmin();
 		PermissionsStorage.DataStore storage s = PermissionsStorage.dataStore();
 		if (s.isMaxSupplyLocked) {
-			revert(Error.PropertyLocked);
+			revert(PermissionsError.PropertyLocked);
 		}
 
 		s.maxSupply = newMaxSupply;
@@ -129,7 +131,7 @@ contract PermissionsFacet {
 		requireAdmin();
 		PermissionsStorage.DataStore storage s = PermissionsStorage.dataStore();
 		if (s.isMaxSupplyLocked) {
-			revert(Error.PropertyLocked);
+			revert(PermissionsError.PropertyLocked);
 		}
 		s.isMaxSupplyLocked = true;
 
@@ -142,7 +144,7 @@ contract PermissionsFacet {
 		requireAdmin();
 		PermissionsStorage.DataStore storage s = PermissionsStorage.dataStore();
 		if (s.isMaxSupplyLocked) {
-			revert(Error.PropertyLocked);
+			revert(PermissionsError.PropertyLocked);
 		}
 
 		PermissionsFacet(address(this)).validatePermissions(
@@ -175,7 +177,7 @@ contract PermissionsFacet {
 		uint256 tokenId
 	) public {
 		if (PermissionsStorage.dataStore().isTransferLocked) {
-			revert(Error.TransfersLocked);
+			revert(PermissionsError.TransfersLocked);
 		}
 	}
 
@@ -189,10 +191,10 @@ contract PermissionsFacet {
 			(end == 0 || block.timestamp <= end);
 	}
 
-	function requireAdmin() internal {
+	function requireAdmin() internal view {
 		AccessControlFacet ac = AccessControlFacet(address(this));
 		if (!ac.hasRole(ac.ADMIN_ROLE(), msg.sender)) {
-			revert(Error.MissingRequiredRole);
+			revert(AccessControlError.MissingRequiredRole);
 		}
 	}
 }

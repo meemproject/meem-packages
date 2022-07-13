@@ -3,14 +3,21 @@ pragma solidity ^0.8.13;
 pragma experimental ABIEncoderV2;
 
 import {SplitsStorage} from './SplitsStorage.sol';
-import {Error} from '../libraries/Errors.sol';
-import {MeemEvents} from '../libraries/Events.sol';
 import {Split} from '../interfaces/MeemStandard.sol';
-import {RoyaltiesV2} from '../../royalties/RoyaltiesV2.sol';
-import {LibPart} from '../../royalties/LibPart.sol';
+import {RoyaltiesV2} from './RoyaltiesV2.sol';
+import {LibPart} from './LibPart.sol';
 import {MeemBaseERC721Facet} from '../MeemERC721/MeemBaseERC721Facet.sol';
+import {PermissionsError} from '../Permissions/PermissionsFacet.sol';
+
+library Error {
+	string public constant InvalidNonOwnerSplitAllocationAmount =
+		'INVALID_NON_OWNER_SPLIT_ALLOCATION_AMOUNT';
+}
 
 contract MeemSplitsFacet is RoyaltiesV2 {
+	event SplitsSet(uint256 tokenId, Split[] splits);
+	event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
+
 	function getRaribleV2Royalties(uint256 tokenId)
 		public
 		view
@@ -72,7 +79,7 @@ contract MeemSplitsFacet is RoyaltiesV2 {
 		SplitsStorage.DataStore storage s = SplitsStorage.dataStore();
 
 		if (s.tokenSplits[tokenId].lockedBy != address(0)) {
-			revert(Error.PropertyLocked);
+			revert(PermissionsError.PropertyLocked);
 		}
 
 		s.tokenSplits[tokenId].lockedBy = msg.sender;
@@ -85,7 +92,7 @@ contract MeemSplitsFacet is RoyaltiesV2 {
 		SplitsStorage.DataStore storage s = SplitsStorage.dataStore();
 
 		if (s.tokenSplits[tokenId].lockedBy != address(0)) {
-			revert(Error.PropertyLocked);
+			revert(PermissionsError.PropertyLocked);
 		}
 
 		// s.tokenSplits[tokenId].splits = splits;
@@ -103,8 +110,8 @@ contract MeemSplitsFacet is RoyaltiesV2 {
 			s.nonOwnerSplitAllocationAmount
 		);
 
-		emit MeemEvents.MeemSplitsSet(tokenId, splits);
-		emit MeemEvents.RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
+		emit SplitsSet(tokenId, splits);
+		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 
 	function _validateSplits(
