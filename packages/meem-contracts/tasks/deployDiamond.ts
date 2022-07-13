@@ -225,7 +225,7 @@ export async function deployDiamond(options: {
 
 		const tx = await diamondCut.diamondCut(
 			cuts,
-			diamondAddress,
+			args.noInit ? Ethers.constants.AddressZero : diamondAddress,
 			args.noInit ? '0x' : functionCall,
 			{
 				gasPrice: wei

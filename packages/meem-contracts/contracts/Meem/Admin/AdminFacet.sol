@@ -46,15 +46,17 @@ contract AdminFacet {
 	}
 
 	function initialize(InitParams memory params) public {
-		// if (AdminStorage.dataStore().hasInitialized) {
-		revert(AdminError.AlreadyInitialized);
-		// }
+		if (AdminStorage.dataStore().hasInitialized) {
+			revert(AdminError.AlreadyInitialized);
+		}
 
 		ERC721MetadataStorage.Layout storage s = ERC721MetadataStorage.layout();
 
+		AdminStorage.DataStore storage adminStore = AdminStorage.dataStore();
+
 		s.name = params.name;
 		s.symbol = params.symbol;
-		s.baseURI = params.contractURI;
+		adminStore.contractURI = params.contractURI;
 
 		LibAccessControl._grantRole(
 			AccessControlStorage.ADMIN_ROLE,

@@ -27,7 +27,8 @@ describe('Deploy', function Test() {
 		signers = await ethers.getSigners()
 		const { DiamondProxy } = await deployDiamond({
 			args: {
-				proxy: false
+				proxy: true,
+				noInit: true
 			},
 			ethers
 		})
@@ -38,16 +39,27 @@ describe('Deploy', function Test() {
 	})
 
 	it('Can deploy and init and not init again', async () => {
+		const name = 'test'
+		const symbol = 'TEST'
+
 		await (
 			await contracts.adminFacet.initialize({
-				name: 'test',
-				symbol: 'TEST',
+				name,
+				symbol,
 				contractURI,
 				admins: [],
 				minters: [],
 				mintPermissions: []
 			})
 		).wait()
+
+		const contractName = await contracts.meemBaseERC721Facet.name()
+
+		console.log({ contractName })
+
+		assert.equal(await contracts.meemBaseERC721Facet.name(), name)
+		assert.equal(await contracts.meemBaseERC721Facet.symbol(), symbol)
+		assert.equal(await contracts.adminFacet.contractURI(), contractURI)
 
 		await assert.isRejected(
 			contracts.adminFacet.initialize({
