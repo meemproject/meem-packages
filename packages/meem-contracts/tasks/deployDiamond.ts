@@ -39,6 +39,7 @@ export async function deployDiamond(options: {
 	args?: {
 		gwei?: number
 		proxy?: boolean
+		noInit?: boolean
 	}
 	ethers: HardhatEthersHelpers
 	hardhatArguments?: HardhatArguments
@@ -222,9 +223,14 @@ export async function deployDiamond(options: {
 			[params]
 		)
 
-		const tx = await diamondCut.diamondCut(cuts, diamondAddress, functionCall, {
-			gasPrice: wei
-		})
+		const tx = await diamondCut.diamondCut(
+			cuts,
+			diamondAddress,
+			args.noInit ? '0x' : functionCall,
+			{
+				gasPrice: wei
+			}
+		)
 		log.info('Diamond cut tx: ', tx.hash)
 		const receipt = await tx.wait()
 		if (!receipt.status) {

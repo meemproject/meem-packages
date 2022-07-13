@@ -1,7 +1,7 @@
 import { Contract, ethers } from 'ethers'
 import type { Transaction } from 'ethers'
 import IDiamondCutABI from '../artifacts/contracts/Meem/interfaces/IDiamondCut.sol/IDiamondCut.json'
-import aft from '../artifacts/contracts/MeemDiamond.sol/MeemDiamond.json'
+import aft from '../artifacts/contracts/proxies/MeemDiamondV1.sol/MeemDiamondV1.json'
 import { IDiamondCut } from '../typechain'
 import { FacetCutAction } from './lib/diamond'
 import { zeroAddress } from './lib/utils'
@@ -12,10 +12,13 @@ export interface ICut {
 	functionSelectors: string[]
 }
 
-export async function deployProxy(options: { signer: ethers.Signer }) {
-	const { signer } = options
+export async function deployProxy(options: {
+	ownerAddress: string
+	signer: ethers.Signer
+}) {
+	const { ownerAddress, signer } = options
 	const proxy = new ethers.ContractFactory(aft.abi, aft.bytecode, signer)
-	const deployedProxy = await proxy.deploy()
+	const deployedProxy = await proxy.deploy(ownerAddress)
 	await deployedProxy.deployed()
 
 	return deployedProxy

@@ -46,9 +46,9 @@ contract AdminFacet {
 	}
 
 	function initialize(InitParams memory params) public {
-		if (AdminStorage.dataStore().hasInitialized) {
-			revert(AdminError.AlreadyInitialized);
-		}
+		// if (AdminStorage.dataStore().hasInitialized) {
+		revert(AdminError.AlreadyInitialized);
+		// }
 
 		ERC721MetadataStorage.Layout storage s = ERC721MetadataStorage.layout();
 
@@ -77,11 +77,13 @@ contract AdminFacet {
 		PermissionsStorage.DataStore storage permStorage = PermissionsStorage
 			.dataStore();
 
-		delete permStorage.mintPermissions;
+		// delete permStorage.mintPermissions;
 
 		for (uint256 i = 0; i < params.mintPermissions.length; i++) {
 			permStorage.mintPermissions.push(params.mintPermissions[i]);
 		}
+
+		AdminStorage.dataStore().hasInitialized = true;
 	}
 
 	function requireAdmin() internal view {
