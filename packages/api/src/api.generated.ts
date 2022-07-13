@@ -259,15 +259,45 @@ export namespace MeemAPI {
 		parent_token_metadata?: Record<string, any> | null
 	}
 	
+	export type IMeemContractType =
+		| 'meem'
+		| 'meem-club'
+		| 'meem-post'
+		| 'meem-publication'
+	
+	export interface IMeemContractAssociation {
+		meem_contract_type: IMeemContractType
+		address: string
+		tokenIds: string[]
+	}
 	export interface IMeemMetadata {
 		name: string
 		description: string
 		external_url: string
 		image: string
-		image_original: string
-		meem_id: string
+		image_original?: string
+		meem_id?: string
 		meem_properties?: IMeemMetadataProperties
 		extension_properties?: Record<string, any>
+		associations?: IMeemContractAssociation[]
+	}
+	export interface IMeemContractMetadata {
+		meem_contract_type: IMeemContractType
+		version: string
+		spec: string
+		name: string
+		description: string
+		image: string
+		associations?: IMeemContractAssociation[]
+	}
+	
+	export interface IMeemContractMetadata {
+		meem_contract_type: IMeemContractType
+		version: string
+		spec: string
+		name: string
+		description: string
+		image: string
 	}
 	
 	export enum OpenSeaDisplayType {
@@ -396,6 +426,37 @@ export namespace MeemAPI {
 		transferLockupUntilLockedBy: string
 	}
 	
+	export interface IMeemContractBaseProperties {
+		totalOriginalsSupply: number
+		totalOriginalsSupplyLockedBy: string
+		mintPermissions: IMeemPermission[]
+		mintPermissionsLockedBy: string
+		splits: IMeemSplit[]
+		splitsLockedBy: string
+		originalsPerWallet: number
+		originalsPerWalletLockedBy: string
+		isTransferrable: boolean
+		isTransferrableLockedBy: string
+		mintStartAt: number
+		mintEndAt: number
+		mintDatesLockedBy: string
+		transferLockupUntil: number
+		transferLockupUntilLockedBy: string
+	}
+	
+	export interface IMeemContractInitParams {
+		symbol: string
+		name: string
+		contractURI: string
+		baseProperties: IMeemContractBaseProperties
+		defaultProperties: IMeemProperties
+		defaultChildProperties: IMeemProperties
+		admins: string[]
+		tokenCounterStart: number
+		childDepth: number
+		nonOwnerSplitAllocationAmount: number
+	}
+	
 	export interface IMeem {
 		tokenId: string
 		/** Address of the token owner */
@@ -458,6 +519,7 @@ export namespace MeemAPI {
 	
 	export interface IMeemContractIntegrationMetadata {
 		externalUrl?: string
+		[key: string]: unknown
 	}
 	
 	export interface INFT {
@@ -562,25 +624,10 @@ export namespace MeemAPI {
 	
 	export const defaultReactionTypes: string[] = ['upvote', 'downvote']
 	
-	
-	export interface TweetMeemExtensionProperties {
-		meem_tweets_extension: {
-			tweet: {
-				text: string
-				userId: string
-				tweetId: string
-				entities?: any
-				username: string
-				createdAt: string
-				updatedAt: string
-				userProfileImageUrl: string
-			}
-			prompt?: {
-				body: string
-				startAt: string
-				tweetId: string
-			}
-		}
+	export enum ContractType {
+		Regular = 'regular',
+		DiamondProxy = 'diamondProxy',
+		DiamondFacet = 'diamondFacet'
 	}
 	
 	export namespace v1 {
@@ -635,6 +682,127 @@ export namespace MeemAPI {
 		export interface IQueryParams {}
 	
 		export interface IRequestBody {}
+	
+		export interface IResponseBody extends IApiResponseBody {
+			status: 'success'
+		}
+	
+		export interface IDefinition {
+			pathParams: IPathParams
+			queryParams: IQueryParams
+			requestBody: IRequestBody
+			responseBody: IResponseBody
+		}
+	
+		export type Response = IResponseBody | IError
+	}
+	
+	
+	
+	export namespace CreateBundle {
+		export interface IPathParams {}
+	
+		export const path = () => `/api/1.0/bundles`
+	
+		export const method = HttpMethod.Post
+	
+		export interface IQueryParams {}
+	
+		export interface IRequestBody {
+			name: string
+			description: string
+			contractIds: string[]
+		}
+	
+		export interface IResponseBody extends IApiResponseBody {
+			bundleId: string
+		}
+	
+		export interface IDefinition {
+			pathParams: IPathParams
+			queryParams: IQueryParams
+			requestBody: IRequestBody
+			responseBody: IResponseBody
+		}
+	
+		export type Response = IResponseBody | IError
+	}
+	
+	
+	
+	export namespace CreateContract {
+		export interface IPathParams {}
+	
+		export const path = () => `/api/1.0/contracts`
+	
+		export const method = HttpMethod.Post
+	
+		export interface IQueryParams {}
+	
+		export interface IRequestBody {
+			name: string
+			description: string
+			contractType: ContractType
+			abi: any[]
+			bytecode: string
+		}
+	
+		export interface IResponseBody extends IApiResponseBody {
+			status: 'success'
+		}
+	
+		export interface IDefinition {
+			pathParams: IPathParams
+			queryParams: IQueryParams
+			requestBody: IRequestBody
+			responseBody: IResponseBody
+		}
+	
+		export type Response = IResponseBody | IError
+	}
+	
+	
+	
+	/** Create Meem Image */
+	export namespace CreateMeemContract {
+		export interface IPathParams {}
+	
+		export const path = () => `/api/1.0/meemContracts`
+	
+		export const method = HttpMethod.Post
+	
+		export interface IQueryParams {}
+	
+		export interface IRequestBody {
+			/** Name of the contract */
+			name: string
+	
+			/** Contract admin wallet addresses */
+			admins: string[]
+	
+			/** Contract metadata */
+			metadata: IMeemContractMetadata
+	
+			/** Symbol for the contract */
+			symbol: string
+	
+			/** Contract base properties */
+			baseProperties: IMeemContractBaseProperties
+	
+			/** Meem default properties */
+			defaultProperties?: IMeemProperties
+	
+			/** Meem default child properties */
+			defaultChildProperties?: IMeemProperties
+	
+			/** Token ID start */
+			tokenCounterStart: number
+	
+			childDepth: number
+	
+			/** Required non-owner split amount */
+			nonOwnerSplitAllocationAmount: number
+		}
 	
 		export interface IResponseBody extends IApiResponseBody {
 			status: 'success'
@@ -736,6 +904,8 @@ export namespace MeemAPI {
 		export interface IRequestBody {
 			/** Is the integration enabled? */
 			isEnabled?: boolean
+			/** Is the integration publicly displayed on club */
+			isPublic?: boolean
 			/** Metadata associated with this integration */
 			metadata?: MeemAPI.IMeemContractIntegrationMetadata
 		}
@@ -961,9 +1131,8 @@ export namespace MeemAPI {
 		export interface IRequestBody {}
 	
 		export interface IResponseBody extends IApiResponseBody {
-			/** The MeemId */
-			meemId: IMeemId
-			isAdmin: boolean
+			walletId: string
+			address: string
 		}
 	
 		export interface IDefinition {
@@ -1433,15 +1602,9 @@ export namespace MeemAPI {
 			address?: string
 			/** Login w/ wallet. Both address and signature must be provided */
 			signature?: string
-	
-			/** Login twitter access token */
-			twitterAccessToken?: string
-			twitterAccessSecret?: string
 		}
 	
 		export interface IResponseBody extends IApiResponseBody {
-			/** The MeemId */
-			meemId: IMeemId | null
 			/** JWT that can be used for future authentication */
 			jwt: string
 		}
@@ -1513,6 +1676,52 @@ export namespace MeemAPI {
 	
 	
 	
+	/** Mint a new (wrapped) Meem */
+	export namespace MintOriginalMeem {
+		export interface IPathParams {}
+	
+		export const path = () => `/api/1.0/meems/mintOriginal`
+	
+		export const method = HttpMethod.Post
+	
+		export interface IQueryParams {}
+	
+		export interface IRequestBody {
+			/** The address of the Meem contract to mint token */
+			meemContractAddress: string
+	
+			/** The chain where the Meem contract lives */
+			chain: Chain
+	
+			/** JSON (or stringified) metadata object to be used for the minted Meem */
+			metadata?: string | any
+	
+			/** The address where the Meem will be minted to. */
+			to: string
+	
+			properties?: Partial<IMeemProperties>
+	
+			childProperties?: Partial<IMeemProperties>
+		}
+	
+		export interface IResponseBody extends IApiResponseBody {
+			// transactionHash: string
+			// tokenId: number
+			status: 'success'
+		}
+	
+		export interface IDefinition {
+			pathParams: IPathParams
+			queryParams: IQueryParams
+			requestBody: IRequestBody
+			responseBody: IResponseBody
+		}
+	
+		export type Response = IResponseBody | IError
+	}
+	
+	
+	
 	export namespace SaveMetadata {
 		export interface IPathParams {}
 	
@@ -1560,6 +1769,103 @@ export namespace MeemAPI {
 	
 		export interface IResponseBody extends IApiResponseBody {
 			meemIds: IMeemId[]
+		}
+	
+		export interface IDefinition {
+			pathParams: IPathParams
+			queryParams: IQueryParams
+			requestBody: IRequestBody
+			responseBody: IResponseBody
+		}
+	
+		export type Response = IResponseBody | IError
+	}
+	
+	
+	
+	export namespace TrackContractInstance {
+		export interface IPathParams {}
+	
+		export const path = () => `/api/1.0/contractInstances`
+	
+		export const method = HttpMethod.Post
+	
+		export interface IQueryParams {}
+	
+		export interface IRequestBody {
+			address: string
+			chainId: number
+		}
+	
+		export interface IResponseBody extends IApiResponseBody {
+			status: 'success'
+		}
+	
+		export interface IDefinition {
+			pathParams: IPathParams
+			queryParams: IQueryParams
+			requestBody: IRequestBody
+			responseBody: IResponseBody
+		}
+	
+		export type Response = IResponseBody | IError
+	}
+	
+	
+	
+	export namespace UpdateBundle {
+		export interface IPathParams {
+			bundleId: string
+		}
+	
+		export const path = (options: IPathParams) =>
+			`/api/1.0/bundles/${options.bundleId}`
+	
+		export const method = HttpMethod.Put
+	
+		export interface IQueryParams {}
+	
+		export interface IRequestBody {
+			name: string
+			description: string
+			contractIds: string[]
+		}
+	
+		export interface IResponseBody extends IApiResponseBody {
+			status: 'success'
+		}
+	
+		export interface IDefinition {
+			pathParams: IPathParams
+			queryParams: IQueryParams
+			requestBody: IRequestBody
+			responseBody: IResponseBody
+		}
+	
+		export type Response = IResponseBody | IError
+	}
+	
+	
+	
+	export namespace UpdateWalletContractInstance {
+		export interface IPathParams {
+			contractInstanceId: string
+		}
+	
+		export const path = (options: IPathParams) =>
+			`/api/1.0/walletContractInstances/${options.contractInstanceId}`
+	
+		export const method = HttpMethod.Patch
+	
+		export interface IQueryParams {}
+	
+		export interface IRequestBody {
+			note: string
+			name: string
+		}
+	
+		export interface IResponseBody extends IApiResponseBody {
+			status: 'success'
 		}
 	
 		export interface IDefinition {
@@ -1691,97 +1997,6 @@ export namespace MeemAPI {
 	
 		export interface IResponseBody extends IApiResponseBody {
 			status: 'success'
-		}
-	
-		export interface IDefinition {
-			pathParams: IPathParams
-			queryParams: IQueryParams
-			requestBody: IRequestBody
-			responseBody: IResponseBody
-		}
-	
-		export type Response = IResponseBody | IError
-	}
-	
-	
-	
-	/** Get Meem Tweets */
-	export namespace GetTweets {
-		export interface IPathParams {}
-	
-		export const path = () => `/api/1.0/tweets`
-	
-		export const method = HttpMethod.Get
-	
-		export interface IQueryParams {}
-	
-		export interface IRequestBody {}
-	
-		export interface IResponseBody extends IApiResponseBody {
-			tweets: any[]
-		}
-	
-		export interface IDefinition {
-			pathParams: IPathParams
-			queryParams: IQueryParams
-			requestBody: IRequestBody
-			responseBody: IResponseBody
-		}
-	
-		export type Response = IResponseBody | IError
-	}
-	
-	
-	
-	/** Get Twitter Access Token */
-	export namespace GetTwitterAccessToken {
-		export interface IPathParams {}
-	
-		export const path = () => `/api/1.0/meemid/twitter/access-token`
-	
-		export const method = HttpMethod.Post
-	
-		export interface IQueryParams {}
-	
-		export interface IRequestBody {
-			oauthToken: string
-			oauthTokenSecret: string
-			oauthVerifier: string
-		}
-	
-		export interface IResponseBody extends IApiResponseBody {
-			accessToken: string
-			accessTokenSecret: string
-		}
-	
-		export interface IDefinition {
-			pathParams: IPathParams
-			queryParams: IQueryParams
-			requestBody: IRequestBody
-			responseBody: IResponseBody
-		}
-	
-		export type Response = IResponseBody | IError
-	}
-	
-	
-	
-	/** Get Twitter Auth Url */
-	export namespace GetTwitterAuthUrl {
-		export interface IPathParams {}
-	
-		export const path = () => `/api/1.0/meemid/twitter/request-url`
-	
-		export const method = HttpMethod.Get
-	
-		export interface IQueryParams {}
-	
-		export interface IRequestBody {}
-	
-		export interface IResponseBody extends IApiResponseBody {
-			url: string
-			oauthToken: string
-			oauthTokenSecret: string
 		}
 	
 		export interface IDefinition {
