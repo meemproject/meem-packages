@@ -2,9 +2,7 @@
 pragma solidity ^0.8.13;
 pragma experimental ABIEncoderV2;
 
-import {LibERC721} from '../libraries/LibERC721.sol';
 import {SplitsStorage} from './SplitsStorage.sol';
-import {LibSplits} from '../libraries/LibSplits.sol';
 import {Error} from '../libraries/Errors.sol';
 import {MeemEvents} from '../libraries/Events.sol';
 import {Split} from '../interfaces/MeemStandard.sol';

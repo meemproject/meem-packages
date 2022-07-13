@@ -16,7 +16,6 @@ enum PermissionType {
 }
 
 enum Permission {
-	Owner,
 	Anyone,
 	Addresses,
 	Holders
@@ -58,11 +57,11 @@ struct MeemPermission {
 	Permission permission;
 	address[] addresses;
 	uint256 numTokens;
-	bool isLocked;
 	uint256 costWei;
 	uint256 mintStartTimestamp;
 	uint256 mintEndTimestamp;
-	// !! Deprecated in favor of isLocked
+	uint256 lockupDuration;
+	// !! Deprecated
 	address lockedBy;
 }
 

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
-import {LibMeta} from '../libraries/LibMeta.sol';
 import {MeemBase, MeemProperties, Chain, BaseProperties} from '../interfaces/MeemStandard.sol';
 
 library Error {
 	string public constant MissingRequiredRole = 'MISSING_REQUIRED_ROLE';
+
 	string public constant NotTokenOwner = 'NOT_TOKEN_OWNER';
 	string public constant NotTokenAdmin = 'NOT_TOKEN_ADMIN';
 	string public constant InvalidNonOwnerSplitAllocationAmount =
@@ -48,11 +48,11 @@ library Error {
 	string public constant InvalidURI = 'INVALID_URI';
 	string public constant InvalidMeemType = 'INVALID_MEEM_TYPE';
 	string public constant InvalidToken = 'INVALID_TOKEN';
-	string public constant AlreadyClipped = 'ALREADY_CLIPPED';
-	string public constant NotClipped = 'NOT_CLIPPED';
+	// string public constant AlreadyClipped = 'ALREADY_CLIPPED';
+	// string public constant NotClipped = 'NOT_CLIPPED';
 	string public constant URILocked = 'URI_LOCKED';
-	string public constant AlreadyReacted = 'ALREADY_REACTED';
-	string public constant ReactionNotFound = 'REACTION_NOT_FOUND';
+	// string public constant AlreadyReacted = 'ALREADY_REACTED';
+	// string public constant ReactionNotFound = 'REACTION_NOT_FOUND';
 	string public constant IncorrectMsgValue = 'INCORRECT_MSG_VALUE';
 	string public constant TotalOriginalsSupplyExceeded =
 		'TOTAL_ORIGINALS_SUPPLY_EXCEEDED';

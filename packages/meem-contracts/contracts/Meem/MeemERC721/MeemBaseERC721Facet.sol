@@ -21,7 +21,8 @@ contract MeemBaseERC721Facet is SolidStateERC721 {
 	 * @param params The minting parameters
 	 */
 	function mint(MintParameters memory params) public payable virtual {
-		uint256 tokenId = MeemBaseStorage.dataStore().tokenCounter++;
+		MeemBaseStorage.dataStore().tokenCounter++;
+		uint256 tokenId = MeemBaseStorage.dataStore().tokenCounter;
 
 		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
 		facet.requireCanMint(msg.sender);
@@ -53,28 +54,34 @@ contract MeemBaseERC721Facet is SolidStateERC721 {
 	 * @notice Require that an address can mint a token
 	 * @param minter The address that is minting
 	 */
-	function requireCanMint(address minter) public {}
+	function requireCanMint(address minter) public payable {}
 
 	/**
 	 * @notice Require that an address can mint to a different address
 	 * @param to The address that is minting
 	 */
-	function requireCanMintTo(address to) public {}
+	function requireCanMintTo(address to) public payable {}
 
 	/**
 	 * @notice Require that an address is a token admin. By default only the token owner is an admin
 	 * @param addy The address to check
 	 * @param tokenId The token id to check
 	 */
-	function requireTokenAdmin(uint256 tokenId, address addy)
-		public
-		view
-		virtual
-	{
+	function requireTokenAdmin(uint256 tokenId, address addy) public view {
 		if (ownerOf(tokenId) != addy) {
 			revert(Error.NotTokenOwner);
 		}
 	}
+
+	/**
+	 * @notice Check if a token can be transferred
+	 * @param tokenId The token id to check
+	 */
+	function requireCanTransfer(
+		address from,
+		address to,
+		uint256 tokenId
+	) public {}
 
 	function _beforeTokenTransfer(
 		address from,
@@ -82,5 +89,10 @@ contract MeemBaseERC721Facet is SolidStateERC721 {
 		uint256 tokenId
 	) internal virtual override {
 		super._beforeTokenTransfer(from, to, tokenId);
+		MeemBaseERC721Facet(address(this)).requireCanTransfer(
+			from,
+			to,
+			tokenId
+		);
 	}
 }
