@@ -4,3 +4,8 @@ dist
 scratch.ts
 typechain
 types
+test/old
+artifacts
+cache
+.diamond
+.vscode

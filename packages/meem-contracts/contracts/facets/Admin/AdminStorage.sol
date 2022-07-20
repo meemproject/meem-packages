@@ -6,7 +6,6 @@ library AdminStorage {
 		keccak256('meem.contracts.storage.Admin');
 
 	struct DataStore {
-		// /** Keeps track of assigned roles */
 		bool hasInitialized;
 		string contractURI;
 	}

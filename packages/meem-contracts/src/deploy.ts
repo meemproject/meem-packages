@@ -1,6 +1,6 @@
 import { Contract, ethers } from 'ethers'
 import type { Transaction } from 'ethers'
-import IDiamondCutABI from '../artifacts/contracts/Meem/interfaces/IDiamondCut.sol/IDiamondCut.json'
+import IDiamondCutABI from '../artifacts/contracts/facets/interfaces/IDiamondCut.sol/IDiamondCut.json'
 import aft from '../artifacts/contracts/proxies/MeemDiamondV1.sol/MeemDiamondV1.json'
 import { IDiamondCut } from '../typechain'
 import { FacetCutAction } from './lib/diamond'

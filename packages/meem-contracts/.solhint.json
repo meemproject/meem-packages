@@ -10,6 +10,12 @@
 		"compiler-version": [
 			"error",
 			"^0.8.4"
+		],
+		"func-visibility": [
+			"warn",
+			{
+				"ignoreConstructors": true
+			}
 		]
 	}
 }

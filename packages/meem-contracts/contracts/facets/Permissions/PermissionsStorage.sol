@@ -13,12 +13,6 @@ library PermissionsStorage {
 		MeemPermission[] mintPermissions;
 		bool isTransferLocked;
 		mapping(uint256 => uint256) tokenLockupTimestamps;
-		// bool isMintPermissionsLocked;
-		// uint256 mintStartTimestamp;
-		// uint256 mintEndTimestamp;
-		// bool isMintTimestampsLocked;
-		// uint256 maxPerWallet;
-		// bool isMaxPerWalletLocked;
 	}
 
 	function dataStore() internal pure returns (DataStore storage l) {

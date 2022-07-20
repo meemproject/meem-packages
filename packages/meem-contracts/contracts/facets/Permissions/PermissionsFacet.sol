@@ -32,7 +32,7 @@ contract PermissionsFacet {
 		AccessControlFacet ac = AccessControlFacet(address(this));
 
 		// Check if the max supply will be exceeded
-		if (baseContract.totalSupply() + 1 > s.maxSupply) {
+		if (s.maxSupply > 0 && baseContract.totalSupply() + 1 > s.maxSupply) {
 			revert(PermissionsError.MaxSupplyExceeded);
 		}
 

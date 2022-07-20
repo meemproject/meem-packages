@@ -79,8 +79,6 @@ contract AdminFacet {
 		PermissionsStorage.DataStore storage permStorage = PermissionsStorage
 			.dataStore();
 
-		// delete permStorage.mintPermissions;
-
 		for (uint256 i = 0; i < params.mintPermissions.length; i++) {
 			permStorage.mintPermissions.push(params.mintPermissions[i]);
 		}

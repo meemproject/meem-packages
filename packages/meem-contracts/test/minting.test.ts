@@ -3,14 +3,14 @@ import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import _ from 'lodash'
-import { zeroAddress } from '../src/lib/utils'
+import { TokenType, UriSource } from '../src/lib/meemStandard'
 import { deployDiamond } from '../tasks'
 import { getMeemContracts, MeemContracts } from './helpers'
 
 use(chaiAsPromised)
 
 // !! These deploy tests are VERY slow to execute (call the diamondCut function) if run using vscode launch with debugger. why?!?
-describe('Deploy', function Test() {
+describe('Minting', function Test() {
 	let contracts: MeemContracts
 	let signers: SignerWithAddress[]
 	let contractAddress: string
@@ -25,8 +25,7 @@ describe('Deploy', function Test() {
 		signers = await ethers.getSigners()
 		const { DiamondProxy } = await deployDiamond({
 			args: {
-				proxy: true,
-				noInit: true
+				proxy: true
 			},
 			ethers
 		})
@@ -36,38 +35,34 @@ describe('Deploy', function Test() {
 		contracts = await getMeemContracts(DiamondProxy)
 	})
 
-	it('Can deploy and init and not init again', async () => {
-		const name = 'test'
-		const symbol = 'TEST'
+	it('Can mint with http uri', async () => {
+		await contracts.meemBaseERC721Facet.connect(signers[3]).mint({
+			to: signers[3].address,
+			tokenType: TokenType.Original,
+			tokenURI: 'https://example.com'
+		})
 
-		await (
-			await contracts.adminFacet.initialize({
-				name,
-				symbol,
-				contractURI,
-				admins: [],
-				minters: [],
-				mintPermissions: []
+		const tokenUri = await contracts.meemBaseERC721Facet.tokenURI(1)
+		assert.equal(tokenUri, 'https://example.com')
+		const owner = await contracts.meemBaseERC721Facet.ownerOf(1)
+		assert.equal(owner, signers[3].address)
+	})
+
+	it('Can mint with json encoded uri', async () => {
+		await contracts.meemBaseERC721Facet.connect(signers[3]).mint({
+			to: signers[3].address,
+			tokenType: TokenType.Original,
+			tokenURI: JSON.stringify({
+				name: 'Testing'
 			})
-		).wait()
+		})
 
-		const contractName = await contracts.meemBaseERC721Facet.name()
-
-		console.log({ contractName })
-
-		assert.equal(await contracts.meemBaseERC721Facet.name(), name)
-		assert.equal(await contracts.meemBaseERC721Facet.symbol(), symbol)
-		assert.equal(await contracts.adminFacet.contractURI(), contractURI)
-
-		await assert.isRejected(
-			contracts.adminFacet.initialize({
-				name: 'test',
-				symbol: 'TEST',
-				contractURI,
-				admins: [],
-				minters: [],
-				mintPermissions: []
-			})
+		const tokenUri = await contracts.meemBaseERC721Facet.tokenURI(2)
+		assert.equal(
+			tokenUri,
+			'data:application/json;base64,eyJuYW1lIjoiVGVzdGluZyJ9'
 		)
+		const owner = await contracts.meemBaseERC721Facet.ownerOf(2)
+		assert.equal(owner, signers[3].address)
 	})
 })

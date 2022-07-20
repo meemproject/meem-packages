@@ -37,14 +37,7 @@ struct MeemPermission {
 struct MintParameters {
 	address to;
 	string tokenURI;
-	// Chain parentChain;
-	// address parent;
-	// uint256 parentTokenId;
 	TokenType tokenType;
-	URISource uriSource;
-	// bool isURILocked;
-	// address mintedBy;
-	// string[] reactionTypes;
 }
 
 struct Reaction {

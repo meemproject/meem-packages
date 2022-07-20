@@ -9,6 +9,7 @@ library MeemBaseStorage {
 
 	struct DataStore {
 		uint256 tokenCounter;
+		string contractURI;
 		mapping(uint256 => TokenType) tokenTypes;
 		mapping(uint256 => URISource) uriSources;
 	}
