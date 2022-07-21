@@ -9,6 +9,10 @@
 			"path": "./packages/api"
 		},
 		{
+			"name": "@meemproject/metadata",
+			"path": "./packages/metadata"
+		},
+		{
 			"name": "@meemproject/meem-contracts",
 			"path": "./packages/meem-contracts"
 		},
@@ -24,6 +28,7 @@
 	"settings": {
 		"eslint.workingDirectories": [
 			"packages/api",
+			"packages/metadata",
 			"packages/react",
 			"packages/utils",
 			"packages/meem-contracts"
