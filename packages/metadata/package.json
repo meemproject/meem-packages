@@ -5,7 +5,7 @@
     "author": "Meem Project",
     "homepage": "https://meem.wtf",
     "license": "MIT",
-    "main": "dist/src/index.js",
+    "main": "./dist/index.js",
     "files": [
         "typechain",
         "types",
