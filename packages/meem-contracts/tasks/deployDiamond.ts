@@ -214,7 +214,11 @@ export async function deployDiamond(options: {
 					mintStartTimestamp: 0,
 					mintEndTimestamp: 0
 				}
-			]
+			],
+			maxSupply: '1000000000000000000000000',
+			isMaxSupplyLocked: false,
+			splits: [],
+			isTransferLocked: false
 		}
 
 		// call to init function
@@ -225,7 +229,7 @@ export async function deployDiamond(options: {
 
 		const tx = await diamondCut.diamondCut(
 			cuts,
-			args.noInit ? Ethers.constants.AddressZero : diamondAddress,
+			args.noInit ? zeroAddress : diamondAddress,
 			args.noInit ? '0x' : functionCall,
 			{
 				gasPrice: wei

@@ -9,3 +9,4 @@ artifacts
 cache
 .diamond
 .vscode
+old_tests
