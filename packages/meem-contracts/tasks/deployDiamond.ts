@@ -8,7 +8,7 @@ import packageJson from '../package.json'
 import log from '../src/lib/log'
 import { Permission } from '../src/lib/meemStandard'
 import { zeroAddress } from '../src/lib/utils'
-import { InitParamsStruct } from '../typechain/contracts/Meem/Admin/AdminFacet.sol/AdminFacet'
+import { InitParamsStruct } from '../typechain/contracts/facets/Admin/AdminFacet.sol/AdminFacet'
 import {
 	FacetCutAction,
 	// getSelector,
