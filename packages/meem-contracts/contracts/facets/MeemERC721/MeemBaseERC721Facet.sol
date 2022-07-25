@@ -9,27 +9,58 @@ import {ERC721Metadata} from '@solidstate/contracts/token/ERC721/metadata/ERC721
 import {IERC721Metadata} from '@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol';
 import {ERC721MetadataStorage} from '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
 import {ERC721BaseStorage} from '@solidstate/contracts/token/ERC721/base/ERC721BaseStorage.sol';
+import {ERC721Base} from '@solidstate/contracts/token/ERC721/base/ERC721Base.sol';
+import {IERC721} from '@solidstate/contracts/token/ERC721/IERC721.sol';
 import {EnumerableSet} from '@solidstate/contracts/utils/EnumerableSet.sol';
 import {EnumerableMap} from '@solidstate/contracts/utils/EnumerableMap.sol';
 import {UintUtils} from '@solidstate/contracts/utils/UintUtils.sol';
 import {Base64} from '../utils/Base64.sol';
 import {Strings} from '../utils/Strings.sol';
+import {TokenType} from '../interfaces/MeemStandard.sol';
+import {ERC165} from '@solidstate/contracts/introspection/ERC165.sol';
+import {ERC721BaseInternal} from '@solidstate/contracts/token/ERC721/base/ERC721Base.sol';
+import {ERC721Facet} from '../ERC721/ERC721Facet.sol';
+import {AccessControlFacet} from '../AccessControl/AccessControlFacet.sol';
+import {AccessControlError} from '../AccessControl/LibAccessControl.sol';
+import {ERC721Enumerable} from '@solidstate/contracts/token/ERC721/enumerable/ERC721Enumerable.sol';
+import {ERC721Metadata} from '@solidstate/contracts/token/ERC721/metadata/ERC721Metadata.sol';
+import {ISolidStateERC721} from '@solidstate/contracts/token/ERC721/ISolidStateERC721.sol';
 
 library Error {
 	string public constant NotTokenAdmin = 'NOT_TOKEN_ADMIN';
 }
 
-contract MeemBaseERC721Facet is SolidStateERC721 {
+struct Meem {
+	address owner;
+	TokenType tokenType;
+	address mintedBy;
+	uint256 mintedAt;
+}
+
+contract MeemBaseERC721Facet is
+	ISolidStateERC721,
+	ERC721Facet,
+	ERC721Enumerable,
+	ERC721Metadata,
+	ERC165
+{
 	using EnumerableSet for EnumerableSet.UintSet;
 	using EnumerableMap for EnumerableMap.UintToAddressMap;
 	using UintUtils for uint256;
+
+	event MeemTransfer(
+		address indexed from,
+		address indexed to,
+		uint256 indexed tokenId
+	);
 
 	/**
 	 * @notice Mint a Meem
 	 * @param params The minting parameters
 	 */
 	function mint(MintParameters memory params) public payable virtual {
-		MeemBaseStorage.dataStore().tokenCounter++;
+		MeemBaseStorage.DataStore storage s = MeemBaseStorage.dataStore();
+		s.tokenCounter++;
 		uint256 tokenId = MeemBaseStorage.dataStore().tokenCounter;
 
 		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
@@ -39,8 +70,9 @@ contract MeemBaseERC721Facet is SolidStateERC721 {
 		_safeMint(params.to, tokenId);
 		ERC721MetadataStorage.Layout storage l = ERC721MetadataStorage.layout();
 		l.tokenURIs[tokenId] = params.tokenURI;
-		MeemBaseStorage.dataStore().tokenTypes[tokenId] = params.tokenType;
-		// MeemBaseStorage.dataStore().uriSources[tokenId] = params.uriSource;
+		s.tokenTypes[tokenId] = params.tokenType;
+		s.minters[tokenId] = msg.sender;
+		s.mintedTimestamps[tokenId] = block.timestamp;
 
 		facet.handleSaleDistribution(0);
 	}
@@ -114,7 +146,9 @@ contract MeemBaseERC721Facet is SolidStateERC721 {
 	 * @param tokenId The token id to check
 	 */
 	function requireTokenAdmin(uint256 tokenId, address addy) public view {
-		if (ownerOf(tokenId) != addy) {
+		if (tokenId == 0) {
+			requireAdmin();
+		} else if (ownerOf(tokenId) != addy) {
 			revert(Error.NotTokenAdmin);
 		}
 	}
@@ -127,18 +161,86 @@ contract MeemBaseERC721Facet is SolidStateERC721 {
 		address from,
 		address to,
 		uint256 tokenId
-	) public {}
+	) public {
+		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
+		facet.requireTokenAdmin(tokenId, msg.sender);
+	}
+
+	function getMeem(uint256 tokenId) public view returns (Meem memory) {
+		MeemBaseStorage.DataStore storage s = MeemBaseStorage.dataStore();
+
+		return
+			Meem({
+				owner: ownerOf(tokenId),
+				tokenType: s.tokenTypes[tokenId],
+				mintedBy: s.minters[tokenId],
+				mintedAt: s.mintedTimestamps[tokenId]
+			});
+	}
+
+	/**
+	 * Override
+	 */
+	function transferFrom(
+		address from,
+		address to,
+		uint256 tokenId
+	) public payable override(ERC721Facet, IERC721) {
+		_handleTransferMessageValue(from, to, tokenId, msg.value);
+
+		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
+		facet.requireCanTransfer(from, to, tokenId);
+
+		_transfer(from, to, tokenId);
+	}
+
+	/**
+	 * Override
+	 */
+	function safeTransferFrom(
+		address from,
+		address to,
+		uint256 tokenId
+	) public payable override(ERC721Facet, IERC721) {
+		safeTransferFrom(from, to, tokenId, '');
+	}
+
+	/**
+	 * Override
+	 */
+	function safeTransferFrom(
+		address from,
+		address to,
+		uint256 tokenId,
+		bytes memory data
+	) public payable override(ERC721Facet, IERC721) {
+		_handleTransferMessageValue(from, to, tokenId, msg.value);
+
+		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
+		facet.requireCanTransfer(from, to, tokenId);
+
+		_safeTransfer(from, to, tokenId, data);
+	}
 
 	function _beforeTokenTransfer(
 		address from,
 		address to,
 		uint256 tokenId
-	) internal virtual override {
+	) internal virtual override(ERC721BaseInternal, ERC721Metadata) {
 		super._beforeTokenTransfer(from, to, tokenId);
 		MeemBaseERC721Facet(address(this)).requireCanTransfer(
 			from,
 			to,
 			tokenId
 		);
+
+		emit MeemTransfer(from, to, tokenId);
+	}
+
+	function requireAdmin() internal view {
+		AccessControlFacet ac = AccessControlFacet(address(this));
+		if (!ac.hasRole(ac.ADMIN_ROLE(), msg.sender)) {
+			revert(AccessControlError.MissingRequiredRole);
+		}
 	}
 }

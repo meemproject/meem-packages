@@ -10,8 +10,8 @@ library ClippingError {
 }
 
 contract ClippingFacet {
-	event TokenClipped(uint256 tokenId, address addy);
-	event TokenUnClipped(uint256 tokenId, address addy);
+	event MeemTokenClipped(uint256 indexed tokenId, address indexed addy);
+	event MeemTokenUnClipped(uint256 indexed tokenId, address indexed addy);
 
 	function clip(uint256 tokenId) public {
 		ClippingStorage.DataStore storage s = ClippingStorage.dataStore();
@@ -28,7 +28,7 @@ contract ClippingFacet {
 			1;
 		s.hasAddressClipped[msg.sender][tokenId] = true;
 
-		emit TokenClipped(tokenId, msg.sender);
+		emit MeemTokenClipped(tokenId, msg.sender);
 	}
 
 	function unClip(uint256 tokenId) public {
@@ -50,7 +50,7 @@ contract ClippingFacet {
 		s.addressClippingsIndex[msg.sender][tokenId] = 0;
 		s.hasAddressClipped[msg.sender][tokenId] = false;
 
-		emit TokenUnClipped(tokenId, msg.sender);
+		emit MeemTokenUnClipped(tokenId, msg.sender);
 	}
 
 	function tokenClippings(uint256 tokenId)

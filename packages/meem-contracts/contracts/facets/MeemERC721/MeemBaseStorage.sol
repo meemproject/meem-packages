@@ -11,7 +11,8 @@ library MeemBaseStorage {
 		uint256 tokenCounter;
 		string contractURI;
 		mapping(uint256 => TokenType) tokenTypes;
-		mapping(uint256 => URISource) uriSources;
+		mapping(uint256 => address) minters;
+		mapping(uint256 => uint256) mintedTimestamps;
 	}
 
 	function dataStore() internal pure returns (DataStore storage l) {

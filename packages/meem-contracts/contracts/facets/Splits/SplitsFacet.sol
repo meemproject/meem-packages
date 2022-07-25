@@ -15,7 +15,7 @@ library Error {
 }
 
 contract SplitsFacet is RoyaltiesV2 {
-	event SplitsSet(uint256 tokenId, Split[] splits);
+	event MeemSplitsSet(uint256 tokenId, Split[] splits);
 	event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
 
 	function getRaribleV2Royalties(uint256 tokenId)
@@ -61,14 +61,8 @@ contract SplitsFacet is RoyaltiesV2 {
 		}
 
 		if (leftover > 0) {
-			if (tokenId == 0) {
-				// Original being minted. Refund difference back to the sender
-				payable(msg.sender).transfer(leftover);
-			} else {
-				address tokenOwner = baseContract.ownerOf(tokenId);
-				// Existing token transfer. Pay the current owner before transferring to new owner
-				payable(tokenOwner).transfer(leftover);
-			}
+			// Refund difference back to the sender
+			payable(msg.sender).transfer(leftover);
 		}
 	}
 
@@ -110,7 +104,7 @@ contract SplitsFacet is RoyaltiesV2 {
 			s.nonOwnerSplitAllocationAmount
 		);
 
-		emit SplitsSet(tokenId, splits);
+		emit MeemSplitsSet(tokenId, splits);
 		emit RoyaltiesSet(tokenId, getRaribleV2Royalties(tokenId));
 	}
 

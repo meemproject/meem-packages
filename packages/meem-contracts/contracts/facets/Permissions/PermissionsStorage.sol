@@ -12,7 +12,6 @@ library PermissionsStorage {
 		bool isMaxSupplyLocked;
 		MeemPermission[] mintPermissions;
 		bool isTransferLocked;
-		mapping(uint256 => uint256) tokenLockupTimestamps;
 	}
 
 	function dataStore() internal pure returns (DataStore storage l) {

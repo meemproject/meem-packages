@@ -12,17 +12,17 @@ library ReactionsError {
 }
 
 contract ReactionFacet {
-	event TokenReactionAdded(
-		uint256 tokenId,
-		address addy,
-		string reaction,
+	event MeemTokenReactionAdded(
+		uint256 indexed tokenId,
+		address indexed addy,
+		string indexed reaction,
 		uint256 newTotalReactions
 	);
 
-	event TokenReactionRemoved(
-		uint256 tokenId,
-		address addy,
-		string reaction,
+	event MeemTokenReactionRemoved(
+		uint256 indexed tokenId,
+		address indexed addy,
+		string indexed reaction,
 		uint256 newTotalReactions
 	);
 
@@ -43,7 +43,7 @@ contract ReactionFacet {
 
 		s.tokenReactions[tokenId][reaction]++;
 
-		emit TokenReactionAdded(
+		emit MeemTokenReactionAdded(
 			tokenId,
 			msg.sender,
 			reaction,
@@ -67,7 +67,7 @@ contract ReactionFacet {
 
 		s.tokenReactions[tokenId][reaction]--;
 
-		emit TokenReactionRemoved(
+		emit MeemTokenReactionRemoved(
 			tokenId,
 			msg.sender,
 			reaction,

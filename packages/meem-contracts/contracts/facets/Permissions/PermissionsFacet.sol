@@ -18,9 +18,9 @@ library PermissionsError {
 }
 
 contract PermissionsFacet {
-	event MintPermissionsSet(MeemPermission[] mintPermissions);
-	event MaxSupplySet(uint256 maxSupply);
-	event MaxSupplyLocked();
+	event MeemMintPermissionsSet(MeemPermission[] mintPermissions);
+	event MeemMaxSupplySet(uint256 maxSupply);
+	event MeemMaxSupplyLocked();
 
 	function MINTER_ROLE() public pure returns (bytes32) {
 		return keccak256('MINTER_ROLE');
@@ -119,7 +119,7 @@ contract PermissionsFacet {
 
 		s.maxSupply = newMaxSupply;
 
-		emit MaxSupplySet(newMaxSupply);
+		emit MeemMaxSupplySet(newMaxSupply);
 	}
 
 	function maxSupply() public view returns (uint256) {
@@ -135,7 +135,7 @@ contract PermissionsFacet {
 		}
 		s.isMaxSupplyLocked = true;
 
-		emit MaxSupplyLocked();
+		emit MeemMaxSupplyLocked();
 	}
 
 	function setMintingPermissions(MeemPermission[] memory newPermissions)
@@ -158,7 +158,7 @@ contract PermissionsFacet {
 			s.mintPermissions.push(newPermissions[i]);
 		}
 
-		emit MintPermissionsSet(s.mintPermissions);
+		emit MeemMintPermissionsSet(s.mintPermissions);
 	}
 
 	function validatePermissions(
