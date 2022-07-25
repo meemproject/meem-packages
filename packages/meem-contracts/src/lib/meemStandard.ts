@@ -1,32 +1,31 @@
-export enum Chain {
-	Ethereum,
-	Polygon,
-	Cardano,
-	Solana,
-	Rinkeby
-}
+// export enum Chain {
+// 	Ethereum,
+// 	Polygon,
+// 	Cardano,
+// 	Solana,
+// 	Rinkeby
+// }
 
-export enum PermissionType {
-	Copy,
-	Remix,
-	Read
-}
+// export enum PermissionType {
+// 	Copy,
+// 	Remix,
+// 	Read
+// }
 
 export enum Permission {
-	Owner,
 	Anyone,
 	Addresses,
 	Holders
 }
 
-export enum PropertyType {
-	Meem,
-	Child,
-	DefaultMeem,
-	DefaultChild
-}
+// export enum PropertyType {
+// 	Meem,
+// 	Child,
+// 	DefaultMeem,
+// 	DefaultChild
+// }
 
-export enum MeemType {
+export enum TokenType {
 	Original,
 	Copy,
 	Remix,
