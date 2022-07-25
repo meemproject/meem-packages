@@ -150,7 +150,6 @@ export enum MeemType {
 
 /** The permission corresponding to the smart contract */
 export enum Permission {
-	Owner,
 	Anyone,
 	Addresses,
 	Holders
