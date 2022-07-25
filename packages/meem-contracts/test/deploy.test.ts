@@ -47,7 +47,11 @@ describe('Deploy', function Test() {
 				contractURI,
 				admins: [],
 				minters: [],
-				mintPermissions: []
+				mintPermissions: [],
+				maxSupply: 0,
+				isMaxSupplyLocked: false,
+				isTransferLocked: false,
+				splits: []
 			})
 		).wait()
 
@@ -66,7 +70,11 @@ describe('Deploy', function Test() {
 				contractURI,
 				admins: [],
 				minters: [],
-				mintPermissions: []
+				mintPermissions: [],
+				maxSupply: 0,
+				isMaxSupplyLocked: false,
+				isTransferLocked: false,
+				splits: []
 			})
 		)
 	})
