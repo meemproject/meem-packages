@@ -396,6 +396,8 @@ export interface IMeemPermission {
 	numTokens: string
 	lockedBy: string
 	costWei: string
+	mintStartTimestamp: string
+	mintEndTimestamp: string
 }
 
 export interface IMeemProperties {
@@ -450,13 +452,13 @@ export interface IMeemContractInitParams {
 	symbol: string
 	name: string
 	contractURI: string
-	baseProperties: IMeemContractBaseProperties
-	defaultProperties: IMeemProperties
-	defaultChildProperties: IMeemProperties
 	admins: string[]
-	tokenCounterStart: number
-	childDepth: number
-	nonOwnerSplitAllocationAmount: number
+	minters: string[]
+	maxSupply: string
+	isMaxSupplyLocked: boolean
+	mintPermissions: IMeemPermission[]
+	splits: IMeemSplit[]
+	isTransferLocked: boolean
 }
 
 export interface IMeem {
@@ -722,6 +724,8 @@ export namespace CreateBundle {
 
 	export interface IResponseBody extends IApiResponseBody {
 		bundleId: string
+		types: string
+		abi: Record<string, any>[]
 	}
 
 	export interface IDefinition {
@@ -781,39 +785,17 @@ export namespace CreateMeemContract {
 	export interface IQueryParams {}
 
 	export interface IRequestBody {
-		/** Name of the contract */
-		name: string
-
-		/** Contract admin wallet addresses */
-		admins: string[]
-
 		/** Contract metadata */
 		metadata: IMeemContractMetadata
 
-		/** Symbol for the contract */
-		symbol: string
-
 		/** Contract base properties */
-		baseProperties: IMeemContractBaseProperties
-
-		/** Meem default properties */
-		// TODO: Make this a partial
-		defaultProperties?: IMeemProperties
-
-		/** Meem default child properties */
-		// TODO: Make this a partial
-		defaultChildProperties?: IMeemProperties
-
-		/** Token ID start */
-		tokenCounterStart: number
-
-		childDepth: number
-
-		/** Required non-owner split amount */
-		nonOwnerSplitAllocationAmount: number
+		contractParams: IMeemContractInitParams
 
 		/** If true, will mint a token to the admin wallet addresses  */
-		mintAdminTokens?: boolean
+		shouldMintAdminTokens?: boolean
+
+		/** The owner of the contract can upgrade */
+		contractOwnerAddress?: string
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
@@ -1734,18 +1716,11 @@ export namespace MintOriginalMeem {
 		/** The address of the Meem contract to mint token */
 		meemContractAddress: string
 
-		/** The chain where the Meem contract lives */
-		chain: Chain
-
 		/** JSON (or stringified) metadata object to be used for the minted Meem */
 		metadata?: string | any
 
 		/** The address where the Meem will be minted to. */
 		to: string
-
-		properties?: Partial<IMeemProperties>
-
-		childProperties?: Partial<IMeemProperties>
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
@@ -1909,7 +1884,8 @@ export namespace UpdateBundle {
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		status: 'success'
+		types: string
+		abi: Record<string, any>[]
 	}
 
 	export interface IDefinition {
