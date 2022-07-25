@@ -28,7 +28,6 @@
     },
     "include": [
         "./src",
-        "./schemas/**/*",
         "./types/**/*",
         "./index.ts"
     ],
