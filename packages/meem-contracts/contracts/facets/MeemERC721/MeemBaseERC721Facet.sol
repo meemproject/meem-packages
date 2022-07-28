@@ -64,7 +64,7 @@ contract MeemBaseERC721Facet is
 		uint256 tokenId = MeemBaseStorage.dataStore().tokenCounter;
 
 		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
-		facet.requireCanMint(msg.sender);
+		facet.requireCanMint(msg.sender, msg.value);
 		facet.requireCanMintTo(params.to);
 
 		_safeMint(params.to, tokenId);
@@ -74,7 +74,7 @@ contract MeemBaseERC721Facet is
 		s.minters[tokenId] = msg.sender;
 		s.mintedTimestamps[tokenId] = block.timestamp;
 
-		facet.handleSaleDistribution(0);
+		facet.handleSaleDistribution(0, msg.sender, msg.value);
 	}
 
 	function tokenURI(uint256 tokenId)
@@ -119,8 +119,12 @@ contract MeemBaseERC721Facet is
 	 * @notice When a token is sold, distribute the royalties
 	 * @param tokenId The token that is being sold. This function will also be called when a token is minted with tokenId=0.
 	 */
-	function handleSaleDistribution(uint256 tokenId) public payable {
-		if (msg.value == 0) {
+	function handleSaleDistribution(
+		uint256 tokenId,
+		address msgSender,
+		uint256 msgValue
+	) public payable {
+		if (msgValue == 0) {
 			return;
 		}
 
@@ -132,7 +136,7 @@ contract MeemBaseERC721Facet is
 	 * @notice Require that an address can mint a token
 	 * @param minter The address that is minting
 	 */
-	function requireCanMint(address minter) public payable {}
+	function requireCanMint(address minter, uint256 msgValue) public payable {}
 
 	/**
 	 * @notice Require that an address can mint to a different address

@@ -197,8 +197,6 @@ export async function deployDiamond(options: {
 				break
 		}
 
-		// const params: any = {
-
 		const params: InitParamsStruct = {
 			name: 'Meem',
 			symbol: 'MEEM',

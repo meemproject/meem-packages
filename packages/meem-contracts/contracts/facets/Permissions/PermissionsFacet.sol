@@ -8,6 +8,7 @@ import {AccessControlFacet} from '../AccessControl/AccessControlFacet.sol';
 import {AccessControlError} from '../AccessControl/LibAccessControl.sol';
 import {MeemBaseERC721Facet} from '../MeemERC721/MeemBaseERC721Facet.sol';
 import {IERC721} from '@solidstate/contracts/token/ERC721/IERC721.sol';
+import 'hardhat/console.sol';
 
 library PermissionsError {
 	string public constant MaxSupplyExceeded = 'MAX_SUPPLY_EXCEEDED';
@@ -21,12 +22,13 @@ contract PermissionsFacet {
 	event MeemMintPermissionsSet(MeemPermission[] mintPermissions);
 	event MeemMaxSupplySet(uint256 maxSupply);
 	event MeemMaxSupplyLocked();
+	event MeemIsTransferrableLocked();
 
 	function MINTER_ROLE() public pure returns (bytes32) {
 		return keccak256('MINTER_ROLE');
 	}
 
-	function requireCanMint(address minter) public payable {
+	function requireCanMint(address minter, uint256 msgValue) public payable {
 		MeemBaseERC721Facet baseContract = MeemBaseERC721Facet(address(this));
 		PermissionsStorage.DataStore storage s = PermissionsStorage.dataStore();
 		AccessControlFacet ac = AccessControlFacet(address(this));
@@ -47,6 +49,7 @@ contract PermissionsFacet {
 
 		for (uint256 i = 0; i < s.mintPermissions.length; i++) {
 			MeemPermission storage perm = s.mintPermissions[i];
+
 			if (
 				isBetweenTimestamps(
 					perm.mintStartTimestamp,
@@ -63,13 +66,7 @@ contract PermissionsFacet {
 				if (perm.permission == Permission.Addresses) {
 					// Allowed if to is in the list of approved addresses
 					for (uint256 j = 0; j < perm.addresses.length; j++) {
-						if (
-							perm.addresses[j] == msg.sender &&
-							isBetweenTimestamps(
-								perm.mintStartTimestamp,
-								perm.mintEndTimestamp
-							)
-						) {
+						if (perm.addresses[j] == minter) {
 							hasPermission = true;
 							break;
 						}
@@ -80,7 +77,7 @@ contract PermissionsFacet {
 					// Check each address
 					for (uint256 j = 0; j < perm.addresses.length; j++) {
 						uint256 balance = IERC721(perm.addresses[j]).balanceOf(
-							msg.sender
+							minter
 						);
 
 						if (balance >= perm.numTokens) {
@@ -101,11 +98,15 @@ contract PermissionsFacet {
 			}
 		}
 
+		console.log('hasPermission', hasPermission);
+		console.log('costWei', costWei);
+		console.log('msg.value', msgValue);
+
 		if (!hasPermission) {
 			revert(PermissionsError.NoPermission);
 		}
 
-		if (costWei != msg.value) {
+		if (costWei != msgValue) {
 			revert(PermissionsError.IncorrectMsgValue);
 		}
 	}
@@ -115,6 +116,12 @@ contract PermissionsFacet {
 		PermissionsStorage.DataStore storage s = PermissionsStorage.dataStore();
 		if (s.isMaxSupplyLocked) {
 			revert(PermissionsError.PropertyLocked);
+		}
+
+		MeemBaseERC721Facet baseContract = MeemBaseERC721Facet(address(this));
+
+		if (newMaxSupply < baseContract.totalSupply()) {
+			revert(PermissionsError.MaxSupplyExceeded);
 		}
 
 		s.maxSupply = newMaxSupply;
@@ -166,9 +173,12 @@ contract PermissionsFacet {
 		MeemPermission[] memory overridePermissions
 	) public pure {}
 
-	function setIsTransferrable(bool isTransferLocked) public {
+	function setIsTransferrable(bool isTransferrable) public {
 		requireAdmin();
-		PermissionsStorage.dataStore().isTransferLocked = isTransferLocked;
+		if (PermissionsStorage.dataStore().isTransferLocked) {
+			revert(PermissionsError.TransfersLocked);
+		}
+		PermissionsStorage.dataStore().isTransferLocked = !isTransferrable;
 	}
 
 	function requireCanTransfer(
