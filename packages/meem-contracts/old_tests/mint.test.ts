@@ -6,7 +6,7 @@ import { defaultOpenProperties } from '../src/lib/meemProperties'
 import { Chain, MeemType, UriSource } from '../src/lib/meemStandard'
 import { zeroAddress } from '../src/lib/utils'
 import { deployDiamond } from '../tasks'
-import { ERC721Facet, MeemBaseFacet, MeemQueryFacet } from '../typechain'
+import { ERC721Facet } from '../typechain'
 
 use(chaiAsPromised)
 

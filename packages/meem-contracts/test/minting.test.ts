@@ -3,13 +3,12 @@ import { assert, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import _ from 'lodash'
-import { TokenType, UriSource } from '../src/lib/meemStandard'
+import { Permission, TokenType, UriSource } from '../src/lib/meemStandard'
 import { deployDiamond } from '../tasks'
 import { getMeemContracts, MeemContracts } from './helpers'
 
 use(chaiAsPromised)
 
-// !! These deploy tests are VERY slow to execute (call the diamondCut function) if run using vscode launch with debugger. why?!?
 describe('Minting', function Test() {
 	let contracts: MeemContracts
 	let signers: SignerWithAddress[]
@@ -64,5 +63,102 @@ describe('Minting', function Test() {
 		)
 		const owner = await contracts.meemBaseERC721Facet.ownerOf(2)
 		assert.equal(owner, signers[3].address)
+	})
+
+	it('Respects address only minting', async () => {
+		await contracts.permissionsFacet.setMintingPermissions([
+			{
+				addresses: [signers[3].address],
+				costWei: 0,
+				mintEndTimestamp: 0,
+				mintStartTimestamp: 0,
+				numTokens: 0,
+				permission: Permission.Addresses
+			}
+		])
+		await contracts.meemBaseERC721Facet.connect(signers[3]).mint({
+			to: signers[3].address,
+			tokenType: TokenType.Original,
+			tokenURI: JSON.stringify({
+				name: 'Testing'
+			})
+		})
+
+		await assert.isRejected(
+			contracts.meemBaseERC721Facet.connect(signers[4]).mint({
+				to: signers[3].address,
+				tokenType: TokenType.Original,
+				tokenURI: JSON.stringify({
+					name: 'Testing'
+				})
+			})
+		)
+	})
+
+	it('Respects address only minting', async () => {
+		await contracts.permissionsFacet.connect(signers[0]).setMintingPermissions([
+			{
+				addresses: [signers[3].address],
+				costWei: 0,
+				mintEndTimestamp: 0,
+				mintStartTimestamp: 0,
+				numTokens: 0,
+				permission: Permission.Addresses
+			}
+		])
+
+		await contracts.meemBaseERC721Facet.connect(signers[3]).mint({
+			to: signers[3].address,
+			tokenType: TokenType.Original,
+			tokenURI: JSON.stringify({
+				name: 'Testing'
+			})
+		})
+
+		await assert.isRejected(
+			contracts.meemBaseERC721Facet.connect(signers[4]).mint({
+				to: signers[3].address,
+				tokenType: TokenType.Original,
+				tokenURI: JSON.stringify({
+					name: 'Testing'
+				})
+			})
+		)
+	})
+
+	it('Can mint w/ cost', async () => {
+		await contracts.permissionsFacet.connect(signers[0]).setMintingPermissions([
+			{
+				addresses: [],
+				costWei: ethers.utils.parseEther('0.1'),
+				mintEndTimestamp: 0,
+				mintStartTimestamp: 0,
+				numTokens: 0,
+				permission: Permission.Anyone
+			}
+		])
+
+		await assert.isRejected(
+			contracts.meemBaseERC721Facet.connect(signers[4]).mint({
+				to: signers[3].address,
+				tokenType: TokenType.Original,
+				tokenURI: JSON.stringify({
+					name: 'Testing'
+				})
+			})
+		)
+
+		await contracts.meemBaseERC721Facet.connect(signers[3]).mint(
+			{
+				to: signers[3].address,
+				tokenType: TokenType.Original,
+				tokenURI: JSON.stringify({
+					name: 'Testing'
+				})
+			},
+			{
+				value: ethers.utils.parseEther('0.1')
+			}
+		)
 	})
 })

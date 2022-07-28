@@ -8,6 +8,7 @@ import {RoyaltiesV2} from './RoyaltiesV2.sol';
 import {LibPart} from './LibPart.sol';
 import {MeemBaseERC721Facet} from '../MeemERC721/MeemBaseERC721Facet.sol';
 import {PermissionsError} from '../Permissions/PermissionsFacet.sol';
+import 'hardhat/console.sol';
 
 library Error {
 	string public constant InvalidNonOwnerSplitAllocationAmount =
@@ -38,14 +39,23 @@ contract SplitsFacet is RoyaltiesV2 {
 		return parts;
 	}
 
-	function handleSaleDistribution(uint256 tokenId) public payable {
-		if (msg.value == 0) {
+	function handleSaleDistribution(
+		uint256 tokenId,
+		address msgSender,
+		uint256 msgValue
+	) public payable {
+		console.log('handleSaleDistribution', tokenId);
+		console.log(msg.value);
+		console.log(msg.sender);
+		console.log(msgSender);
+		console.log(msgValue);
+		if (msgValue == 0) {
 			return;
 		}
 
-		MeemBaseERC721Facet baseContract = MeemBaseERC721Facet(address(this));
+		// MeemBaseERC721Facet baseContract = MeemBaseERC721Facet(address(this));
 
-		uint256 leftover = msg.value;
+		uint256 leftover = msgValue;
 		SplitsStorage.DataStore storage s = SplitsStorage.dataStore();
 
 		for (uint256 i = 0; i < s.tokenSplits[tokenId].splits.length; i++) {
@@ -60,9 +70,11 @@ contract SplitsFacet is RoyaltiesV2 {
 			leftover = leftover - amt;
 		}
 
+		console.log('leftover', leftover);
+
 		if (leftover > 0) {
 			// Refund difference back to the sender
-			payable(msg.sender).transfer(leftover);
+			payable(msgSender).transfer(leftover);
 		}
 	}
 
