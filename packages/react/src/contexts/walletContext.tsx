@@ -301,6 +301,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	}, [])
 
 	const setMeemJwt = useCallback((newMeemJwt: string) => {
+		setLoginState(LoginState.Unknown)
 		setJwt(newMeemJwt)
 		Cookies.set('meemJwtToken', newMeemJwt)
 	}, [])
