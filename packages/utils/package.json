@@ -1,6 +1,6 @@
 {
 	"name": "@meemproject/utils",
-	"version": "0.6.10",
+	"version": "0.7.0",
 	"main": "build/index.js",
 	"license": "MIT",
 	"files": [
@@ -34,7 +34,7 @@
 	},
 	"dependencies": {
 		"@kengoldfarb/log": "^1.0.5",
-		"@meemproject/meem-contracts": "^0.6.10",
+		"@meemproject/meem-contracts": "^0.7.0",
 		"ethers": "^5.6.4"
 	},
 	"publishConfig": {
