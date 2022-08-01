@@ -112,7 +112,7 @@ function init(options: { matchMutate: MatchMutate; wsUrl: string }): {
 	ws.onclose = e => {
 		log.trace('ws closed. Attempting to reconnect.', e.reason)
 		setTimeout(() => {
-			init({ matchMutate })
+			init({ matchMutate, wsUrl })
 		}, 1000)
 	}
 
