@@ -51,17 +51,17 @@ function handleEventSWRInvalidation(options: {
 	}
 }
 
-function init(options: { matchMutate: MatchMutate }): {
+function init(options: { matchMutate: MatchMutate; wsUrl: string }): {
 	ws?: WebSocket
 	sockets?: ISockets
 } {
-	const { matchMutate } = options
-	if (!process.env.NEXT_PUBLIC_WS_URL) {
-		log.warn('process.env.NEXT_PUBLIC_WS_URL is not set')
-		return {}
+	const { matchMutate, wsUrl } = options
+	if (!wsUrl) {
+		log.warn('Missing websocket URL wsUrl')
+		throw new Error('Missing websocket URL wsUrl')
 	}
 
-	const ws = new WebSocket(process.env.NEXT_PUBLIC_WS_URL)
+	const ws = new WebSocket(wsUrl)
 
 	const eventHandlers: {
 		[eventName: string]: ((data: any) => void)[]
@@ -112,7 +112,7 @@ function init(options: { matchMutate: MatchMutate }): {
 	ws.onclose = e => {
 		log.trace('ws closed. Attempting to reconnect.', e.reason)
 		setTimeout(() => {
-			init({ matchMutate })
+			init({ matchMutate, wsUrl })
 		}, 1000)
 	}
 
@@ -214,6 +214,7 @@ function init(options: { matchMutate: MatchMutate }): {
 
 export interface ISocketProviderProps {
 	children?: ReactNode
+	wsUrl: string
 }
 
 const SocketProvider: React.FC<ISocketProviderProps> = props => {
@@ -227,7 +228,7 @@ const SocketProvider: React.FC<ISocketProviderProps> = props => {
 		if (isConnected) {
 			return
 		}
-		const result = init({ matchMutate })
+		const result = init({ matchMutate, wsUrl: props.wsUrl })
 		setIsConnected(true)
 
 		setWebsocket(result?.ws)

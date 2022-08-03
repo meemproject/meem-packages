@@ -5,7 +5,6 @@ pragma experimental ABIEncoderV2;
 import {SplitsStorage} from './SplitsStorage.sol';
 import {Split} from '../interfaces/MeemStandard.sol';
 import {RoyaltiesV2} from './RoyaltiesV2.sol';
-import {LibPart} from './LibPart.sol';
 import {MeemBaseERC721Facet} from '../MeemERC721/MeemBaseERC721Facet.sol';
 import {PermissionsError} from '../Permissions/PermissionsFacet.sol';
 import 'hardhat/console.sol';
@@ -15,22 +14,27 @@ library Error {
 		'INVALID_NON_OWNER_SPLIT_ALLOCATION_AMOUNT';
 }
 
+struct Part {
+	address payable account;
+	uint96 value;
+}
+
 contract SplitsFacet is RoyaltiesV2 {
 	event MeemSplitsSet(uint256 tokenId, Split[] splits);
-	event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
+	event RoyaltiesSet(uint256 tokenId, Part[] royalties);
 
 	function getRaribleV2Royalties(uint256 tokenId)
 		public
 		view
 		override
-		returns (LibPart.Part[] memory)
+		returns (Part[] memory)
 	{
 		SplitsStorage.DataStore storage s = SplitsStorage.dataStore();
 
 		uint256 numSplits = s.tokenSplits[tokenId].splits.length;
-		LibPart.Part[] memory parts = new LibPart.Part[](numSplits);
+		Part[] memory parts = new Part[](numSplits);
 		for (uint256 i = 0; i < s.tokenSplits[tokenId].splits.length; i++) {
-			parts[i] = LibPart.Part({
+			parts[i] = Part({
 				account: payable(s.tokenSplits[tokenId].splits[i].toAddress),
 				value: uint96(s.tokenSplits[tokenId].splits[i].amount)
 			});

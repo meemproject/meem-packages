@@ -197,12 +197,20 @@ export async function deployDiamond(options: {
 				break
 		}
 
+		const adminRole =
+			'0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775'
+
 		const params: InitParamsStruct = {
 			name: 'Meem',
 			symbol: 'MEEM',
 			contractURI: `{"name": "Meem","description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value. Join us at https://discord.gg/VTsnW6jUgE","image": "https://meem-assets.s3.amazonaws.com/meem.jpg","external_link": "https://meem.wtf","seller_fee_basis_points": ${basisPoints}, "fee_recipient": "${walletAddress}"}`,
-			admins: [],
-			minters: [],
+			roles: [
+				{
+					role: adminRole,
+					user: contractOwner.address,
+					hasRole: true
+				}
+			],
 			mintPermissions: [
 				{
 					permission: Permission.Anyone,
@@ -214,7 +222,6 @@ export async function deployDiamond(options: {
 				}
 			],
 			maxSupply: '1000000000000000000000000',
-			isMaxSupplyLocked: false,
 			splits: [],
 			isTransferLocked: false
 		}
