@@ -45,11 +45,15 @@ describe('Deploy', function Test() {
 				name,
 				symbol,
 				contractURI,
-				admins: [],
-				minters: [],
+				roles: [
+					{
+						role: '0x189ab7a9244df0848122154315af71fe140f3db0fe014031783b0946b8c9d2e3',
+						user: '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5',
+						hasRole: true
+					}
+				],
 				mintPermissions: [],
 				maxSupply: 0,
-				isMaxSupplyLocked: false,
 				isTransferLocked: false,
 				splits: []
 			})
@@ -65,14 +69,18 @@ describe('Deploy', function Test() {
 
 		await assert.isRejected(
 			contracts.adminFacet.initialize({
-				name: 'test',
-				symbol: 'TEST',
+				name,
+				symbol,
 				contractURI,
-				admins: [],
-				minters: [],
+				roles: [
+					{
+						role: '0x189ab7a9244df0848122154315af71fe140f3db0fe014031783b0946b8c9d2e3',
+						user: '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5',
+						hasRole: true
+					}
+				],
 				mintPermissions: [],
 				maxSupply: 0,
-				isMaxSupplyLocked: false,
 				isTransferLocked: false,
 				splits: []
 			})

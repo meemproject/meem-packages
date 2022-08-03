@@ -141,7 +141,13 @@ contract AdminFacet {
 	function initialize(InitParams memory params) public {
 		MeemDiamondV2 diamond = MeemDiamondV2(payable(address(this)));
 
-		if (diamond.owner() != msg.sender) {
+		if (
+			diamond.owner() != msg.sender &&
+			!AccessControlStorage
+				.dataStore()
+				.roles[AccessControlStorage.UPGRADER_ROLE]
+				.members[msg.sender]
+		) {
 			revert(AccessControlError.MissingRequiredRole);
 		}
 

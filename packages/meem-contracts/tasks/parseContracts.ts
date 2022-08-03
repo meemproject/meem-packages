@@ -1,27 +1,26 @@
 import path from 'path'
 import { HardhatEthersHelpers } from '@nomiclabs/hardhat-ethers/types'
-import { ethers as Ethers } from 'ethers'
 import fs from 'fs-extra'
 import globby from 'globby'
 import { task, types } from 'hardhat/config'
 import { HardhatArguments } from 'hardhat/types'
-import packageJson from '../package.json'
+import request from 'superagent'
 import log from '../src/lib/log'
-import { Permission } from '../src/lib/meemStandard'
-import { zeroAddress } from '../src/lib/utils'
-import { InitParamsStruct } from '../typechain/contracts/facets/Admin/AdminFacet.sol/AdminFacet'
-import {
-	FacetCutAction,
-	// getSelector,
-	getSelectors,
-	IDeployHistoryFacet
-} from './lib/diamond'
+
+enum ContractType {
+	Regular = 'regular',
+	DiamondProxy = 'diamondProxy',
+	DiamondFacet = 'diamondFacet'
+}
 
 export async function parseContracts(options: {
+	args: {
+		name: string
+	}
 	ethers: HardhatEthersHelpers
 	hardhatArguments?: HardhatArguments
 }) {
-	const { ethers, hardhatArguments } = options
+	const { args } = options
 
 	const contractsPath = path.join(
 		process.cwd(),
@@ -48,19 +47,52 @@ export async function parseContracts(options: {
 			contents.bytecode !== '0x' &&
 			filename === fromFilename
 		) {
-			console.log({
-				filename,
-				fromFilename
-			})
+			let contractType = ContractType.Regular
+
+			if (file.includes('facets')) {
+				contractType = ContractType.DiamondFacet
+			} else if (file.includes('proxies')) {
+				contractType = ContractType.DiamondProxy
+			}
+			log.superInfo(`Uploading contract for: ${filename}`)
+
+			try {
+				await request
+					.post(`${process.env.API_HOST}/api/1.0/contracts`)
+					.set('Authorization', `JWT ${process.env.API_KEY}`)
+					.send({
+						name: `${filename} ${args.name}`,
+						description: args.name,
+						contractType,
+						abi: contents.abi,
+						bytecode: contents.bytecode
+					})
+			} catch (e: any) {
+				if (
+					e &&
+					e.response &&
+					e.response.body &&
+					e.response.body.code === 'CONTRACT_ALREADY_EXISTS'
+				) {
+					log.warn(`Contract already exists for: ${filename}`)
+				} else {
+					log.warn(e)
+					log.warn(e.response?.body)
+				}
+			}
 		}
 	}
-
-	// console.log(files)
 }
 
-task('parseContracts', 'Deploys Meem').setAction(
-	async (args, { ethers, hardhatArguments }) => {
-		const result = await parseContracts({ ethers, hardhatArguments })
+task('parseContracts', 'Deploys Meem')
+	.addParam(
+		'name',
+		'The name of the contract group',
+		undefined,
+		types.string,
+		false
+	)
+	.setAction(async (args, { ethers, hardhatArguments }) => {
+		const result = await parseContracts({ args, ethers, hardhatArguments })
 		return result
-	}
-)
+	})
