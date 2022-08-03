@@ -69,11 +69,4 @@ describe('Permissions', function Test() {
 		const ci = await contracts.adminFacet.getContractInfo()
 		assert.equal(ci.maxSupply.toNumber(), 2000)
 	})
-
-	it('Can lock max supply', async () => {
-		await contracts.permissionsFacet.lockMaxSupply()
-		await assert.isRejected(
-			contracts.permissionsFacet.connect(signers[0]).setMaxSupply(2000)
-		)
-	})
 })
