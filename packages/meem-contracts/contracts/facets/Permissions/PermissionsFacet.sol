@@ -4,8 +4,7 @@ pragma solidity ^0.8.13;
 import {Array} from '../utils/Array.sol';
 import {MeemPermission, Permission} from '../interfaces/MeemStandard.sol';
 import {PermissionsStorage} from './PermissionsStorage.sol';
-import {AccessControlFacet} from '../AccessControl/AccessControlFacet.sol';
-import {AccessControlError} from '../AccessControl/LibAccessControl.sol';
+import {AccessControlFacet, AccessControlError} from '../AccessControl/AccessControlFacet.sol';
 import {MeemBaseERC721Facet} from '../MeemERC721/MeemBaseERC721Facet.sol';
 import {IERC721} from '@solidstate/contracts/token/ERC721/IERC721.sol';
 import 'hardhat/console.sol';
@@ -113,10 +112,8 @@ contract PermissionsFacet {
 
 	function setMaxSupply(uint256 newMaxSupply) public {
 		requireAdmin();
+
 		PermissionsStorage.DataStore storage s = PermissionsStorage.dataStore();
-		if (s.isMaxSupplyLocked) {
-			revert(PermissionsError.PropertyLocked);
-		}
 
 		MeemBaseERC721Facet baseContract = MeemBaseERC721Facet(address(this));
 
@@ -134,25 +131,12 @@ contract PermissionsFacet {
 		return s.maxSupply;
 	}
 
-	function lockMaxSupply() public {
-		requireAdmin();
-		PermissionsStorage.DataStore storage s = PermissionsStorage.dataStore();
-		if (s.isMaxSupplyLocked) {
-			revert(PermissionsError.PropertyLocked);
-		}
-		s.isMaxSupplyLocked = true;
-
-		emit MeemMaxSupplyLocked();
-	}
-
 	function setMintingPermissions(MeemPermission[] memory newPermissions)
 		public
 	{
 		requireAdmin();
+
 		PermissionsStorage.DataStore storage s = PermissionsStorage.dataStore();
-		if (s.isMaxSupplyLocked) {
-			revert(PermissionsError.PropertyLocked);
-		}
 
 		PermissionsFacet(address(this)).validatePermissions(
 			s.mintPermissions,

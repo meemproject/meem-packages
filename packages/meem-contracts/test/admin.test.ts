@@ -14,6 +14,8 @@ describe('Admin', function Test() {
 	let contracts: MeemContracts
 	let signers: SignerWithAddress[]
 	let contractAddress: string
+	const adminRole =
+		'0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775'
 	// const ipfsURL = 'ipfs://QmWEFSMku6yGLQ9TQr66HjSd9kay8ZDYKbBEfjNi4pLtrr/1'
 	// const owner = '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5'
 	// const nftAddress = '0xaF7Cc059196a09f50632372893617376dAfADFF2'
@@ -105,10 +107,14 @@ describe('Admin', function Test() {
 				symbol: 'asd',
 				name: 'alskdfj',
 				contractURI,
-				admins: [],
-				minters: [],
 				maxSupply: 2000,
-				isMaxSupplyLocked: false,
+				roles: [
+					{
+						role: adminRole,
+						user: signers[0].address,
+						hasRole: true
+					}
+				],
 				mintPermissions: [],
 				splits: [],
 				isTransferLocked: false
@@ -122,10 +128,14 @@ describe('Admin', function Test() {
 				symbol: 'asd',
 				name: 'alskdfj',
 				contractURI,
-				admins: [],
-				minters: [],
 				maxSupply: 2000,
-				isMaxSupplyLocked: false,
+				roles: [
+					{
+						role: adminRole,
+						user: signers[0].address,
+						hasRole: true
+					}
+				],
 				mintPermissions: [],
 				splits: [
 					{
@@ -144,10 +154,14 @@ describe('Admin', function Test() {
 			symbol: 'asd',
 			name: 'alskdfj',
 			contractURI,
-			admins: [],
-			minters: [],
 			maxSupply: 2000,
-			isMaxSupplyLocked: false,
+			roles: [
+				{
+					role: adminRole,
+					user: signers[0].address,
+					hasRole: true
+				}
+			],
 			mintPermissions: [],
 			splits: [
 				{

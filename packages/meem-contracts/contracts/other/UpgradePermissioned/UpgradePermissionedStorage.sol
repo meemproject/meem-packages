@@ -1,16 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import {MeemPermission} from '../interfaces/MeemStandard.sol';
-
-library PermissionsStorage {
+library UpgradePermissionedStorage {
 	bytes32 internal constant STORAGE_SLOT =
-		keccak256('meem.contracts.storage.Permissions');
+		keccak256('meem.contracts.storage.UpgradePermissioned');
 
 	struct DataStore {
-		uint256 maxSupply;
-		MeemPermission[] mintPermissions;
-		bool isTransferLocked;
+		mapping(address => bool) upgraders;
 	}
 
 	function dataStore() internal pure returns (DataStore storage l) {

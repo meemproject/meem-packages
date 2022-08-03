@@ -6,6 +6,7 @@ library AccessControlStorage {
 		keccak256('meem.contracts.storage.AccessControl');
 
 	bytes32 constant ADMIN_ROLE = keccak256('ADMIN_ROLE');
+	bytes32 constant UPGRADER_ROLE = keccak256('UPGRADER_ROLE');
 
 	struct RoleData {
 		mapping(address => bool) members;

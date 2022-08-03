@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import {LibAccessControl, AccessControlError} from '../AccessControl/LibAccessControl.sol';
+import {LibAccessControl} from '../AccessControl/LibAccessControl.sol';
 import {AccessControlStorage} from '../AccessControl/AccessControlStorage.sol';
-import {AccessControlFacet} from '../AccessControl/AccessControlFacet.sol';
-import {MeemDiamondV1} from '../../proxies/MeemDiamondV1.sol';
+import {AccessControlFacet, SetRoleItem, AccessControlError} from '../AccessControl/AccessControlFacet.sol';
+import {MeemDiamondV2} from '../../proxies/MeemDiamondV2.sol';
 import {ERC721MetadataStorage} from '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
 import {AdminStorage} from './AdminStorage.sol';
 import {PermissionsFacet} from '../Permissions/PermissionsFacet.sol';
@@ -17,10 +17,8 @@ struct InitParams {
 	string symbol;
 	string name;
 	string contractURI;
-	address[] admins;
-	address[] minters;
+	SetRoleItem[] roles;
 	uint256 maxSupply;
-	bool isMaxSupplyLocked;
 	MeemPermission[] mintPermissions;
 	Split[] splits;
 	bool isTransferLocked;
@@ -35,7 +33,6 @@ struct ContractInfo {
 	string name;
 	string contractURI;
 	uint256 maxSupply;
-	bool isMaxSupplyLocked;
 	MeemPermission[] mintPermissions;
 	Split[] splits;
 	bool isTransferLocked;
@@ -89,9 +86,7 @@ contract AdminFacet {
 		PermissionsStorage.DataStore storage permStorage = PermissionsStorage
 			.dataStore();
 
-		if (!permStorage.isMaxSupplyLocked) {
-			permStorage.maxSupply = maxSupply;
-		}
+		permStorage.maxSupply = maxSupply;
 
 		emit MeemContractInfoSet(address(this));
 	}
@@ -131,7 +126,6 @@ contract AdminFacet {
 				symbol: s.symbol,
 				contractURI: adminStorage.contractURI,
 				maxSupply: permStorage.maxSupply,
-				isMaxSupplyLocked: permStorage.isMaxSupplyLocked,
 				mintPermissions: permStorage.mintPermissions,
 				splits: splits,
 				isTransferLocked: permStorage.isTransferLocked
@@ -145,7 +139,7 @@ contract AdminFacet {
 	}
 
 	function initialize(InitParams memory params) public {
-		MeemDiamondV1 diamond = MeemDiamondV1(payable(address(this)));
+		MeemDiamondV2 diamond = MeemDiamondV2(payable(address(this)));
 
 		if (diamond.owner() != msg.sender) {
 			revert(AccessControlError.MissingRequiredRole);
@@ -168,24 +162,24 @@ contract AdminFacet {
 			msg.sender
 		);
 
-		for (uint256 i = 0; i < params.admins.length; i++) {
-			LibAccessControl._grantRole(
-				AccessControlStorage.ADMIN_ROLE,
-				params.admins[i]
-			);
-		}
-
-		bytes32 minterRole = PermissionsFacet(address(this)).MINTER_ROLE();
-
-		for (uint256 i = 0; i < params.minters.length; i++) {
-			LibAccessControl._grantRole(minterRole, params.admins[i]);
+		for (uint256 i = 0; i < params.roles.length; i++) {
+			if (params.roles[i].hasRole) {
+				LibAccessControl._grantRole(
+					params.roles[i].role,
+					params.roles[i].user
+				);
+			} else {
+				LibAccessControl._revokeRole(
+					params.roles[i].role,
+					params.roles[i].user
+				);
+			}
 		}
 
 		PermissionsStorage.DataStore storage permStorage = PermissionsStorage
 			.dataStore();
 
 		permStorage.maxSupply = params.maxSupply;
-		permStorage.isMaxSupplyLocked = params.isMaxSupplyLocked;
 		permStorage.isTransferLocked = params.isTransferLocked;
 
 		for (uint256 i = 0; i < params.mintPermissions.length; i++) {
@@ -208,58 +202,26 @@ contract AdminFacet {
 		s.symbol = params.symbol;
 		adminStore.contractURI = params.contractURI;
 
-		AccessControlStorage.DataStore storage acStorage = AccessControlStorage
-			.dataStore();
-
-		// Remove admins
-		for (
-			uint256 i = 0;
-			i < acStorage.rolesList[AccessControlStorage.ADMIN_ROLE].length;
-			i++
-		) {
-			address a = acStorage.rolesList[AccessControlStorage.ADMIN_ROLE][i];
-			acStorage.roles[AccessControlStorage.ADMIN_ROLE].members[a] = false;
-		}
-
-		delete acStorage.rolesList[AccessControlStorage.ADMIN_ROLE];
-
-		// Remove minters
-		bytes32 minterRole = PermissionsFacet(address(this)).MINTER_ROLE();
-		for (uint256 i = 0; i < acStorage.rolesList[minterRole].length; i++) {
-			address a = acStorage.rolesList[minterRole][i];
-			acStorage.roles[minterRole].members[a] = false;
-		}
-
-		delete acStorage.rolesList[minterRole];
-
-		// Grant permissions to new admins / minters
-		LibAccessControl._grantRole(
-			AccessControlStorage.ADMIN_ROLE,
-			msg.sender
-		);
-
-		for (uint256 i = 0; i < params.admins.length; i++) {
-			LibAccessControl._grantRole(
-				AccessControlStorage.ADMIN_ROLE,
-				params.admins[i]
-			);
-		}
-
-		for (uint256 i = 0; i < params.minters.length; i++) {
-			LibAccessControl._grantRole(minterRole, params.admins[i]);
+		for (uint256 i = 0; i < params.roles.length; i++) {
+			if (params.roles[i].hasRole) {
+				LibAccessControl._grantRole(
+					params.roles[i].role,
+					params.roles[i].user
+				);
+			} else {
+				LibAccessControl._revokeRole(
+					params.roles[i].role,
+					params.roles[i].user
+				);
+			}
 		}
 
 		PermissionsStorage.DataStore storage permStorage = PermissionsStorage
 			.dataStore();
 
-		if (!permStorage.isMaxSupplyLocked) {
-			permStorage.maxSupply = params.maxSupply;
-			permStorage.isMaxSupplyLocked = params.isMaxSupplyLocked;
-		}
+		permStorage.maxSupply = params.maxSupply;
 
-		if (!permStorage.isTransferLocked) {
-			permStorage.isTransferLocked = params.isTransferLocked;
-		}
+		permStorage.isTransferLocked = params.isTransferLocked;
 
 		for (uint256 i = 0; i < params.mintPermissions.length; i++) {
 			permStorage.mintPermissions.push(params.mintPermissions[i]);

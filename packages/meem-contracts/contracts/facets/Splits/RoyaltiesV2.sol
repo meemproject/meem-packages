@@ -3,7 +3,7 @@
 pragma solidity ^0.8.13;
 pragma abicoder v2;
 
-import './LibPart.sol';
+import {Part} from './SplitsFacet.sol';
 
 interface RoyaltiesV2 {
 	// event RoyaltiesSet(uint256 tokenId, LibPart.Part[] royalties);
@@ -11,5 +11,5 @@ interface RoyaltiesV2 {
 	function getRaribleV2Royalties(uint256 id)
 		external
 		view
-		returns (LibPart.Part[] memory);
+		returns (Part[] memory);
 }
