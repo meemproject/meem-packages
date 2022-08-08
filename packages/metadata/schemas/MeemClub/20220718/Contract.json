@@ -6,5 +6,14 @@
         {
             "$ref": "Meem/20220718/Contract.json"
         }
-    ]
+    ],
+    "properties": {
+        "application_instructions": {
+            "description": "The instructions for applying to join the club",
+            "examples": [
+                "Message @user in Discord to join."
+            ],
+            "type": "string"
+        }
+    }
 }

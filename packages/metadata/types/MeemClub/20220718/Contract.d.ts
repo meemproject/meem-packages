@@ -8,7 +8,8 @@
 /**
  * This schema describes version 20220718 of the Meem Club Contract Metadata Standard
  */
-export type MeemClub_Contract_20220718 = Meem_Contract_20220718;
+export type MeemClub_Contract_20220718 = MeemClub_Contract_202207181 & MeemClub_Contract_202207182;
+export type MeemClub_Contract_202207181 = Meem_Contract_20220718;
 
 /**
  * This schema describes the 20220718 version of the Meem Contract Metadata Standard
@@ -52,4 +53,11 @@ export interface Meem_Contract_20220718 {
     address: string;
     [k: string]: unknown;
   }[];
+}
+export interface MeemClub_Contract_202207182 {
+  /**
+   * The instructions for applying to join the club
+   */
+  application_instructions?: string;
+  [k: string]: unknown;
 }
