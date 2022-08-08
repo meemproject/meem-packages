@@ -1,4 +1,6 @@
-import log from '@kengoldfarb/log'
+import { Log } from '@kengoldfarb/log'
+
+const log = new Log()
 
 log.setOptions({
 	namespace: '@meemproject/react'

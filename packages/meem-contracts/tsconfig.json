@@ -22,7 +22,7 @@
     "strictNullChecks": true,
     "target": "es6",
   },
-  "exclude": ["**/dist"],
+  "exclude": ["**/dist", "./test/old"],
   "include": [
     "./tasks",
     "./test",

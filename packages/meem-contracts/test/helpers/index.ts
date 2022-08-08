@@ -1,15 +1,12 @@
 import { ethers } from 'hardhat'
 import {
 	AccessControlFacet,
+	AdminFacet,
 	ClippingFacet,
-	ERC721Facet,
-	InitDiamond,
-	MeemAdminFacet,
-	MeemBaseFacet,
-	MeemPermissionsFacet,
-	MeemQueryFacet,
-	MeemSplitsFacet,
-	ReactionFacet
+	PermissionsFacet,
+	SplitsFacet,
+	ReactionFacet,
+	MeemBaseERC721Facet
 } from '../../typechain'
 
 export async function getMeemContracts(contractAddress: string) {
@@ -17,54 +14,39 @@ export async function getMeemContracts(contractAddress: string) {
 		'AccessControlFacet',
 		contractAddress
 	)) as AccessControlFacet
+	const adminFacet = (await ethers.getContractAt(
+		'AdminFacet',
+		contractAddress
+	)) as AdminFacet
 	const clippingFacet = (await ethers.getContractAt(
 		'ClippingFacet',
 		contractAddress
 	)) as ClippingFacet
-	const eRC721Facet = (await ethers.getContractAt(
-		'ERC721Facet',
+	const permissionsFacet = (await ethers.getContractAt(
+		'PermissionsFacet',
 		contractAddress
-	)) as ERC721Facet
-	const initDiamond = (await ethers.getContractAt(
-		'InitDiamond',
+	)) as PermissionsFacet
+	const splitsFacet = (await ethers.getContractAt(
+		'SplitsFacet',
 		contractAddress
-	)) as InitDiamond
-	const meemAdminFacet = (await ethers.getContractAt(
-		'MeemAdminFacet',
-		contractAddress
-	)) as MeemAdminFacet
-	const meemBaseFacet = (await ethers.getContractAt(
-		'MeemBaseFacet',
-		contractAddress
-	)) as MeemBaseFacet
-	const meemPermissionsFacet = (await ethers.getContractAt(
-		'MeemPermissionsFacet',
-		contractAddress
-	)) as MeemPermissionsFacet
-	const meemQueryFacet = (await ethers.getContractAt(
-		'MeemQueryFacet',
-		contractAddress
-	)) as MeemQueryFacet
-	const meemSplitsFacet = (await ethers.getContractAt(
-		'MeemSplitsFacet',
-		contractAddress
-	)) as MeemSplitsFacet
+	)) as SplitsFacet
 	const reactionFacet = (await ethers.getContractAt(
 		'ReactionFacet',
 		contractAddress
 	)) as ReactionFacet
+	const meemBaseERC721Facet = (await ethers.getContractAt(
+		'MeemBaseERC721Facet',
+		contractAddress
+	)) as MeemBaseERC721Facet
 
 	return {
 		accessControlFacet,
+		adminFacet,
 		clippingFacet,
-		eRC721Facet,
-		initDiamond,
-		meemAdminFacet,
-		meemBaseFacet,
-		meemPermissionsFacet,
-		meemQueryFacet,
-		meemSplitsFacet,
-		reactionFacet
+		permissionsFacet,
+		splitsFacet,
+		reactionFacet,
+		meemBaseERC721Facet
 	}
 }
 

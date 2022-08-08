@@ -1,6 +1,6 @@
 {
 	"name": "@meemproject/api",
-	"version": "0.6.9",
+	"version": "0.7.2",
 	"main": "build/index.js",
 	"license": "MIT",
 	"files": [
@@ -17,7 +17,6 @@
 		"fetchTypes": "tsnd --project tsconfig.json --transpile-only src/scripts/fetchTypes.ts",
 		"generateTypes": "typechain --target=ethers-v5 'src/abis/*.json' --out-dir='src/abis'",
 		"fetchMeemABI": "tsnd --project tsconfig.scripts.json --transpile-only src/scripts/fetchMeemABI.ts && yarn generateTypes",
-		"fetchMeemIdABI": "tsnd --project tsconfig.scripts.json --transpile-only src/scripts/fetchMeemIdABI.ts && yarn generateTypes",
 		"lint": "eslint --max-warnings=0 --ext=.ts,.tsx . && tsc -p . --noEmit",
 		"lint:fix": "eslint --fix --ext=.ts,.tsx .",
 		"watch": "yarn run build && chokidar 'src/**/*.(js|jsx|ts|tsx)' -c 'yarn run build'",
@@ -37,7 +36,7 @@
 	},
 	"dependencies": {
 		"@kengoldfarb/log": "^1.0.5",
-		"@meemproject/meem-contracts": "^0.6.9",
+		"@meemproject/meem-contracts": "^0.7.2",
 		"@typechain/ethers-v5": "^10.0.0",
 		"@types/js-cookie": "^3.0.1",
 		"@types/luxon": "^2.3.1",
