@@ -11,6 +11,7 @@ import {PermissionsFacet} from '../Permissions/PermissionsFacet.sol';
 import {PermissionsStorage} from '../Permissions/PermissionsStorage.sol';
 import {AccessControlStorage} from '../AccessControl/AccessControlStorage.sol';
 import {SplitsStorage, TokenSplit} from '../Splits/SplitsStorage.sol';
+import {LibSplits} from '../Splits/LibSplits.sol';
 import {MeemPermission, Split} from '../interfaces/MeemStandard.sol';
 
 struct InitParams {
@@ -192,6 +193,8 @@ contract AdminFacet {
 			permStorage.mintPermissions.push(params.mintPermissions[i]);
 		}
 
+		LibSplits._setSplits(0, params.splits);
+
 		AdminStorage.dataStore().hasInitialized = true;
 
 		emit MeemContractInitialized(address(this));
@@ -229,9 +232,13 @@ contract AdminFacet {
 
 		permStorage.isTransferLocked = params.isTransferLocked;
 
+		delete permStorage.mintPermissions;
+
 		for (uint256 i = 0; i < params.mintPermissions.length; i++) {
 			permStorage.mintPermissions.push(params.mintPermissions[i]);
 		}
+
+		LibSplits._setSplits(0, params.splits);
 
 		emit MeemContractInitialized(address(this));
 	}

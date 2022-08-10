@@ -225,6 +225,13 @@ contract MeemBaseERC721Facet is
 		_safeTransfer(from, to, tokenId, data);
 	}
 
+	function burn(uint256 tokenId) public {
+		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
+		facet.requireTokenAdmin(tokenId, msg.sender);
+
+		_burn(tokenId);
+	}
+
 	function _beforeTokenTransfer(
 		address from,
 		address to,
