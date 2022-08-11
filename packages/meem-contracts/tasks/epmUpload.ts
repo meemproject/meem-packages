@@ -13,7 +13,7 @@ enum ContractType {
 	DiamondFacet = 'diamondFacet'
 }
 
-export async function parseContracts(options: {
+export async function epmUpload(options: {
 	args: {
 		name: string
 	}
@@ -84,7 +84,7 @@ export async function parseContracts(options: {
 	}
 }
 
-task('parseContracts', 'Deploys Meem')
+task('epmUpload', 'Deploys contracts to EPM')
 	.addParam(
 		'name',
 		'The name of the contract group',
@@ -93,6 +93,6 @@ task('parseContracts', 'Deploys Meem')
 		false
 	)
 	.setAction(async (args, { ethers, hardhatArguments }) => {
-		const result = await parseContracts({ args, ethers, hardhatArguments })
+		const result = await epmUpload({ args, ethers, hardhatArguments })
 		return result
 	})

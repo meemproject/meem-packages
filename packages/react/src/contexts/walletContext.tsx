@@ -3,6 +3,8 @@ import { ERC20, MeemAPI } from '@meemproject/api'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers, ethers } from 'ethers'
 import Cookies from 'js-cookie'
+import JWT from 'jsonwebtoken'
+import { DateTime } from 'luxon'
 import React, {
 	createContext,
 	useMemo,
@@ -204,12 +206,20 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 
 	useEffect(() => {
 		const meemJwtToken = Cookies.get('meemJwtToken')
+
 		if (meemJwtToken) {
-			setLoginState(LoginState.Unknown)
-			setJwt(meemJwtToken)
-		} else {
-			setLoginState(LoginState.NotLoggedIn)
+			const result = JWT.decode(meemJwtToken) as Record<string, any>
+			if (result && result.exp && +result.exp > DateTime.now().toSeconds()) {
+				setLoginState(LoginState.Unknown)
+				setJwt(meemJwtToken)
+				return
+			} else {
+				log.debug('JWT expired')
+			}
 		}
+
+		setLoginState(LoginState.NotLoggedIn)
+		setJwt(undefined)
 	}, [])
 
 	const connectWallet = useCallback(async () => {
@@ -238,6 +248,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		const address = await s.getAddress()
 
 		const n = await w3p.getNetwork()
+
 		setNetwork(n)
 		setChainId(n.chainId)
 		setProvider(p)
@@ -361,10 +372,10 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 					method: 'wallet_switchEthereumChain',
 					params: [{ chainId: formattedChainId }]
 				})
+				setChainId(chain.chainId)
 			} catch (e) {
 				log.warn(e)
 			}
-			setChainId(chain.chainId)
 		}
 	}, [])
 

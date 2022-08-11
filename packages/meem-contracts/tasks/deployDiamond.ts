@@ -76,11 +76,15 @@ export async function deployDiamond(options: {
 
 	if (shouldDeployProxy) {
 		// deploy Diamond
-		const Diamond = await ethers.getContractFactory('MeemDiamondV1')
+		const Diamond = await ethers.getContractFactory('MeemDiamond')
 
-		diamond = await Diamond.deploy(contractOwner.address, {
-			gasPrice: wei
-		})
+		diamond = await Diamond.deploy(
+			contractOwner.address,
+			[contractOwner.address],
+			{
+				gasPrice: wei
+			}
+		)
 
 		await diamond.deployed()
 		diamondAddress = diamond.address

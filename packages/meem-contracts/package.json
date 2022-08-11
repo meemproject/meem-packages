@@ -32,7 +32,7 @@
 		"coverage": "hardhat coverage",
 		"network": "TS_NODE_TRANSPILE_ONLY=true hardhat node",
 		"console": "TS_NODE_TRANSPILE_ONLY=true hardhat console",
-		"parseContracts": "TS_NODE_TRANSPILE_ONLY=true hardhat parseContracts",
+		"epmUpload": "TS_NODE_TRANSPILE_ONLY=true hardhat epmUpload",
 		"watch": "concurrently -r --kill-others \"chokidar 'contracts/**/*.sol' -c 'yarn build:sol'\" \"chokidar 'src/**/*.ts' -c 'yarn build:ts'\"",
 		"verify": "hardhat verify",
 		"createVersion": "DEBUG=@meemproject/* hardhat createVersion",

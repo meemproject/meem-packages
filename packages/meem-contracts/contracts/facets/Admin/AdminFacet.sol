@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import {LibAccessControl} from '../AccessControl/LibAccessControl.sol';
 import {AccessControlStorage} from '../AccessControl/AccessControlStorage.sol';
 import {AccessControlFacet, SetRoleItem, AccessControlError} from '../AccessControl/AccessControlFacet.sol';
-import {MeemDiamondV2} from '../../proxies/MeemDiamondV2.sol';
+import {MeemDiamond} from '../../proxies/MeemDiamond.sol';
 import {ERC721MetadataStorage} from '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
 import {AdminStorage} from './AdminStorage.sol';
 import {PermissionsFacet} from '../Permissions/PermissionsFacet.sol';
@@ -140,7 +140,7 @@ contract AdminFacet {
 	}
 
 	function initialize(InitParams memory params) public {
-		MeemDiamondV2 diamond = MeemDiamondV2(payable(address(this)));
+		MeemDiamond diamond = MeemDiamond(payable(address(this)));
 
 		if (
 			diamond.owner() != msg.sender &&
