@@ -6,6 +6,7 @@
 			"error",
 			"single"
 		],
+		"no-empty-blocks": "off",
 		"const-name-snakecase": "off",
 		"compiler-version": [
 			"error",
