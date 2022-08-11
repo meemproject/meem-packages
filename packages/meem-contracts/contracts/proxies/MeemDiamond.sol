@@ -30,11 +30,11 @@ import {IERC173} from '@solidstate/contracts/access/IERC173.sol';
 import {AccessControlFacet} from '../facets/AccessControl/AccessControlFacet.sol';
 import {AccessControlStorage} from '../facets/AccessControl/AccessControlStorage.sol';
 
-library MeemDiamondV2Error {
+library MeemDiamondError {
 	string public constant NoPermission = 'NO_PERMISSION';
 }
 
-contract MeemDiamondV2 is
+contract MeemDiamond is
 	ISolidStateDiamond,
 	DiamondBase,
 	DiamondReadable,
@@ -129,7 +129,7 @@ contract MeemDiamondV2 is
 				.roles[AccessControlStorage.UPGRADER_ROLE]
 				.members[msg.sender]
 		) {
-			revert(MeemDiamondV2Error.NoPermission);
+			revert(MeemDiamondError.NoPermission);
 		}
 
 		DiamondBaseStorage.layout().diamondCut(facetCuts, target, data);
@@ -150,7 +150,7 @@ contract MeemDiamondV2 is
 	function setFallbackAddress(address fallbackAddress) external {
 		AccessControlFacet ac = AccessControlFacet(address(this));
 		if (!ac.canUpgradeContract(msg.sender)) {
-			revert(MeemDiamondV2Error.NoPermission);
+			revert(MeemDiamondError.NoPermission);
 		}
 
 		DiamondBaseStorage.layout().fallbackAddress = fallbackAddress;
