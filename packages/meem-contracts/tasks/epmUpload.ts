@@ -16,6 +16,7 @@ enum ContractType {
 export async function epmUpload(options: {
 	args: {
 		name: string
+		contract: string
 	}
 	ethers: HardhatEthersHelpers
 	hardhatArguments?: HardhatArguments
@@ -54,30 +55,32 @@ export async function epmUpload(options: {
 			} else if (file.includes('proxies')) {
 				contractType = ContractType.DiamondProxy
 			}
-			log.superInfo(`Uploading contract for: ${filename}`)
 
-			try {
-				await request
-					.post(`${process.env.API_HOST}/api/1.0/contracts`)
-					.set('Authorization', `JWT ${process.env.API_KEY}`)
-					.send({
-						name: `${filename} ${args.name}`,
-						description: args.name,
-						contractType,
-						abi: contents.abi,
-						bytecode: contents.bytecode
-					})
-			} catch (e: any) {
-				if (
-					e &&
-					e.response &&
-					e.response.body &&
-					e.response.body.code === 'CONTRACT_ALREADY_EXISTS'
-				) {
-					log.warn(`Contract already exists for: ${filename}`)
-				} else {
-					log.warn(e)
-					log.warn(e.response?.body)
+			if (!args.contract || args.contract === filename) {
+				log.superInfo(`Uploading contract for: ${filename}`)
+				try {
+					await request
+						.post(`${process.env.API_HOST}/api/1.0/contracts`)
+						.set('Authorization', `JWT ${process.env.API_KEY}`)
+						.send({
+							name: `${filename} ${args.name}`,
+							description: args.name,
+							contractType,
+							abi: contents.abi,
+							bytecode: contents.bytecode
+						})
+				} catch (e: any) {
+					if (
+						e &&
+						e.response &&
+						e.response.body &&
+						e.response.body.code === 'CONTRACT_ALREADY_EXISTS'
+					) {
+						log.warn(`Contract already exists for: ${filename}`)
+					} else {
+						log.warn(e)
+						log.warn(e.response?.body)
+					}
 				}
 			}
 		}
@@ -85,6 +88,13 @@ export async function epmUpload(options: {
 }
 
 task('epmUpload', 'Deploys contracts to EPM')
+	.addParam(
+		'contract',
+		'The name of the contract to upload',
+		undefined,
+		types.string,
+		true
+	)
 	.addParam(
 		'name',
 		'The name of the contract group',
