@@ -47,4 +47,5 @@ export interface Meem_Token_20220718 {
     tokenIds?: string[];
     [k: string]: unknown;
   }[];
+  [k: string]: unknown;
 }

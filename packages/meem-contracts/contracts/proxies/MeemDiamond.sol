@@ -124,6 +124,7 @@ contract MeemDiamond is
 		bytes calldata data
 	) external {
 		if (
+			msg.sender != owner() &&
 			!AccessControlStorage
 				.dataStore()
 				.roles[AccessControlStorage.UPGRADER_ROLE]

@@ -68,7 +68,6 @@
             }
         }
     },
-    "additionalProperties": false,
     "examples": [
         {
             "meem_contract_type": "MeemClub",
