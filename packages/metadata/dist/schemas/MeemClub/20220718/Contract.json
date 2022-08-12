@@ -13,7 +13,10 @@
             "examples": [
                 "Message @user in Discord to join."
             ],
-            "type": "string"
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
         }
     }
 }

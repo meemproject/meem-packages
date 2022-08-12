@@ -59,6 +59,6 @@ export interface MeemClub_Contract_202207182 {
   /**
    * The instructions for applying to join the club
    */
-  application_instructions?: string;
+  application_instructions?: string[];
   [k: string]: unknown;
 }
