@@ -309,6 +309,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	const handleAccountsChanged = useCallback((acc: string[]) => {
 		log.debug('handleAccountsChanged', { acc })
 		setAccounts(acc)
+		Cookies.remove('meemJwtToken')
 	}, [])
 
 	const setMeemJwt = useCallback((newMeemJwt: string) => {

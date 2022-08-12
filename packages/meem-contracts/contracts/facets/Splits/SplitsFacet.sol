@@ -18,16 +18,15 @@ contract SplitsFacet is RoyaltiesV2 {
 		return LibSplits._getRaribleV2Royalties(tokenId);
 	}
 
-	function handleSaleDistribution(
-		uint256 tokenId,
-		address msgSender,
-		uint256 msgValue
-	) public payable {
-		if (msgValue == 0) {
+	function handleSaleDistribution(uint256 tokenId, address msgSender)
+		public
+		payable
+	{
+		if (msg.value == 0) {
 			return;
 		}
 
-		uint256 leftover = msgValue;
+		uint256 leftover = msg.value;
 		SplitsStorage.DataStore storage s = SplitsStorage.dataStore();
 
 		for (uint256 i = 0; i < s.tokenSplits[tokenId].splits.length; i++) {

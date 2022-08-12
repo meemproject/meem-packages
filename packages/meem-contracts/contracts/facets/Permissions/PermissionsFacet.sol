@@ -27,7 +27,7 @@ contract PermissionsFacet {
 		return keccak256('MINTER_ROLE');
 	}
 
-	function requireCanMint(address minter, uint256 msgValue) public payable {
+	function requireCanMint(address minter, address to) public payable {
 		MeemBaseERC721Facet baseContract = MeemBaseERC721Facet(address(this));
 		PermissionsStorage.DataStore storage s = PermissionsStorage.dataStore();
 		AccessControlFacet ac = AccessControlFacet(address(this));
@@ -48,6 +48,7 @@ contract PermissionsFacet {
 
 		for (uint256 i = 0; i < s.mintPermissions.length; i++) {
 			MeemPermission storage perm = s.mintPermissions[i];
+			bool hasIndividualPermission = false;
 
 			if (
 				isBetweenTimestamps(
@@ -60,6 +61,7 @@ contract PermissionsFacet {
 					perm.permission == Permission.Anyone
 				) {
 					hasPermission = true;
+					hasIndividualPermission = true;
 				}
 
 				if (perm.permission == Permission.Addresses) {
@@ -67,6 +69,7 @@ contract PermissionsFacet {
 					for (uint256 j = 0; j < perm.addresses.length; j++) {
 						if (perm.addresses[j] == minter) {
 							hasPermission = true;
+							hasIndividualPermission = true;
 							break;
 						}
 					}
@@ -81,13 +84,14 @@ contract PermissionsFacet {
 
 						if (balance >= perm.numTokens) {
 							hasPermission = true;
+							hasIndividualPermission = true;
 							break;
 						}
 					}
 				}
 
 				if (
-					hasPermission &&
+					hasIndividualPermission &&
 					(!hasCostBeenSet ||
 						(hasCostBeenSet && costWei > perm.costWei))
 				) {
@@ -97,15 +101,11 @@ contract PermissionsFacet {
 			}
 		}
 
-		console.log('hasPermission', hasPermission);
-		console.log('costWei', costWei);
-		console.log('msg.value', msgValue);
-
 		if (!hasPermission) {
 			revert(PermissionsError.NoPermission);
 		}
 
-		if (costWei != msgValue) {
+		if (costWei != msg.value) {
 			revert(PermissionsError.IncorrectMsgValue);
 		}
 	}
