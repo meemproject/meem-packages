@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.7](https://github.com/meemproject/meem-packages/compare/v0.7.6...v0.7.7) (2022-08-12)
+
+
+### Bug Fixes
+
+* json schema validation ([953b1f0](https://github.com/meemproject/meem-packages/commit/953b1f0))
+
+
+
+
+
 ## [0.7.6](https://github.com/meemproject/meem-packages/compare/v0.7.5...v0.7.6) (2022-08-12)
 
 **Note:** Version bump only for package @meemproject/metadata
