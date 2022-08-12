@@ -255,7 +255,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 
 		setSigner(s)
 		setAccounts([address])
-		Cookies.set('walletAddress', address)
 		setWeb3Provider(w3p)
 		setIsConnected(true)
 	}, [web3Modal])
@@ -267,7 +266,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		}
 
 		setWeb3Provider(undefined)
-		Cookies.remove('walletAddress')
 		setAccounts([])
 	}, [provider, web3Modal])
 
@@ -310,6 +308,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		log.debug('handleAccountsChanged', { acc })
 		setAccounts(acc)
 		Cookies.remove('meemJwtToken')
+		setLoginState(LoginState.NotLoggedIn)
 	}, [])
 
 	const setMeemJwt = useCallback((newMeemJwt: string) => {
