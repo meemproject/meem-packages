@@ -179,7 +179,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	)
 
 	useEffect(() => {
-		console.log('meData', meData)
 		if (meData) {
 			setLoginState(LoginState.LoggedIn)
 		}
