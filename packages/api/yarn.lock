@@ -403,10 +403,10 @@
   resolved "https://registry.yarnpkg.com/@kengoldfarb/log/-/log-1.0.5.tgz#7b83c4c43f86358e5b2f0fb7cce5b08534ca9b4c"
   integrity sha512-lVTKWRS5JR36Uuo3rbtslAv701igH+JCUYKWsw12ngLs1e7pdWvmpw/b7AJQ0rSqoqKgcoZ8PDgZEN7rYGMiDA==
 
-"@meemproject/meem-contracts@^0.7.3":
-  version "0.7.4"
-  resolved "https://registry.yarnpkg.com/@meemproject/meem-contracts/-/meem-contracts-0.7.4.tgz#97c453e1a8675e4d226d18facbe332581c87f2b9"
-  integrity sha512-Qe7Qs4dsdn/koZkJO8ESo8qlqGc5sK+icwhrwYnVYuVV7kPQ6SjeC0w4xMzFpPovyYNv41eI08VLupeDyBdNrw==
+"@meemproject/meem-contracts@^0.7.8":
+  version "0.7.8"
+  resolved "https://registry.yarnpkg.com/@meemproject/meem-contracts/-/meem-contracts-0.7.8.tgz#0d7ea32ee259380c402be4a1d5f209bf220c93d7"
+  integrity sha512-3Zu33BZyC/1RYGXgDnwqMLrNsaxGLhiHq0WafW4lllaqnPMsTE5MWVXgTM5GuEOTkOJyRxNZXZ4aWkOZd1+J0g==
   dependencies:
     "@kengoldfarb/log" "^1.0.5"
     ethers "^5.6.4"
