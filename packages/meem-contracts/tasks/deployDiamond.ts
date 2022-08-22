@@ -222,7 +222,8 @@ export async function deployDiamond(options: {
 					addresses: [],
 					costWei: 0,
 					mintStartTimestamp: 0,
-					mintEndTimestamp: 0
+					mintEndTimestamp: 0,
+					merkleRoot: Ethers.utils.formatBytes32String('')
 				}
 			],
 			maxSupply: '1000000000000000000000000',

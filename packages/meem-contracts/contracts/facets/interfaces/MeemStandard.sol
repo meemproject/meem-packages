@@ -39,6 +39,12 @@ struct MintParameters {
 	address to;
 	string tokenURI;
 	TokenType tokenType;
+}
+
+struct MintWithProofParameters {
+	address to;
+	string tokenURI;
+	TokenType tokenType;
 	bytes32[] proof;
 }
 

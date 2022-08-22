@@ -6,6 +6,9 @@ import {AccessControlStorage} from '../AccessControl/AccessControlStorage.sol';
 import {AccessControlFacet, SetRoleItem, AccessControlError} from '../AccessControl/AccessControlFacet.sol';
 import {MeemDiamond} from '../../proxies/MeemDiamond.sol';
 import {ERC721MetadataStorage} from '@solidstate/contracts/token/ERC721/metadata/ERC721MetadataStorage.sol';
+import {IERC721Metadata} from '@solidstate/contracts/token/ERC721/metadata/IERC721Metadata.sol';
+import {IERC721Enumerable} from '@solidstate/contracts/token/ERC721/enumerable/IERC721Enumerable.sol';
+import {IERC721} from '@solidstate/contracts/token/ERC721/IERC721.sol';
 import {AdminStorage} from './AdminStorage.sol';
 import {PermissionsFacet} from '../Permissions/PermissionsFacet.sol';
 import {PermissionsStorage} from '../Permissions/PermissionsStorage.sol';
@@ -13,6 +16,7 @@ import {AccessControlStorage} from '../AccessControl/AccessControlStorage.sol';
 import {SplitsStorage, TokenSplit} from '../Splits/SplitsStorage.sol';
 import {LibSplits} from '../Splits/LibSplits.sol';
 import {MeemPermission, Split} from '../interfaces/MeemStandard.sol';
+import {ERC165Storage, IERC165} from '@solidstate/contracts/introspection/ERC165.sol';
 
 struct InitParams {
 	string symbol;
@@ -40,6 +44,8 @@ struct ContractInfo {
 }
 
 contract AdminFacet {
+	using ERC165Storage for ERC165Storage.Layout;
+
 	event MeemContractInitialized(address indexed contractAddress);
 	event MeemContractInfoSet(address indexed contractAddress);
 	event MeemContractURISet(address indexed contractAddress);
@@ -156,6 +162,11 @@ contract AdminFacet {
 			revert(AdminError.AlreadyInitialized);
 		}
 
+		ERC165Storage.Layout storage erc165 = ERC165Storage.layout();
+		erc165.setSupportedInterface(type(IERC721Metadata).interfaceId, true);
+		erc165.setSupportedInterface(type(IERC721Enumerable).interfaceId, true);
+		erc165.setSupportedInterface(type(IERC721).interfaceId, true);
+
 		ERC721MetadataStorage.Layout storage s = ERC721MetadataStorage.layout();
 
 		AdminStorage.DataStore storage adminStore = AdminStorage.dataStore();
@@ -202,6 +213,11 @@ contract AdminFacet {
 
 	function reinitialize(InitParams memory params) public {
 		requireAdmin();
+
+		ERC165Storage.Layout storage erc165 = ERC165Storage.layout();
+		erc165.setSupportedInterface(type(IERC721Metadata).interfaceId, true);
+		erc165.setSupportedInterface(type(IERC721Enumerable).interfaceId, true);
+		erc165.setSupportedInterface(type(IERC721).interfaceId, true);
 
 		ERC721MetadataStorage.Layout storage s = ERC721MetadataStorage.layout();
 
