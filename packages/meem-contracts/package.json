@@ -25,6 +25,7 @@
 		"build:ts": "tsc -p ./tsconfig.build.json && echo 'build:ts Finished'",
 		"hardhat": "hardhat",
 		"accounts": "hardhat accounts",
+		"randomWallets": "hardhat randomWallets",
 		"deployDiamond": "TS_NODE_TRANSPILE_ONLY=true DEBUG=@meemproject/* hardhat deployDiamond",
 		"upgradeDiamond": "TS_NODE_TRANSPILE_ONLY=true DEBUG=@meemproject/* hardhat upgradeDiamond",
 		"upgradeFacet": "TS_NODE_TRANSPILE_ONLY=true DEBUG=@meemproject/* hardhat upgradeFacet",
