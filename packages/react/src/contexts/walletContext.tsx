@@ -179,16 +179,11 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	)
 
 	useEffect(() => {
+		console.log('meData', meData)
 		if (meData) {
 			setLoginState(LoginState.LoggedIn)
 		}
 	}, [meData])
-
-	useEffect(() => {
-		if (isMeemIdLoading) {
-			setLoginState(LoginState.Unknown)
-		}
-	}, [isMeemIdLoading])
 
 	useEffect(() => {
 		if (jwt) {
@@ -196,13 +191,13 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		}
 	}, [jwt, meMutate])
 
-	// useEffect(() => {
-	// 	if (isMeemIdError && jwt) {
-	// 		Cookies.remove('meemJwtToken')
-	// 		// setMeemId(undefined)
-	// 		setLoginState(LoginState.NotLoggedIn)
-	// 	}
-	// }, [isMeemIdError, jwt])
+	useEffect(() => {
+		if (isMeemIdError && jwt) {
+			Cookies.remove('meemJwtToken')
+			// setMeemId(undefined)
+			setLoginState(LoginState.NotLoggedIn)
+		}
+	}, [isMeemIdError, jwt])
 
 	useEffect(() => {
 		const meemJwtToken = Cookies.get('meemJwtToken')

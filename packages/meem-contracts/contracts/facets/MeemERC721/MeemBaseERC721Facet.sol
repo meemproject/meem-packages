@@ -36,6 +36,12 @@ struct Meem {
 	uint256 mintedAt;
 }
 
+struct RequireCanMintParams {
+	address minter;
+	address to;
+	bytes32[] proof;
+}
+
 contract MeemBaseERC721Facet is
 	ISolidStateERC721,
 	ERC721Facet,
@@ -63,7 +69,13 @@ contract MeemBaseERC721Facet is
 		uint256 tokenId = MeemBaseStorage.dataStore().tokenCounter;
 
 		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
-		facet.requireCanMint{value: msg.value}(msg.sender, params.to);
+		facet.requireCanMint{value: msg.value}(
+			RequireCanMintParams({
+				minter: msg.sender,
+				to: params.to,
+				proof: params.proof
+			})
+		);
 
 		_safeMint(params.to, tokenId);
 		ERC721MetadataStorage.Layout storage l = ERC721MetadataStorage.layout();
@@ -131,10 +143,12 @@ contract MeemBaseERC721Facet is
 
 	/**
 	 * @notice Require that an address can mint a token
-	 * @param minter The address that is minting
-	 * @param to The address that will receive the token
+	 * @param params The requirement parameters
 	 */
-	function requireCanMint(address minter, address to) public payable {}
+	function requireCanMint(RequireCanMintParams memory params)
+		public
+		payable
+	{}
 
 	/**
 	 * @notice Require that an address is a token admin. By default only the token owner is an admin

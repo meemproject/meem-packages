@@ -32,12 +32,14 @@ struct MeemPermission {
 	uint256 costWei;
 	uint256 mintStartTimestamp;
 	uint256 mintEndTimestamp;
+	bytes32 merkleRoot;
 }
 
 struct MintParameters {
 	address to;
 	string tokenURI;
 	TokenType tokenType;
+	bytes32[] proof;
 }
 
 struct Reaction {
