@@ -4,6 +4,7 @@ import chaiAsPromised from 'chai-as-promised'
 import { ethers } from 'hardhat'
 import _ from 'lodash'
 import { Permission, TokenType, UriSource } from '../src/lib/meemStandard'
+import { getMerkleInfo } from '../src/merkle'
 import { deployDiamond } from '../tasks'
 import { getMeemContracts, MeemContracts } from './helpers'
 
@@ -66,6 +67,10 @@ describe('Minting', function Test() {
 	})
 
 	it('Respects address only minting', async () => {
+		const info = getMerkleInfo({
+			addresses: [signers[3].address]
+		})
+
 		await contracts.permissionsFacet.setMintingPermissions([
 			{
 				addresses: [signers[3].address],
@@ -73,7 +78,8 @@ describe('Minting', function Test() {
 				mintEndTimestamp: 0,
 				mintStartTimestamp: 0,
 				numTokens: 0,
-				permission: Permission.Addresses
+				permission: Permission.Addresses,
+				merkleRoot: info.rootHash
 			}
 		])
 		await contracts.meemBaseERC721Facet.connect(signers[3]).mint({
@@ -96,14 +102,19 @@ describe('Minting', function Test() {
 	})
 
 	it('Respects address only minting', async () => {
+		const info = getMerkleInfo({
+			addresses: [signers[3].address]
+		})
+
 		await contracts.permissionsFacet.connect(signers[0]).setMintingPermissions([
 			{
-				addresses: [signers[3].address],
+				addresses: [],
 				costWei: 0,
 				mintEndTimestamp: 0,
 				mintStartTimestamp: 0,
 				numTokens: 0,
-				permission: Permission.Addresses
+				permission: Permission.Addresses,
+				merkleRoot: info.rootHash
 			}
 		])
 
@@ -134,7 +145,8 @@ describe('Minting', function Test() {
 				mintEndTimestamp: 0,
 				mintStartTimestamp: 0,
 				numTokens: 0,
-				permission: Permission.Anyone
+				permission: Permission.Anyone,
+				merkleRoot: ethers.utils.formatBytes32String('')
 			}
 		])
 

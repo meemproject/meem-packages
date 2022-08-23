@@ -9,6 +9,9 @@ import {MeemBaseERC721Facet} from '../MeemERC721/MeemBaseERC721Facet.sol';
 import {PermissionsError} from '../Permissions/PermissionsFacet.sol';
 
 contract SplitsFacet is RoyaltiesV2 {
+	event MeemSplitsSet(uint256 tokenId, Split[] splits);
+	event RoyaltiesSet(uint256 tokenId, Part[] royalties);
+
 	function getRaribleV2Royalties(uint256 tokenId)
 		public
 		view

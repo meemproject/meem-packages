@@ -49,7 +49,8 @@ describe('Minting #2', function Test() {
 					numTokens: 0,
 					costWei: ethers.utils.parseEther('0.1'),
 					mintStartTimestamp: 0,
-					mintEndTimestamp: 0
+					mintEndTimestamp: 0,
+					merkleRoot: ethers.utils.formatBytes32String('')
 				}
 			],
 			splits: [
@@ -92,23 +93,8 @@ describe('Minting #2', function Test() {
 					numTokens: 0,
 					costWei: ethers.utils.parseEther('0.1'),
 					mintStartTimestamp: 0,
-					mintEndTimestamp: 0
-				},
-				{
-					permission: Permission.Addresses,
-					addresses: [signers[1].address],
-					numTokens: 0,
-					costWei: 0,
-					mintStartTimestamp: 0,
-					mintEndTimestamp: 0
-				},
-				{
-					permission: Permission.Addresses,
-					addresses: [signers[2].address],
-					numTokens: 0,
-					costWei: 0,
-					mintStartTimestamp: 0,
-					mintEndTimestamp: 0
+					mintEndTimestamp: 0,
+					merkleRoot: ethers.utils.formatBytes32String('')
 				}
 			],
 			splits: [
