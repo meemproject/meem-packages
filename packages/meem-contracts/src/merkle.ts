@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import keccak256 from 'keccak256'
 import { MerkleTree } from 'merkletreejs'
 
@@ -21,7 +22,10 @@ export function getMerkleInfo(options: {
 	return {
 		leaves,
 		merkleTree,
-		rootHash: `0x${rootHash}`,
+		rootHash:
+			rootHash && rootHash.length > 0
+				? `0x${rootHash}`
+				: ethers.utils.formatBytes32String(''),
 		proof,
 		isVerified
 	}
