@@ -27,6 +27,7 @@ import {ISolidStateERC721} from '@solidstate/contracts/token/ERC721/ISolidStateE
 
 library Error {
 	string public constant NotTokenAdmin = 'NOT_TOKEN_ADMIN';
+	string public constant NotPayable = 'NOT_PAYABLE';
 }
 
 struct Meem {
@@ -58,6 +59,45 @@ contract MeemBaseERC721Facet is
 		address indexed to,
 		uint256 indexed tokenId
 	);
+
+	/**
+	 * @notice Bulk Mint Meems
+	 * @param bulkParams Array of minting parameters
+	 */
+	function bulkMint(MintParameters[] memory bulkParams)
+		public
+		payable
+		virtual
+	{
+		// Only allow bulk minting if there is no fee involved
+		if (msg.value > 0) {
+			revert(Error.NotPayable);
+		}
+		MeemBaseStorage.DataStore storage s = MeemBaseStorage.dataStore();
+		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
+		bytes32[] memory p;
+
+		for (uint256 i = 0; i < bulkParams.length; i++) {
+			s.tokenCounter++;
+			uint256 tokenId = MeemBaseStorage.dataStore().tokenCounter;
+			MintParameters memory params = bulkParams[i];
+			facet.requireCanMint{value: msg.value}(
+				RequireCanMintParams({
+					minter: msg.sender,
+					to: params.to,
+					proof: p
+				})
+			);
+
+			_safeMint(params.to, tokenId);
+			ERC721MetadataStorage.Layout storage l = ERC721MetadataStorage
+				.layout();
+			l.tokenURIs[tokenId] = params.tokenURI;
+			s.tokenTypes[tokenId] = params.tokenType;
+			s.minters[tokenId] = msg.sender;
+			s.mintedTimestamps[tokenId] = block.timestamp;
+		}
+	}
 
 	/**
 	 * @notice Mint a Meem
