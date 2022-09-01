@@ -383,6 +383,7 @@ export namespace MeemAPI {
 		costWei: string
 		mintStartTimestamp: string
 		mintEndTimestamp: string
+		merkleRoot: string
 	}
 	
 	export interface IMeemProperties {
@@ -627,6 +628,45 @@ export namespace MeemAPI {
 	
 	export namespace v1 {
 	
+	export namespace BulkMint {
+		export interface IPathParams {
+			/** The meem pass id to fetch */
+			meemContractId: string
+		}
+	
+		export const path = (options: IPathParams) =>
+			`/api/1.0/meemContracts/${options.meemContractId}/bulkMint`
+	
+		export const method = HttpMethod.Post
+	
+		export interface IQueryParams {}
+	
+		export interface IRequestBody {
+			tokens: {
+				/** Metadata object to be used for the minted Meem */
+				metadata?: IMeemMetadataLike
+	
+				/** The address where the Meem will be minted to. */
+				to: string
+			}[]
+		}
+	
+		export interface IResponseBody extends IApiResponseBody {
+			status: 'success'
+		}
+	
+		export interface IDefinition {
+			pathParams: IPathParams
+			queryParams: IQueryParams
+			requestBody: IRequestBody
+			responseBody: IResponseBody
+		}
+	
+		export type Response = IResponseBody | IError
+	}
+	
+	
+	
 	export namespace CheckClippingStatus {
 		export interface IPathParams {}
 	
@@ -835,7 +875,7 @@ export namespace MeemAPI {
 			isMaxSupplyLocked?: boolean
 	
 			/** Minting permissions */
-			mintPermissions?: IMeemPermission[]
+			mintPermissions?: Omit<IMeemPermission, 'merkleRoot'>[]
 	
 			/** Splits for minting / transfers */
 			splits?: IMeemSplit[]
@@ -1028,7 +1068,7 @@ export namespace MeemAPI {
 	
 		export interface IRequestBody {
 			/** Set the visibility type of the integration */
-			visibility?: string
+			visibility?: IMeemIdIntegrationVisibility
 			/** Metadata associated with this integration */
 			metadata?: { [key: string]: unknown }
 		}
@@ -1505,6 +1545,37 @@ export namespace MeemAPI {
 	
 	
 	
+	export namespace GetMintingProof {
+		export interface IPathParams {
+			/** The meem pass id to fetch */
+			meemContractId: string
+		}
+	
+		export const path = (options: IPathParams) =>
+			`/api/1.0/meemContracts/${options.meemContractId}/proof`
+	
+		export const method = HttpMethod.Get
+	
+		export interface IQueryParams {}
+	
+		export interface IRequestBody {}
+	
+		export interface IResponseBody extends IApiResponseBody {
+			proof: string[]
+		}
+	
+		export interface IDefinition {
+			pathParams: IPathParams
+			queryParams: IQueryParams
+			requestBody: IRequestBody
+			responseBody: IResponseBody
+		}
+	
+		export type Response = IResponseBody | IError
+	}
+	
+	
+	
 	/** Get NFTs owned by an account */
 	export namespace GetNFTs {
 		export interface IPathParams {}
@@ -1744,6 +1815,8 @@ export namespace MeemAPI {
 		export interface IQueryParams {}
 	
 		export interface IRequestBody {
+			/** Login w/ access token provided by Auth0 magic link */
+			accessToken?: string
 			/** Login w/ wallet. Both address and signature must be provided */
 			address?: string
 			/** Login w/ wallet. Both address and signature must be provided */
