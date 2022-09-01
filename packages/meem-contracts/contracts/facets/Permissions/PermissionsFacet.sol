@@ -5,9 +5,9 @@ import {Array} from '../utils/Array.sol';
 import {MeemPermission, Permission} from '../interfaces/MeemStandard.sol';
 import {PermissionsStorage} from './PermissionsStorage.sol';
 import {AccessControlFacet, AccessControlError} from '../AccessControl/AccessControlFacet.sol';
-import {MeemBaseERC721Facet} from '../MeemERC721/MeemBaseERC721Facet.sol';
+import {MeemBaseERC721Facet, RequireCanMintParams} from '../MeemERC721/MeemBaseERC721Facet.sol';
 import {IERC721} from '@solidstate/contracts/token/ERC721/IERC721.sol';
-import 'hardhat/console.sol';
+import {MerkleProof} from '@openzeppelin/contracts/utils/cryptography/MerkleProof.sol';
 
 library PermissionsError {
 	string public constant MaxSupplyExceeded = 'MAX_SUPPLY_EXCEEDED';
@@ -27,7 +27,7 @@ contract PermissionsFacet {
 		return keccak256('MINTER_ROLE');
 	}
 
-	function requireCanMint(address minter, address to) public payable {
+	function requireCanMint(RequireCanMintParams memory params) public payable {
 		MeemBaseERC721Facet baseContract = MeemBaseERC721Facet(address(this));
 		PermissionsStorage.DataStore storage s = PermissionsStorage.dataStore();
 		AccessControlFacet ac = AccessControlFacet(address(this));
@@ -38,7 +38,7 @@ contract PermissionsFacet {
 		}
 
 		// Bypass checks if user has the MINTER_ROLE
-		if (ac.hasRole(MINTER_ROLE(), minter)) {
+		if (ac.hasRole(MINTER_ROLE(), params.minter)) {
 			return;
 		}
 
@@ -65,13 +65,12 @@ contract PermissionsFacet {
 				}
 
 				if (perm.permission == Permission.Addresses) {
-					// Allowed if to is in the list of approved addresses
-					for (uint256 j = 0; j < perm.addresses.length; j++) {
-						if (perm.addresses[j] == minter) {
-							hasPermission = true;
-							hasIndividualPermission = true;
-							break;
-						}
+					bytes32 leaf = keccak256(abi.encodePacked(params.minter));
+					if (
+						MerkleProof.verify(params.proof, perm.merkleRoot, leaf)
+					) {
+						hasPermission = true;
+						hasIndividualPermission = true;
 					}
 				}
 
@@ -79,7 +78,7 @@ contract PermissionsFacet {
 					// Check each address
 					for (uint256 j = 0; j < perm.addresses.length; j++) {
 						uint256 balance = IERC721(perm.addresses[j]).balanceOf(
-							minter
+							params.minter
 						);
 
 						if (balance >= perm.numTokens) {

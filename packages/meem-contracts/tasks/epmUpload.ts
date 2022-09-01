@@ -17,11 +17,37 @@ export async function epmUpload(options: {
 	args: {
 		name: string
 		contract: string
+		env: string
 	}
 	ethers: HardhatEthersHelpers
 	hardhatArguments?: HardhatArguments
 }) {
 	const { args } = options
+
+	let apiKey: string
+	let apiHost: string
+
+	switch (args.env) {
+		case 'alpha':
+			apiKey = process.env.ALPHA_API_KEY as string
+			apiHost = process.env.ALPHA_API_HOST as string
+			break
+		case 'dev':
+			apiKey = process.env.DEV_API_KEY as string
+			apiHost = process.env.DEV_API_HOST as string
+			break
+		case 'stage':
+			apiKey = process.env.STAGE_API_KEY as string
+			apiHost = process.env.STAGE_API_HOST as string
+			break
+		case 'prod':
+			apiKey = process.env.PROD_API_KEY as string
+			apiHost = process.env.PROD_API_HOST as string
+			break
+
+		default:
+			throw new Error(`Invalid environment ${args.env}`)
+	}
 
 	const contractsPath = path.join(
 		process.cwd(),
@@ -60,8 +86,8 @@ export async function epmUpload(options: {
 				log.superInfo(`Uploading contract for: ${filename}`)
 				try {
 					await request
-						.post(`${process.env.API_HOST}/api/1.0/contracts`)
-						.set('Authorization', `JWT ${process.env.API_KEY}`)
+						.post(`${apiHost}/api/1.0/contracts`)
+						.set('Authorization', `JWT ${apiKey}`)
 						.send({
 							name: `${filename} ${args.name}`,
 							description: args.name,
@@ -98,6 +124,13 @@ task('epmUpload', 'Deploys contracts to EPM')
 	.addParam(
 		'name',
 		'The name of the contract group',
+		undefined,
+		types.string,
+		false
+	)
+	.addParam(
+		'env',
+		'The name of the environment to upload to. "alpha", "dev", "stage", or "prod"',
 		undefined,
 		types.string,
 		false
