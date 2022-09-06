@@ -15,10 +15,11 @@ export interface ICut {
 export async function deployProxy(options: {
 	ownerAddress: string
 	signer: ethers.Signer
+	overrides?: ethers.Overrides
 }) {
-	const { ownerAddress, signer } = options
+	const { ownerAddress, signer, overrides } = options
 	const proxy = new ethers.ContractFactory(aft.abi, aft.bytecode, signer)
-	const deployedProxy = await proxy.deploy(ownerAddress)
+	const deployedProxy = await proxy.deploy(ownerAddress, overrides)
 	await deployedProxy.deployed()
 
 	return deployedProxy
@@ -175,8 +176,10 @@ export async function upgrade(options: {
 	proxyContractAddress: string
 	fromVersion: IFacetVersion[]
 	toVersion: IFacetVersion[]
+	overrides?: ethers.Overrides
 }): Promise<Transaction | undefined> {
-	const { signer, proxyContractAddress, fromVersion, toVersion } = options
+	const { signer, proxyContractAddress, fromVersion, toVersion, overrides } =
+		options
 
 	const cuts = getCuts({ proxyContractAddress, fromVersion, toVersion })
 
@@ -193,7 +196,8 @@ export async function upgrade(options: {
 	const tx = await diamondCut.diamondCut(
 		cuts,
 		ethers.constants.AddressZero,
-		'0x'
+		'0x',
+		overrides
 	)
 
 	await tx.wait()
