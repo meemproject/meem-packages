@@ -207,7 +207,7 @@ contract MeemBaseERC721Facet is
 		}
 
 		// By default, send the funds back
-		payable(msg.sender).transfer(msg.value);
+		payable(msgSender).transfer(msg.value);
 	}
 
 	/**
