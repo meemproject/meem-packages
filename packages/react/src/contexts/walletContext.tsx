@@ -16,7 +16,7 @@ import React, {
 } from 'react'
 import useSWR from 'swr'
 import Web3Modal from 'web3modal'
-import chains from '../lib/chains.json'
+import { chains } from '../lib/chains'
 import { makeFetcher } from '../lib/fetcher'
 import log from '../lib/log'
 
@@ -330,6 +330,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		const { ethereum } = window
 
 		const chain = chains.find(c => +c.chainId === +newChainId)
+
 		if (!chain) {
 			throw new Error(`Unsupported chain with id: ${newChainId}`)
 		}
