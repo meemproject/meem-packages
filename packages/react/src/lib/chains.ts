@@ -156,8 +156,8 @@ export const chains = [
 		]
 	},
 	{
-		name: 'Görli',
-		title: 'Ethereum Testnet Görli',
+		name: 'Göerli',
+		title: 'Ethereum Testnet Göerli',
 		chain: 'ETH',
 		network: 'testnet',
 		rpc: ['https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
@@ -167,7 +167,7 @@ export const chains = [
 			'https://faucet.goerli.mudit.blog'
 		],
 		nativeCurrency: {
-			name: 'Görli Ether',
+			name: 'Göerli Ether',
 			symbol: 'gorETH',
 			decimals: 18
 		},
