@@ -44,6 +44,15 @@ describe('Access Control', function Test() {
 		assert.isTrue(hasAdminRole)
 	})
 
+	it('Grants the contract owner any role', async () => {
+		const hasMinterRole = await contracts.accessControlFacet.hasRole(
+			// Not a role that's being used. The owner should always have permission though.
+			'0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe2875693c21775825b09',
+			signers[0].address
+		)
+		assert.isTrue(hasMinterRole)
+	})
+
 	it('Can grant minter role', async () => {
 		const minterRole = await contracts.permissionsFacet.MINTER_ROLE()
 		await contracts.accessControlFacet.grantRole(minterRole, signers[1].address)
@@ -62,5 +71,47 @@ describe('Access Control', function Test() {
 				.connect(signers[1])
 				.grantRole(minterRole, signers[2].address)
 		)
+	})
+
+	it('Can set the admin contract', async () => {
+		const { DiamondProxy } = await deployDiamond({
+			args: {
+				proxy: true
+			},
+			ethers
+		})
+
+		const adminContracts = await getMeemContracts(DiamondProxy)
+
+		const adminRole = await contracts.accessControlFacet.ADMIN_ROLE()
+
+		let hasAdminRole = await contracts.accessControlFacet.hasRole(
+			adminRole,
+			signers[1].address
+		)
+
+		assert.isFalse(hasAdminRole)
+
+		await contracts.accessControlFacet.setAdminContract(DiamondProxy)
+
+		hasAdminRole = await contracts.accessControlFacet.hasRole(
+			adminRole,
+			signers[1].address
+		)
+
+		assert.isFalse(hasAdminRole)
+
+		await adminContracts.meemBaseERC721Facet.mint({
+			to: signers[1].address,
+			tokenType: TokenType.Original,
+			tokenURI: ''
+		})
+
+		hasAdminRole = await contracts.accessControlFacet.hasRole(
+			adminRole,
+			signers[1].address
+		)
+
+		assert.isTrue(hasAdminRole)
 	})
 })

@@ -18,6 +18,7 @@ library AccessControlStorage {
 		mapping(bytes32 => RoleData) roles;
 		mapping(bytes32 => address[]) rolesList;
 		mapping(bytes32 => mapping(address => uint256)) rolesListIndex;
+		address adminContract;
 	}
 
 	function dataStore() internal pure returns (DataStore storage l) {

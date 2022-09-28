@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
+import {MeemDiamond} from '../../proxies/MeemDiamond.sol';
+import {IERC721} from '@solidstate/contracts/token/ERC721/IERC721.sol';
 import {AccessControlStorage} from './AccessControlStorage.sol';
 import {LibAccessControl} from './LibAccessControl.sol';
 import {Array} from '../utils/Array.sol';
@@ -90,11 +92,38 @@ contract AccessControlFacet {
 		emit MeemRoleRevoked(role, user);
 	}
 
-	/// @notice Grant a role to a user. The granting user must have the ADMIN_ROLE
-	/// @param user The wallet address of the user to revoke the role from
-	/// @param role The role to revoke
+	/// @notice Check if a user has a role
+	/// @param user The wallet address of the user
+	/// @param role The role
 	function hasRole(bytes32 role, address user) public view returns (bool) {
-		return AccessControlStorage.dataStore().roles[role].members[user];
+		MeemDiamond diamond = MeemDiamond(payable(address(this)));
+
+		AccessControlStorage.DataStore storage s = AccessControlStorage
+			.dataStore();
+
+		// Check explicitly assigned roles
+		if (s.roles[role].members[user]) {
+			return true;
+		}
+
+		// Owner always has permission / all roles
+		if (diamond.owner() == user) {
+			return true;
+		}
+
+		// Check if the user has the role via a token
+		if (
+			s.adminContract != address(0) &&
+			role == AccessControlStorage.ADMIN_ROLE
+		) {
+			uint256 balance = IERC721(s.adminContract).balanceOf(user);
+
+			if (balance > 0) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/// @notice Get the list of users with a role
@@ -112,5 +141,19 @@ contract AccessControlFacet {
 		if (!ac.hasRole(role, user)) {
 			revert(AccessControlError.MissingRequiredRole);
 		}
+	}
+
+	/// @notice Gets the admin contract address
+	/// @return The admin contract address (or address(0) if not set)
+	function adminContract() public view returns (address) {
+		return AccessControlStorage.dataStore().adminContract;
+	}
+
+	/// @notice Set the admin contract address
+	function setAdminContract(address newAdminContract) public {
+		AccessControlFacet ac = AccessControlFacet(address(this));
+		ac.requireRole(AccessControlStorage.ADMIN_ROLE, msg.sender);
+
+		AccessControlStorage.dataStore().adminContract = newAdminContract;
 	}
 }

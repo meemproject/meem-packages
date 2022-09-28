@@ -5,6 +5,7 @@ import {Array} from '../utils/Array.sol';
 import {MeemPermission, Permission} from '../interfaces/MeemStandard.sol';
 import {PermissionsStorage} from './PermissionsStorage.sol';
 import {AccessControlFacet, AccessControlError} from '../AccessControl/AccessControlFacet.sol';
+import {AccessControlStorage} from '../AccessControl/AccessControlStorage.sol';
 import {MeemBaseERC721Facet, RequireCanMintParams} from '../MeemERC721/MeemBaseERC721Facet.sol';
 import {IERC721} from '@solidstate/contracts/token/ERC721/IERC721.sol';
 import {MerkleProof} from '@openzeppelin/contracts/utils/cryptography/MerkleProof.sol';
@@ -46,8 +47,11 @@ contract PermissionsFacet {
 			revert(PermissionsError.MaxSupplyExceeded);
 		}
 
-		// Bypass checks if user has the MINTER_ROLE
-		if (ac.hasRole(MINTER_ROLE(), params.minter)) {
+		// Bypass checks if user has the MINTER_ROLE or ADMIN_ROLE
+		if (
+			ac.hasRole(MINTER_ROLE(), params.minter) ||
+			ac.hasRole(AccessControlStorage.ADMIN_ROLE, params.minter)
+		) {
 			return;
 		}
 
