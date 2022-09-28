@@ -17,7 +17,7 @@ const config: HardhatUserConfig = {
 		outDir: './typechain'
 	},
 	solidity: {
-		version: '0.8.4',
+		version: '0.8.13',
 		settings: {
 			optimizer: {
 				enabled: true,
@@ -83,6 +83,11 @@ const config: HardhatUserConfig = {
 			accounts: process.env.LOCAL_MNEMONIC
 				? { mnemonic: process.env.LOCAL_MNEMONIC }
 				: [process.env.LOCAL_WALLET_PRIVATE_KEY!].filter(Boolean)
+		},
+		hardhat: {
+			mining: {
+				auto: true
+			}
 		}
 	},
 	etherscan: {

@@ -1,0 +1,22 @@
+{
+	"extends": "solhint:recommended",
+	"plugins": [],
+	"rules": {
+		"quotes": [
+			"error",
+			"single"
+		],
+		"no-empty-blocks": "off",
+		"const-name-snakecase": "off",
+		"compiler-version": [
+			"error",
+			"^0.8.4"
+		],
+		"func-visibility": [
+			"warn",
+			{
+				"ignoreConstructors": true
+			}
+		]
+	}
+}

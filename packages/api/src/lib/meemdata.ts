@@ -45,6 +45,18 @@ export const meemDataFromApiMeem = (meemApiData: MeemAPI.IMetadataMeem) => {
 		}
 	})
 
+	let upvotes = 0
+	let downvotes = 0
+
+	if (meemApiData.reactionCounts) {
+		if (meemApiData.reactionCounts.upvote) {
+			upvotes = meemApiData.reactionCounts.upvote
+		}
+		if (meemApiData.reactionCounts.downvote) {
+			downvotes = meemApiData.reactionCounts.downvote
+		}
+	}
+
 	const meemDataModel: MeemData = {
 		// childMeemCount: meemApiData.childCount,
 		childMeemCount: 0,
@@ -71,13 +83,9 @@ export const meemDataFromApiMeem = (meemApiData: MeemAPI.IMetadataMeem) => {
 				: '',
 		project: getMeemProject(meemApiData.parentTokenId),
 		rawMeem: meemApiData,
-		reactionDownvotes: meemApiData.reactionCounts.downvote
-			? meemApiData.reactionCounts.downvote
-			: 0,
+		reactionDownvotes: downvotes,
 		reactionDownvoteFromMe: hasDownvotesFromMe,
-		reactionUpvotes: meemApiData.reactionCounts.upvote
-			? meemApiData.reactionCounts.upvote
-			: 0,
+		reactionUpvotes: upvotes,
 		reactionUpvoteFromMe: hasUpvotesFromMe,
 		title: meemMetadata.name,
 		tokenId: meemApiData.tokenId,

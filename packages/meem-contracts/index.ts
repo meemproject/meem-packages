@@ -1,2 +1,3 @@
-export * from './types/ethers-contracts'
-// export * from './typechain'
+/* eslint-disable import/export */
+export * from './src'
+// export * from './types'

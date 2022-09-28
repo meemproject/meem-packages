@@ -22,12 +22,14 @@
     "strictNullChecks": true,
     "target": "es6",
   },
-  "exclude": ["**/dist"],
+  "exclude": ["**/dist", "./test/old"],
   "include": [
     "./tasks",
     "./test",
     "./scripts",
-    "./types"
+    "./types",
+    "./src",
+    "./versions"
   ],
-  "files": ["./hardhat.config.ts"]
+  "files": ["./hardhat.config.ts", "./index.ts"]
 }

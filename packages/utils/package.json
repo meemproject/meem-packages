@@ -1,6 +1,6 @@
 {
 	"name": "@meemproject/utils",
-	"version": "0.1.7",
+	"version": "0.8.6",
 	"main": "build/index.js",
 	"license": "MIT",
 	"files": [
@@ -16,7 +16,8 @@
 		"build": "npm run clean ; tsc ; echo \"Finished Building\"",
 		"lint": "eslint --max-warnings=0 --ext=.ts,.tsx . && tsc -p . --noEmit",
 		"lint:fix": "eslint --fix --ext=.ts,.tsx .",
-		"watch": "yarn run build && chokidar 'src/**/*.(js|jsx|ts|tsx)' -c 'yarn run build'"
+		"watch": "yarn run build && chokidar 'src/**/*.(js|jsx|ts|tsx)' -c 'yarn run build'",
+		"link": "yarn link"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^9.0.13",
@@ -24,7 +25,7 @@
 		"@types/superagent": "^4.1.15",
 		"chokidar-cli": "^3.0.0",
 		"eslint": "^8.13.0",
-		"eslint-config-kengoldfarb": "1.4.1",
+		"eslint-config-kengoldfarb": "^1.4.2",
 		"fs-extra": "^10.0.1",
 		"superagent": "^7.1.2",
 		"ts-node": "^10.7.0",
@@ -33,8 +34,8 @@
 	},
 	"dependencies": {
 		"@kengoldfarb/log": "^1.0.5",
-		"@meemproject/meem-contracts": "^0.1.7",
-		"ethers": "^5.6.3"
+		"@meemproject/meem-contracts": "^0.8.6",
+		"ethers": "^5.6.4"
 	},
 	"publishConfig": {
 		"access": "public",
