@@ -5,6 +5,7 @@ import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-etherscan'
 import '@float-capital/solidity-coverage'
 import '@typechain/hardhat'
+import 'solidity-docgen'
 import 'hardhat-abi-exporter'
 import 'hardhat-gas-reporter'
 import 'hardhat-contract-sizer'
@@ -13,6 +14,9 @@ import './tasks'
 dotenv.config()
 
 const config: HardhatUserConfig = {
+	docgen: {
+		pages: 'files'
+	},
 	typechain: {
 		outDir: './typechain'
 	},

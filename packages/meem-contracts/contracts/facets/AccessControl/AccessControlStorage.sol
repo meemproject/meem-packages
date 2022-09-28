@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
+/// @title Storage layout for Access Control
 library AccessControlStorage {
 	bytes32 internal constant STORAGE_SLOT =
 		keccak256('meem.contracts.storage.AccessControl');
