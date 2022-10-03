@@ -95,6 +95,17 @@ contract AccessControlFacet {
 	/// @notice Check if a user has a role
 	/// @param user The wallet address of the user
 	/// @param role The role
+	function hasAssignedRole(bytes32 role, address user)
+		public
+		view
+		returns (bool)
+	{
+		return AccessControlStorage.dataStore().roles[role].members[user];
+	}
+
+	/// @notice Check if a user has a role
+	/// @param user The wallet address of the user
+	/// @param role The role
 	function hasRole(bytes32 role, address user) public view returns (bool) {
 		MeemDiamond diamond = MeemDiamond(payable(address(this)));
 

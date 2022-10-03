@@ -114,4 +114,65 @@ describe('Access Control', function Test() {
 
 		assert.isTrue(hasAdminRole)
 	})
+
+	it('Can set multiple roles for wallets on init', async () => {
+		const { DiamondProxy } = await deployDiamond({
+			args: {
+				proxy: true,
+				noInit: true
+			},
+			ethers
+		})
+
+		const meemContracts = await getMeemContracts(DiamondProxy)
+
+		await meemContracts.adminFacet.initialize({
+			contractURI: '',
+			roles: [
+				{
+					role: '0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775',
+					user: '0xbA343C26ad4387345edBB3256e62f4bB73d68a04',
+					hasRole: true
+				},
+				{
+					role: '0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775',
+					user: '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5',
+					hasRole: true
+				},
+				{
+					role: '0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6',
+					user: '0xbA343C26ad4387345edBB3256e62f4bB73d68a04',
+					hasRole: true
+				},
+				{
+					role: '0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6',
+					user: '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5',
+					hasRole: true
+				},
+				{
+					role: '0x189ab7a9244df0848122154315af71fe140f3db0fe014031783b0946b8c9d2e3',
+					user: '0xde19C037a85A609ec33Fc747bE9Db8809175C3a5',
+					hasRole: true
+				}
+			],
+			isTransferLocked: false,
+			maxSupply: 0,
+			mintPermissions: [],
+			name: 'test',
+			symbol: 'test',
+			splits: []
+		})
+
+		const minterRoles = await meemContracts.accessControlFacet.getRoles(
+			'0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775'
+		)
+
+		const adminRoles = await meemContracts.accessControlFacet.getRoles(
+			'0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6'
+		)
+
+		console.log(adminRoles)
+		assert.equal(adminRoles.length, 2)
+		assert.equal(minterRoles.length, 2)
+	})
 })
