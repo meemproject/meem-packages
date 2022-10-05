@@ -660,7 +660,74 @@ export namespace MeemAPI {
 		memberMeemIds: IMeemIdentity[]
 	}
 	
+	export interface IDiscordServer {
+		id: string
+		name: string
+		icon: string
+		owner: boolean
+		guildData: {
+			serverIcon: string
+			serverName: string
+			serverId: string
+			categories: {
+				id: string
+				name: string
+				channels: {
+					id: string
+					name: string
+					roles: any[]
+				}[]
+			}[]
+			roles: {
+				guild: string
+				icon: string | null
+				unicodeEmoji: string | null
+				id: string
+				name: string
+			}[]
+			isAdmin: boolean
+			membersWithoutRole: number
+			channels: {
+				id: string
+				name: string
+			}[]
+		}
+	}
+	
 	export namespace v1 {
+	
+	export namespace AuthenticateWithDiscord {
+		export interface IPathParams {}
+	
+		export const path = (options: IPathParams) => `/api/1.0/discord/authenticate`
+	
+		export const method = HttpMethod.Post
+	
+		export interface IQueryParams {}
+	
+		export interface IRequestBody {
+			/** The Discord authentication code */
+			authCode: string
+			/** The Discord authentication callback url */
+			redirectUri: string
+		}
+	
+		export interface IResponseBody extends IApiResponseBody {
+			user: { [key: string]: any }
+			accessToken: string
+		}
+	
+		export interface IDefinition {
+			pathParams: IPathParams
+			queryParams: IQueryParams
+			requestBody: IRequestBody
+			responseBody: IResponseBody
+		}
+	
+		export type Response = IResponseBody | IError
+	}
+	
+	
 	
 	export namespace BulkMint {
 		export interface IPathParams {
@@ -1372,6 +1439,40 @@ export namespace MeemAPI {
 		export interface IRequestBody {}
 	
 		export interface IResponseBody extends IApiResponseBody {}
+	
+		export interface IDefinition {
+			pathParams: IPathParams
+			queryParams: IQueryParams
+			requestBody: IRequestBody
+			responseBody: IResponseBody
+		}
+	
+		export type Response = IResponseBody | IError
+	}
+	
+	
+	
+	export namespace GetDiscordServers {
+		export interface IPathParams {}
+	
+		export const path = (options: IPathParams) => `/api/1.0/discord/servers`
+	
+		export const method = HttpMethod.Get
+	
+		export interface IQueryParams {
+			accessToken: string
+		}
+	
+		export interface IRequestBody {
+			/** The Discord authentication code */
+			authCode: string
+			/** The Discord authentication callback url */
+			redirectUri: string
+		}
+	
+		export interface IResponseBody extends IApiResponseBody {
+			discordServers: IDiscordServer[]
+		}
 	
 		export interface IDefinition {
 			pathParams: IPathParams
@@ -2244,13 +2345,13 @@ export namespace MeemAPI {
 	
 		export interface IRequestBody {
 			/** Contract metadata */
-			metadata: IMeemContractMetadataLike
+			metadata?: IMeemContractMetadataLike
 	
 			/** The symbol for the token. If omitted, will use a slug of the name */
 			symbol?: string
 	
 			/** The name of the token */
-			name: string
+			name?: string
 	
 			/** Contract admins */
 			admins?: string[]
@@ -2259,7 +2360,7 @@ export namespace MeemAPI {
 			minters?: string[]
 	
 			/** The max number of tokens */
-			maxSupply: string
+			maxSupply?: string
 	
 			/** Minting permissions */
 			mintPermissions?: IMeemPermission[]
@@ -2547,6 +2648,10 @@ export namespace MeemAPI {
 	
 	
 	export namespace UpdateMeemContractRole {
+		export interface DiscordRoleIntegrationData {
+			discordServerId: string
+			discordGatedChannels: string[]
+		}
 		export interface IPathParams {
 			/** The meem contract id to fetch */
 			meemContractId: string
@@ -2568,6 +2673,11 @@ export namespace MeemAPI {
 			permissions?: string[]
 			/** Wallet addresses of members */
 			members?: string[]
+			/** Role integration data */
+			roleIntegrationsData?: (
+				| DiscordRoleIntegrationData
+				| { [key: string]: any }
+			)[]
 		}
 	
 		export interface IResponseBody extends IApiResponseBody {
