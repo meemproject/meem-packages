@@ -44,14 +44,14 @@ const config: HardhatUserConfig = {
 		},
 		arbgoerli: {
 			timeout: 120000,
-			url: process.env.ARBITRUM_GOERLI_RPC_URL,
+			url: process.env.ARBITRUM_GOERLI_RPC_URL ?? '',
 			accounts: process.env.LIVE_MNEMONIC
 				? { mnemonic: process.env.LIVE_MNEMONIC }
 				: [process.env.LIVE_WALLET_PRIVATE_KEY!].filter(Boolean)
 		},
 		goerli: {
 			timeout: 120000,
-			url: process.env.GOERLI_RPC_URL,
+			url: process.env.GOERLI_RPC_URL ?? '',
 			accounts: process.env.LIVE_MNEMONIC
 				? { mnemonic: process.env.LIVE_MNEMONIC }
 				: [process.env.LIVE_WALLET_PRIVATE_KEY!].filter(Boolean)
