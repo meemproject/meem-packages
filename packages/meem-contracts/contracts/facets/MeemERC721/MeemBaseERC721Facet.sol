@@ -43,6 +43,7 @@ struct RequireCanMintParams {
 	bytes32[] proof;
 }
 
+/// @title The base ERC-721 Meem contract implementation
 contract MeemBaseERC721Facet is
 	ISolidStateERC721,
 	ERC721Facet,
@@ -54,16 +55,18 @@ contract MeemBaseERC721Facet is
 	using EnumerableMap for EnumerableMap.UintToAddressMap;
 	using UintUtils for uint256;
 
+	/// @notice Emitted when a token is transferred
+	/// @param from The address the token is being transferred from
+	/// @param to The address the token is being transferred to
+	/// @param tokenId The token being transferred
 	event MeemTransfer(
 		address indexed from,
 		address indexed to,
 		uint256 indexed tokenId
 	);
 
-	/**
-	 * @notice Bulk Mint Meems
-	 * @param bulkParams Array of minting parameters
-	 */
+	/// @notice Bulk Mint tokens
+	/// @param bulkParams Array of minting parameters
 	function bulkMint(MintParameters[] memory bulkParams)
 		public
 		payable
@@ -99,10 +102,8 @@ contract MeemBaseERC721Facet is
 		}
 	}
 
-	/**
-	 * @notice Mint a Meem
-	 * @param params The minting parameters
-	 */
+	/// @notice Mint a token
+	/// @param params The minting parameters
 	function mint(MintParameters memory params) public payable virtual {
 		MeemBaseStorage.DataStore storage s = MeemBaseStorage.dataStore();
 		s.tokenCounter++;
@@ -124,10 +125,8 @@ contract MeemBaseERC721Facet is
 		facet.handleSaleDistribution{value: msg.value}(0, msg.sender);
 	}
 
-	/**
-	 * @notice Mint a Meem
-	 * @param params The minting parameters
-	 */
+	/// @notice Mint a token and provide a proof that the minter is in the allowlist
+	/// @param params The minting parameters
 	function mintWithProof(MintWithProofParameters memory params)
 		public
 		payable
@@ -156,6 +155,8 @@ contract MeemBaseERC721Facet is
 		facet.handleSaleDistribution{value: msg.value}(0, msg.sender);
 	}
 
+	/// @notice Get the token URI
+	/// @param tokenId The tokenId to get the token URI for
 	function tokenURI(uint256 tokenId)
 		public
 		view
@@ -194,10 +195,9 @@ contract MeemBaseERC721Facet is
 		}
 	}
 
-	/**
-	 * @notice When a token is sold, distribute the royalties
-	 * @param tokenId The token that is being sold. This function will also be called when a token is minted with tokenId=0.
-	 */
+	/// @notice When a token is sold, distribute the royalties
+	/// @param tokenId The token that is being purchased. This function will also be called when a token is minted with tokenId=0.
+	/// @param msgSender The address who is purchasing the token
 	function handleSaleDistribution(uint256 tokenId, address msgSender)
 		public
 		payable
@@ -207,23 +207,19 @@ contract MeemBaseERC721Facet is
 		}
 
 		// By default, send the funds back
-		payable(msg.sender).transfer(msg.value);
+		payable(msgSender).transfer(msg.value);
 	}
 
-	/**
-	 * @notice Require that an address can mint a token
-	 * @param params The requirement parameters
-	 */
+	/// @notice Require that an address can mint a token
+	/// @param params The requirement parameters
 	function requireCanMint(RequireCanMintParams memory params)
 		public
 		payable
 	{}
 
-	/**
-	 * @notice Require that an address is a token admin. By default only the token owner is an admin
-	 * @param addy The address to check
-	 * @param tokenId The token id to check
-	 */
+	/// @notice Require that an address is a token admin. By default only the token owner is an admin
+	/// @param tokenId The token id to check
+	/// @param addy The address to check
 	function requireTokenAdmin(uint256 tokenId, address addy) public view {
 		if (tokenId == 0) {
 			requireAdmin();
@@ -232,10 +228,10 @@ contract MeemBaseERC721Facet is
 		}
 	}
 
-	/**
-	 * @notice Check if a token can be transferred
-	 * @param tokenId The token id to check
-	 */
+	/// @notice Check if a token can be transferred
+	/// @param from The address the token is being transferred from
+	/// @param to The address the token is being transferred to
+	/// @param tokenId The token id to check
 	function requireCanTransfer(
 		address from,
 		address to,
@@ -257,9 +253,10 @@ contract MeemBaseERC721Facet is
 			});
 	}
 
-	/**
-	 * Override
-	 */
+	/// @notice Transfer a token
+	/// @param from The address the token is being transferred from
+	/// @param to The address the token is being transferred to
+	/// @param tokenId The token id to transfer
 	function transferFrom(
 		address from,
 		address to,
@@ -273,9 +270,10 @@ contract MeemBaseERC721Facet is
 		_transfer(from, to, tokenId);
 	}
 
-	/**
-	 * Override
-	 */
+	/// @notice Safely transfer a token
+	/// @param from The address the token is being transferred from
+	/// @param to The address the token is being transferred to
+	/// @param tokenId The token id to transfer
 	function safeTransferFrom(
 		address from,
 		address to,
@@ -284,9 +282,11 @@ contract MeemBaseERC721Facet is
 		safeTransferFrom(from, to, tokenId, '');
 	}
 
-	/**
-	 * Override
-	 */
+	/// @notice Safely transfer a token
+	/// @param from The address the token is being transferred from
+	/// @param to The address the token is being transferred to
+	/// @param tokenId The token id to transfer
+	/// @param data The data
 	function safeTransferFrom(
 		address from,
 		address to,
@@ -301,6 +301,8 @@ contract MeemBaseERC721Facet is
 		_safeTransfer(from, to, tokenId, data);
 	}
 
+	/// @notice Burns a token (sends it to the 0x0 address)
+	/// @param tokenId The token id to burn
 	function burn(uint256 tokenId) public {
 		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
 		facet.requireTokenAdmin(tokenId, msg.sender);
@@ -308,6 +310,10 @@ contract MeemBaseERC721Facet is
 		_burn(tokenId);
 	}
 
+	/// @notice Runs before a token is transferred
+	/// @param from The address the token is being transferred from
+	/// @param to The address the token is being transferred to
+	/// @param tokenId The token id to burn
 	function _beforeTokenTransfer(
 		address from,
 		address to,
@@ -323,6 +329,7 @@ contract MeemBaseERC721Facet is
 		emit MeemTransfer(from, to, tokenId);
 	}
 
+	/// @notice Convenience function to require the caller to be an admin
 	function requireAdmin() internal view {
 		AccessControlFacet ac = AccessControlFacet(address(this));
 		if (!ac.hasRole(ac.ADMIN_ROLE(), msg.sender)) {

@@ -5,6 +5,7 @@ import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-etherscan'
 import '@float-capital/solidity-coverage'
 import '@typechain/hardhat'
+import 'solidity-docgen'
 import 'hardhat-abi-exporter'
 import 'hardhat-gas-reporter'
 import 'hardhat-contract-sizer'
@@ -13,6 +14,9 @@ import './tasks'
 dotenv.config()
 
 const config: HardhatUserConfig = {
+	docgen: {
+		pages: 'files'
+	},
 	typechain: {
 		outDir: './typechain'
 	},
@@ -37,6 +41,20 @@ const config: HardhatUserConfig = {
 			accounts: process.env.TESTNET_MNEMONIC
 				? { mnemonic: process.env.TESTNET_MNEMONIC }
 				: [process.env.TESTNET_WALLET_PRIVATE_KEY!].filter(Boolean)
+		},
+		arbgoerli: {
+			timeout: 120000,
+			url: process.env.ARBITRUM_GOERLI_RPC_URL ?? '',
+			accounts: process.env.LIVE_MNEMONIC
+				? { mnemonic: process.env.LIVE_MNEMONIC }
+				: [process.env.LIVE_WALLET_PRIVATE_KEY!].filter(Boolean)
+		},
+		goerli: {
+			timeout: 120000,
+			url: process.env.GOERLI_RPC_URL ?? '',
+			accounts: process.env.LIVE_MNEMONIC
+				? { mnemonic: process.env.LIVE_MNEMONIC }
+				: [process.env.LIVE_WALLET_PRIVATE_KEY!].filter(Boolean)
 		},
 		polygon: {
 			timeout: 120000,

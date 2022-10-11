@@ -34,6 +34,7 @@ library MeemDiamondError {
 	string public constant NoPermission = 'NO_PERMISSION';
 }
 
+/// @title An EIP-2535 Diamond proxy contract implementation for Meem contracts. Based on the SolidState Diamond implementation.
 contract MeemDiamond is
 	ISolidStateDiamond,
 	DiamondBase,
@@ -43,12 +44,16 @@ contract MeemDiamond is
 {
 	using OwnableStorage for OwnableStorage.Layout;
 
+	/// @notice Emitted when the contract is created
 	event MeemDiamondCreated();
 
 	using DiamondBaseStorage for DiamondBaseStorage.Layout;
 	using ERC165Storage for ERC165Storage.Layout;
 	using OwnableStorage for OwnableStorage.Layout;
 
+	/// @notice Set some basic permissions for the contract during creation
+	/// @param owner The address that should assigned ownership of the contract
+	/// @param upgraders Addresses that have the ability to upgrade the contract
 	constructor(address owner, address[] memory upgraders) {
 		ERC165Storage.Layout storage erc165 = ERC165Storage.layout();
 		bytes4[] memory selectors = new bytes4[](12);
@@ -118,6 +123,10 @@ contract MeemDiamond is
 		emit MeemDiamondCreated();
 	}
 
+	/// @notice Perform a "diamond cut" to add, replace, or remove functions
+	/// @param facetCuts The cuts to make
+	/// @param target The target
+	/// @param data Data for the cut function
 	function diamondCut(
 		FacetCut[] calldata facetCuts,
 		address target,

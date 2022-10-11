@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
+/// @title Storage layout for Access Control
 library AccessControlStorage {
 	bytes32 internal constant STORAGE_SLOT =
 		keccak256('meem.contracts.storage.AccessControl');
@@ -17,6 +18,7 @@ library AccessControlStorage {
 		mapping(bytes32 => RoleData) roles;
 		mapping(bytes32 => address[]) rolesList;
 		mapping(bytes32 => mapping(address => uint256)) rolesListIndex;
+		address adminContract;
 	}
 
 	function dataStore() internal pure returns (DataStore storage l) {

@@ -8,8 +8,16 @@ import {RoyaltiesV2} from './RoyaltiesV2.sol';
 import {MeemBaseERC721Facet} from '../MeemERC721/MeemBaseERC721Facet.sol';
 import {PermissionsError} from '../Permissions/PermissionsFacet.sol';
 
+/// @title Handles token sales and currency distributions. Compatible with Rarible v2 royalties.
 contract SplitsFacet is RoyaltiesV2 {
+	/// @notice Emitted when token splits are set
+	/// @param tokenId The token
+	/// @param splits The new splits for the token
 	event MeemSplitsSet(uint256 tokenId, Split[] splits);
+
+	/// @notice Rarible v2 compatible event when royalties (splits) are set
+	/// @param tokenId The token
+	/// @param royalties The royalties assigned to the token
 	event RoyaltiesSet(uint256 tokenId, Part[] royalties);
 
 	function getRaribleV2Royalties(uint256 tokenId)
@@ -21,6 +29,9 @@ contract SplitsFacet is RoyaltiesV2 {
 		return LibSplits._getRaribleV2Royalties(tokenId);
 	}
 
+	/// @notice Overrides the MeemBaseERC721Facet function to distrubute royalties
+	/// @param msgSender The address that is purchasing the token
+	/// @param tokenId The token being transferred
 	function handleSaleDistribution(uint256 tokenId, address msgSender)
 		public
 		payable
@@ -50,6 +61,8 @@ contract SplitsFacet is RoyaltiesV2 {
 		}
 	}
 
+	/// @notice Locks the token splits
+	/// @param tokenId The token to lock (0 for minted tokens)
 	function lockSplits(uint256 tokenId) external {
 		MeemBaseERC721Facet baseContract = MeemBaseERC721Facet(address(this));
 		baseContract.requireTokenAdmin(tokenId, msg.sender);
@@ -63,6 +76,9 @@ contract SplitsFacet is RoyaltiesV2 {
 		s.tokenSplits[tokenId].lockedBy = msg.sender;
 	}
 
+	/// @notice Sets the token splits (royalties)
+	/// @param tokenId The token to lock (0 for minted tokens)
+	/// @param splits The new splits
 	function setSplits(uint256 tokenId, Split[] memory splits) external {
 		MeemBaseERC721Facet baseContract = MeemBaseERC721Facet(address(this));
 		baseContract.requireTokenAdmin(tokenId, msg.sender);

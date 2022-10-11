@@ -214,14 +214,14 @@ export const chains = [
 		]
 	},
 	{
-		name: 'Arbitrum Görli',
-		title: 'Arbitrum Testnet Görli',
+		name: 'Arbitrum Göerli',
+		title: 'Arbitrum Testnet Göerli',
 		chain: 'ETH',
 		network: 'testnet',
 		rpc: ['https://goerli-rollup.arbitrum.io/rpc'],
 		faucets: [],
 		nativeCurrency: {
-			name: 'Görli Ether',
+			name: 'Göerli Ether',
 			symbol: 'gorETH',
 			decimals: 18
 		},
@@ -254,7 +254,7 @@ export const chains = [
 		rpc: ['https://goerli.optimism.io/'],
 		faucets: [],
 		nativeCurrency: {
-			name: 'Görli Ether',
+			name: 'Göerli Ether',
 			symbol: 'gorETH',
 			decimals: 18
 		},
