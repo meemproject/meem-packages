@@ -1,8 +1,7 @@
 /* eslint-disable import/named */
-import { ERC20, MeemAPI } from '@meemproject/api'
+import { ERC20, MeemAPI, makeFetcher } from '@meemproject/api'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers, ethers } from 'ethers'
-import Cookies from 'js-cookie'
 import JWT from 'jsonwebtoken'
 import { DateTime } from 'luxon'
 import React, {
@@ -17,7 +16,6 @@ import React, {
 import useSWR from 'swr'
 import Web3Modal from 'web3modal'
 import { chains } from '../lib/chains'
-import { makeFetcher } from '../lib/fetcher'
 import log from '../lib/log'
 
 // Suppress warnings
@@ -33,6 +31,41 @@ ethers.utils.Logger.setLogLevel(ethers.utils.Logger.levels.ERROR)
 // 	mumbai: 80001,
 // 	local: 31337
 // }
+
+const safeLocalStorage = {
+	getItem: (key: string) => {
+		if (typeof localStorage === 'undefined') {
+			return null
+		}
+		try {
+			return localStorage.getItem(key)
+		} catch (e) {
+			log.warn(e)
+		}
+
+		return null
+	},
+	setItem: (key: string, value: string) => {
+		if (typeof localStorage === 'undefined') {
+			return
+		}
+		try {
+			localStorage.setItem(key, value)
+		} catch (e) {
+			log.warn(e)
+		}
+	},
+	removeItem: (key: string) => {
+		if (typeof localStorage === 'undefined') {
+			return
+		}
+		try {
+			localStorage.removeItem(key)
+		} catch (e) {
+			log.warn(e)
+		}
+	}
+}
 
 export enum LoginState {
 	LoggedIn = 'loggedIn',
@@ -154,29 +187,28 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	})
 	const [rpcUrls] = useState(initialRpcUrls)
 
-	const getMeFetcher = makeFetcher<
-		MeemAPI.v1.GetMe.IQueryParams,
-		MeemAPI.v1.GetMe.IRequestBody,
-		MeemAPI.v1.GetMe.IResponseBody
-	>({
-		method: MeemAPI.v1.GetMe.method
-	})
+	const getMeFetcher = useCallback(
+		() =>
+			makeFetcher<
+				MeemAPI.v1.GetMe.IQueryParams,
+				MeemAPI.v1.GetMe.IRequestBody,
+				MeemAPI.v1.GetMe.IResponseBody
+			>({
+				method: MeemAPI.v1.GetMe.method
+			}),
+		[jwt]
+	)
 
-	const cookieJwtToken = Cookies.get('meemJwtToken')
 	const {
 		data: meData,
 		error: isMeemIdError,
 		isValidating: isMeemIdLoading,
 		mutate: meMutate
-	} = useSWR(
-		cookieJwtToken && jwt ? MeemAPI.v1.GetMe.path() : null,
-		getMeFetcher,
-		{
-			shouldRetryOnError: !!jwt
-			// if the user is logged out, they don't have a JWT. dont retry.
-			// docs here => https://github.com/vercel/swr
-		}
-	)
+	} = useSWR(jwt ? MeemAPI.v1.GetMe.path() : null, getMeFetcher, {
+		shouldRetryOnError: !!jwt
+		// if the user is logged out, they don't have a JWT. dont retry.
+		// docs here => https://github.com/vercel/swr
+	})
 
 	useEffect(() => {
 		if (meData) {
@@ -191,15 +223,15 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	}, [jwt, meMutate])
 
 	useEffect(() => {
-		if (isMeemIdError && jwt) {
-			Cookies.remove('meemJwtToken')
-			// setMeemId(undefined)
+		if ((isMeemIdError && jwt) || !jwt) {
+			safeLocalStorage.removeItem('meemJwtToken')
 			setLoginState(LoginState.NotLoggedIn)
 		}
 	}, [isMeemIdError, jwt])
 
 	useEffect(() => {
-		const meemJwtToken = Cookies.get('meemJwtToken')
+		// const meemJwtToken = Cookies.get('meemJwtToken')
+		const meemJwtToken = safeLocalStorage.getItem('meemJwtToken')
 
 		if (meemJwtToken) {
 			const result = JWT.decode(meemJwtToken) as Record<string, any>
@@ -253,16 +285,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		setIsConnected(true)
 	}, [web3Modal])
 
-	const disconnectWallet = useCallback(async () => {
-		web3Modal?.clearCachedProvider()
-		if (provider?.disconnect && typeof provider.disconnect === 'function') {
-			await provider.disconnect()
-		}
-
-		setWeb3Provider(undefined)
-		setAccounts([])
-	}, [provider, web3Modal])
-
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
 			const w3m = new Web3Modal({
@@ -299,21 +321,32 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	}, [])
 
 	const handleAccountsChanged = useCallback((acc: string[]) => {
-		log.debug('handleAccountsChanged', { acc })
 		setAccounts(acc)
-		Cookies.remove('meemJwtToken')
+		safeLocalStorage.removeItem('meemJwtToken')
 		setLoginState(LoginState.NotLoggedIn)
 	}, [])
 
-	const setMeemJwt = useCallback((newMeemJwt: string) => {
+	const setMeemJwt = useCallback((newMeemJwt?: string) => {
 		setLoginState(LoginState.Unknown)
 		setJwt(newMeemJwt)
-		Cookies.set('meemJwtToken', newMeemJwt)
+		if (newMeemJwt) {
+			safeLocalStorage.setItem('meemJwtToken', newMeemJwt)
+		} else {
+			safeLocalStorage.removeItem('meemJwtToken')
+		}
 	}, [])
 
-	if (typeof window !== 'undefined') {
-		window.Cookies = Cookies
-	}
+	const disconnectWallet = useCallback(async () => {
+		setMeemJwt(undefined)
+		web3Modal?.clearCachedProvider()
+		if (provider?.disconnect && typeof provider.disconnect === 'function') {
+			await provider.disconnect()
+		}
+
+		setWeb3Provider(undefined)
+		setAccounts([])
+		meMutate()
+	}, [provider, web3Modal])
 
 	const handleChainChanged = useCallback(
 		(chainHex: string) => {
