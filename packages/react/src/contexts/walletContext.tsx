@@ -296,7 +296,11 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		setLoginState(LoginState.Unknown)
 		setJwt(newMeemJwt)
 		if (newMeemJwt) {
-			Cookies.set('meemJwtToken', newMeemJwt)
+			Cookies.set('meemJwtToken', newMeemJwt, {
+				sameSite: 'strict',
+				secure:
+					typeof window !== 'undefined' && window.location.protocol === 'https:'
+			})
 		} else {
 			Cookies.remove('meemJwtToken')
 			setLoginState(LoginState.NotLoggedIn)
