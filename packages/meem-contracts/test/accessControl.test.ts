@@ -173,6 +173,6 @@ describe('Access Control', function Test() {
 
 		console.log(adminRoles)
 		assert.equal(adminRoles.length, 2)
-		assert.equal(minterRoles.length, 2)
+		assert.equal(minterRoles.length, 3)
 	})
 })
