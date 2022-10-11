@@ -2,6 +2,7 @@
 import { ERC20, MeemAPI, makeFetcher } from '@meemproject/api'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers, ethers } from 'ethers'
+import Cookies from 'js-cookie'
 import JWT from 'jsonwebtoken'
 import { DateTime } from 'luxon'
 import React, {
@@ -31,41 +32,6 @@ ethers.utils.Logger.setLogLevel(ethers.utils.Logger.levels.ERROR)
 // 	mumbai: 80001,
 // 	local: 31337
 // }
-
-const safeLocalStorage = {
-	getItem: (key: string) => {
-		if (typeof localStorage === 'undefined') {
-			return null
-		}
-		try {
-			return localStorage.getItem(key)
-		} catch (e) {
-			log.warn(e)
-		}
-
-		return null
-	},
-	setItem: (key: string, value: string) => {
-		if (typeof localStorage === 'undefined') {
-			return
-		}
-		try {
-			localStorage.setItem(key, value)
-		} catch (e) {
-			log.warn(e)
-		}
-	},
-	removeItem: (key: string) => {
-		if (typeof localStorage === 'undefined') {
-			return
-		}
-		try {
-			localStorage.removeItem(key)
-		} catch (e) {
-			log.warn(e)
-		}
-	}
-}
 
 export enum LoginState {
 	LoggedIn = 'loggedIn',
@@ -224,14 +190,14 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 
 	useEffect(() => {
 		if ((isMeemIdError && jwt) || !jwt) {
-			safeLocalStorage.removeItem('meemJwtToken')
+			Cookies.remove('meemJwtToken')
 			setLoginState(LoginState.NotLoggedIn)
 		}
 	}, [isMeemIdError, jwt])
 
 	useEffect(() => {
 		// const meemJwtToken = Cookies.get('meemJwtToken')
-		const meemJwtToken = safeLocalStorage.getItem('meemJwtToken')
+		const meemJwtToken = Cookies.get('meemJwtToken')
 
 		if (meemJwtToken) {
 			const result = JWT.decode(meemJwtToken) as Record<string, any>
@@ -322,7 +288,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 
 	const handleAccountsChanged = useCallback((acc: string[]) => {
 		setAccounts(acc)
-		safeLocalStorage.removeItem('meemJwtToken')
+		Cookies.remove('meemJwtToken')
 		setLoginState(LoginState.NotLoggedIn)
 	}, [])
 
@@ -330,9 +296,9 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		setLoginState(LoginState.Unknown)
 		setJwt(newMeemJwt)
 		if (newMeemJwt) {
-			safeLocalStorage.setItem('meemJwtToken', newMeemJwt)
+			Cookies.set('meemJwtToken', newMeemJwt)
 		} else {
-			safeLocalStorage.removeItem('meemJwtToken')
+			Cookies.remove('meemJwtToken')
 		}
 	}, [])
 

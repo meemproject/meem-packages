@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie'
 import superagent from 'superagent'
 import { MeemAPI } from '../api.generated'
 
@@ -20,10 +21,7 @@ export function makeFetcher<U, V extends IBody | undefined, X>({
 		const uri = process.env.NEXT_PUBLIC_API_URL
 		// @ts-ignore
 		const req = superagent[method.toLowerCase()](`${uri}${path}`)
-		const jwt =
-			typeof localStorage !== 'undefined'
-				? localStorage.getItem('meemJwtToken')
-				: null
+		const jwt = Cookies.get('meemJwtToken')
 
 		if (jwt) {
 			req.set('Authorization', `JWT ${jwt}`)
@@ -99,10 +97,7 @@ export async function makeRequest<TDefinition extends IEndpoint = IEndpoint>(
 	const method = options?.method ?? MeemAPI.HttpMethod.Get
 	// @ts-ignore
 	const req = superagent[method.toLowerCase()](uri)
-	const jwt =
-		typeof localStorage !== 'undefined'
-			? localStorage.getItem('meemJwtToken')
-			: null
+	const jwt = Cookies.get('meemJwtToken')
 	if (jwt) {
 		req.set('Authorization', `JWT ${jwt}`)
 	}
