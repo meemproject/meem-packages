@@ -221,9 +221,13 @@ contract MeemBaseERC721Facet is
 	/// @param tokenId The token id to check
 	/// @param addy The address to check
 	function requireTokenAdmin(uint256 tokenId, address addy) public view {
+		AccessControlFacet ac = AccessControlFacet(address(this));
+
 		if (tokenId == 0) {
 			requireAdmin();
-		} else if (ownerOf(tokenId) != addy) {
+		} else if (
+			ownerOf(tokenId) != addy && !ac.hasRole(ac.ADMIN_ROLE(), addy)
+		) {
 			revert(Error.NotTokenAdmin);
 		}
 	}
@@ -233,12 +237,12 @@ contract MeemBaseERC721Facet is
 	/// @param to The address the token is being transferred to
 	/// @param tokenId The token id to check
 	function requireCanTransfer(
+		address msgSender,
 		address from,
 		address to,
 		uint256 tokenId
 	) public {
-		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
-		facet.requireTokenAdmin(tokenId, msg.sender);
+		MeemBaseERC721Facet(address(this)).requireTokenAdmin(tokenId, from);
 	}
 
 	function getMeem(uint256 tokenId) public view returns (Meem memory) {
@@ -265,7 +269,7 @@ contract MeemBaseERC721Facet is
 		_handleTransferMessageValue(from, to, tokenId, msg.value);
 
 		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
-		facet.requireCanTransfer(from, to, tokenId);
+		facet.requireCanTransfer(msg.sender, from, to, tokenId);
 
 		_transfer(from, to, tokenId);
 	}
@@ -296,7 +300,7 @@ contract MeemBaseERC721Facet is
 		_handleTransferMessageValue(from, to, tokenId, msg.value);
 
 		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
-		facet.requireCanTransfer(from, to, tokenId);
+		facet.requireCanTransfer(msg.sender, from, to, tokenId);
 
 		_safeTransfer(from, to, tokenId, data);
 	}
@@ -305,9 +309,16 @@ contract MeemBaseERC721Facet is
 	/// @param tokenId The token id to burn
 	function burn(uint256 tokenId) public {
 		MeemBaseERC721Facet facet = MeemBaseERC721Facet(address(this));
-		facet.requireTokenAdmin(tokenId, msg.sender);
 
 		_burn(tokenId);
+	}
+
+	/// @notice Bulk burns tokens (sends it to the 0x0 address)
+	/// @param tokenIds The token ids to burn
+	function bulkBurn(uint256[] memory tokenIds) public {
+		for (uint256 i = 0; i < tokenIds.length; i++) {
+			_burn(tokenIds[i]);
+		}
 	}
 
 	/// @notice Runs before a token is transferred
@@ -321,6 +332,7 @@ contract MeemBaseERC721Facet is
 	) internal virtual override(ERC721BaseInternal, ERC721Metadata) {
 		super._beforeTokenTransfer(from, to, tokenId);
 		MeemBaseERC721Facet(address(this)).requireCanTransfer(
+			msg.sender,
 			from,
 			to,
 			tokenId
