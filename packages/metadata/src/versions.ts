@@ -3,7 +3,8 @@
  */
 export const supportedVersions: { [key: string]: Array<string> } = {
 	Meem: ['20220718'],
-	MeemClub: ['20220718']
+	MeemClub: ['20220718'],
+	MeemClubRole: ['20220718']
 }
 
 /**
@@ -22,6 +23,12 @@ export const supportedVersionsTypeMapping: {
 		20220718: {
 			Contract: 'MeemClub_Contract_20220718',
 			Token: 'MeemClub_Token_20220718'
+		}
+	},
+	MeemClubRole: {
+		20220718: {
+			Contract: 'MeemClubRole_Contract_20220718',
+			Token: 'MeemClubRole_Token_20220718'
 		}
 	}
 }

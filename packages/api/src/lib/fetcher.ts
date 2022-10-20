@@ -22,6 +22,7 @@ export function makeFetcher<U, V extends IBody | undefined, X>({
 		// @ts-ignore
 		const req = superagent[method.toLowerCase()](`${uri}${path}`)
 		const jwt = Cookies.get('meemJwtToken')
+
 		if (jwt) {
 			req.set('Authorization', `JWT ${jwt}`)
 		}

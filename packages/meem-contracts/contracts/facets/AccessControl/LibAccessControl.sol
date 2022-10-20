@@ -10,7 +10,7 @@ library LibAccessControl {
 		AccessControlFacet ac = AccessControlFacet(address(this));
 		AccessControlStorage.DataStore storage s = AccessControlStorage
 			.dataStore();
-		if (!ac.hasRole(role, account)) {
+		if (!ac.hasAssignedRole(role, account)) {
 			s.roles[role].members[account] = true;
 			s.rolesList[role].push(account);
 			s.rolesListIndex[role][account] = s.rolesList[role].length - 1;
@@ -21,7 +21,7 @@ library LibAccessControl {
 		AccessControlFacet ac = AccessControlFacet(address(this));
 		AccessControlStorage.DataStore storage s = AccessControlStorage
 			.dataStore();
-		if (ac.hasRole(role, account)) {
+		if (ac.hasAssignedRole(role, account)) {
 			s.roles[role].members[account] = false;
 			uint256 idx = s.rolesListIndex[role][account];
 			Array.removeAt(s.rolesList[role], idx);

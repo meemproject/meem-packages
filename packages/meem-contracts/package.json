@@ -1,6 +1,6 @@
 {
 	"name": "@meemproject/meem-contracts",
-	"version": "0.8.6",
+	"version": "0.9.4",
 	"description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value.",
 	"author": "Meem Project",
 	"homepage": "https://meem.wtf",
@@ -31,6 +31,7 @@
 		"upgradeFacet": "TS_NODE_TRANSPILE_ONLY=true DEBUG=@meemproject/* hardhat upgradeFacet",
 		"test": "TS_NODE_TRANSPILE_ONLY=true hardhat test --network hardhat",
 		"coverage": "hardhat coverage",
+		"docgen": "hardhat docgen",
 		"network": "TS_NODE_TRANSPILE_ONLY=true hardhat node",
 		"console": "TS_NODE_TRANSPILE_ONLY=true hardhat console",
 		"epmUpload": "TS_NODE_TRANSPILE_ONLY=true hardhat epmUpload",
@@ -91,6 +92,7 @@
 		"prettier-plugin-solidity": "^1.0.0-beta.12",
 		"prompt": "^1.1.0",
 		"solhint": "^3.3.7",
+		"solidity-docgen": "^0.6.0-beta.27",
 		"solregex": "^0.3.1",
 		"ts-node": "^10.0.0",
 		"ts-node-dev": "^1.1.8",

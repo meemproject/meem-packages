@@ -7,7 +7,7 @@
         "meem_contract_type": {
             "description": "The type of Meem Contract. See supported Meem contract types here: https://meem.wtf",
             "examples": [
-                "MeemClub"
+                "meem-club"
             ],
             "type": "string"
         },
@@ -70,7 +70,7 @@
     },
     "examples": [
         {
-            "meem_contract_type": "MeemClub",
+            "meem_contract_type": "meem-club",
             "version": "20220718",
             "name": "Meemsters Union",
             "description": "Meemsters Unite!",
