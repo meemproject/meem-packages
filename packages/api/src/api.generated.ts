@@ -659,7 +659,7 @@ export namespace MeemAPI {
 			rolePlatforms: {
 				guildPlatform: {
 					platformGuildId: string
-					invite: string
+					invite?: string
 					platform: {
 						id: number
 						name: 'DISCORD'
@@ -670,6 +670,18 @@ export namespace MeemAPI {
 		memberMeemIds: IMeemIdentity[]
 	}
 	
+	export interface IGuild {
+		id: number
+		name: string
+		guildPlatforms: {
+			id: number
+			platformId: number
+			platformGuildId: string
+			platformGuildData?: any
+			platformGuildName?: string
+			invite?: string
+		}[]
+	}
 	export interface IDiscordServer {
 		id: string
 		name: string
@@ -1681,6 +1693,7 @@ export namespace MeemAPI {
 		export interface IRequestBody {}
 	
 		export interface IResponseBody extends IApiResponseBody {
+			guild: IGuild | null
 			role: IMeemContractRole
 		}
 	
@@ -1712,7 +1725,7 @@ export namespace MeemAPI {
 		export interface IRequestBody {}
 	
 		export interface IResponseBody extends IApiResponseBody {
-			/** The MeemId */
+			guild: IGuild | null
 			roles: any[]
 		}
 	
