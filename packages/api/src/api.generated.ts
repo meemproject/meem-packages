@@ -656,6 +656,14 @@ export namespace MeemAPI {
 			description: string
 			imageUrl: string | null
 			members: string[]
+			rolePlatforms: {
+				guildPlatform: {
+					invite: string
+					platform: {
+						name: 'DISCORD'
+					}
+				}
+			}[]
 		}
 		memberMeemIds: IMeemIdentity[]
 	}
