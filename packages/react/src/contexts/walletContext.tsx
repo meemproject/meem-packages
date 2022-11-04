@@ -131,7 +131,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	...props
 }: IWalletContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
-	// const [meemContract, setMeemContract] = useState<Meem | undefined>()
 	const [signature, setSignature] = useState('')
 	const [jwt, setJwt] = useState<string>()
 	const [chainId, setChainId] = useState<number>()
