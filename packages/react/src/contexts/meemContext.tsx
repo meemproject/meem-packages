@@ -61,7 +61,7 @@ export interface IChain {
 	}[]
 }
 
-interface IAuthContextState {
+interface IMeemContextState {
 	/** The Web3 provider */
 	web3Provider?: providers.Web3Provider
 
@@ -86,9 +86,9 @@ interface IAuthContextState {
 
 	loginState?: LoginState
 
-	isMeemIdError: boolean
+	isGetMeError: boolean
 
-	isMeemIdLoading: boolean
+	isMeLoading: boolean
 
 	signature: string
 
@@ -103,10 +103,10 @@ interface IAuthContextState {
 	chainId?: number
 }
 
-const AuthContext = createContext({} as IAuthContextState)
+const AuthContext = createContext({} as IMeemContextState)
 AuthContext.displayName = 'AuthContext'
 
-export interface IAuthContextProps {
+export interface IMeemContextProps {
 	children?: ReactNode
 
 	/** Use custom RPC endpoints for a chain */
@@ -122,10 +122,10 @@ export interface IAuthContextProps {
 	}
 }
 
-export const AuthProvider: React.FC<IAuthContextProps> = ({
+export const MeemProvider: React.FC<IMeemContextProps> = ({
 	rpcs,
 	...props
-}: IAuthContextProps) => {
+}: IMeemContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
 	const [signature, setSignature] = useState('')
 	const [jwt, setJwt] = useState<string>()
@@ -162,8 +162,8 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 
 	const {
 		data: meData,
-		error: isMeemIdError,
-		isValidating: isMeemIdLoading,
+		error: isGetMeError,
+		isValidating: isMeLoading,
 		mutate: meMutate
 	} = useSWR(jwt ? MeemAPI.v1.GetMe.path() : null, getMeFetcher, {
 		shouldRetryOnError: !!jwt
@@ -184,11 +184,11 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 	}, [jwt, meMutate])
 
 	useEffect(() => {
-		if (isMeemIdError && jwt) {
+		if (isGetMeError && jwt) {
 			Cookies.remove('meemJwtToken')
 			setLoginState(LoginState.NotLoggedIn)
 		}
-	}, [isMeemIdError, jwt])
+	}, [isGetMeError, jwt])
 
 	useEffect(() => {
 		const meemJwtToken = Cookies.get('meemJwtToken')
@@ -408,8 +408,8 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 			disconnectWallet,
 			isConnected,
 			setJwt: setMeemJwt,
-			isMeemIdLoading,
-			isMeemIdError,
+			isMeLoading,
+			isGetMeError,
 			loginState,
 			signature,
 			updateSignature,
@@ -426,8 +426,8 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 			disconnectWallet,
 			isConnected,
 			setMeemJwt,
-			isMeemIdLoading,
-			isMeemIdError,
+			isMeLoading,
+			isGetMeError,
 			loginState,
 			signature,
 			updateSignature,
@@ -440,11 +440,21 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 	return <AuthContext.Provider value={value} {...props} />
 }
 
+export function useMeem() {
+	const context = useContext(AuthContext)
+
+	if (typeof context === 'undefined') {
+		throw new Error(`useMeem must be used within a MeemProvider`)
+	}
+
+	return context
+}
+
 export function useWallet() {
 	const context = useContext(AuthContext)
 
 	if (typeof context === 'undefined') {
-		throw new Error(`useWallet must be used within a AuthProvider`)
+		throw new Error(`useMeem must be used within a MeemProvider`)
 	}
 
 	return context

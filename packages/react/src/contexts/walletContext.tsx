@@ -214,42 +214,45 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		setJwt(undefined)
 	}, [])
 
-	const connectWallet = useCallback(async () => {
-		let p: any
+	const connectWallet = useCallback(
+		async (to: string) => {
+			let p: any
 
-		try {
-			// This is the initial `provider` that is returned when
-			// using web3Modal to connect. Can be MetaMask or WalletConnect.
-			p = await web3Modal?.connect()
-			log.debug('Connected')
-		} catch (e) {
-			log.warn(e)
-			log.warn(
-				'Error: unable to connect with web3modal. Did the user close the modal?'
-			)
-			return
-		}
+			try {
+				// This is the initial `provider` that is returned when
+				// using web3Modal to connect. Can be MetaMask or WalletConnect.
+				p = to ? await web3Modal?.connectTo(to) : await web3Modal?.connect()
+				log.debug('Connected')
+			} catch (e) {
+				log.warn(e)
+				log.warn(
+					'Error: unable to connect with web3modal. Did the user close the modal?'
+				)
+				return
+			}
 
-		// We plug the initial `provider` into ethers.js and get back
-		// a Web3Provider. This will add on methods from ethers.js and
-		// event listeners such as `.on()` will be different.
-		const w3p = new providers.Web3Provider(p, 'any')
+			// We plug the initial `provider` into ethers.js and get back
+			// a Web3Provider. This will add on methods from ethers.js and
+			// event listeners such as `.on()` will be different.
+			const w3p = new providers.Web3Provider(p, 'any')
 
-		const s = w3p.getSigner()
+			const s = w3p.getSigner()
 
-		const address = await s.getAddress()
+			const address = await s.getAddress()
 
-		const n = await w3p.getNetwork()
+			const n = await w3p.getNetwork()
 
-		setNetwork(n)
-		setChainId(n.chainId)
-		setProvider(p)
+			setNetwork(n)
+			setChainId(n.chainId)
+			setProvider(p)
 
-		setSigner(s)
-		setAccounts([address])
-		setWeb3Provider(w3p)
-		setIsConnected(true)
-	}, [web3Modal])
+			setSigner(s)
+			setAccounts([address])
+			setWeb3Provider(w3p)
+			setIsConnected(true)
+		},
+		[web3Modal]
+	)
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {

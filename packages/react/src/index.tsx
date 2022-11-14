@@ -1,5 +1,5 @@
 export * from './contexts/socketContext'
-export * from './contexts/walletContext'
+export * from './contexts/meemContext'
 export * from './lib/getNodeSize'
 export * from './lib/useMatchMutate'
 export * from './lib/useStateCallback'
