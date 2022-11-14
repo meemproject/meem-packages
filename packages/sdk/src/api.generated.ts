@@ -656,11 +656,132 @@ export interface IMeemContractRole {
 		description: string
 		imageUrl: string | null
 		members: string[]
+		rolePlatforms: {
+			guildPlatform: {
+				platformGuildId: string
+				invite?: string
+				platform: {
+					id: number
+					name: 'DISCORD'
+				}
+			}
+		}[]
 	}
 	memberMeemIds: IMeemIdentity[]
 }
 
+export interface IGuild {
+	id: number
+	name: string
+	guildPlatforms: {
+		id: number
+		platformId: number
+		platformGuildId: string
+		platformGuildData?: any
+		platformGuildName?: string
+		invite?: string
+	}[]
+}
+export interface IDiscordServer {
+	id: string
+	name: string
+	icon: string
+	owner: boolean
+	guildData: {
+		connectedGuildId: number
+		serverIcon: string
+		serverName: string
+		serverId: string
+		categories: {
+			id: string
+			name: string
+			channels: {
+				id: string
+				name: string
+				roles: any[]
+			}[]
+		}[]
+		roles: {
+			guild: string
+			icon: string | null
+			unicodeEmoji: string | null
+			id: string
+			name: string
+		}[]
+		isAdmin: boolean
+		membersWithoutRole: number
+		channels: {
+			id: string
+			name: string
+		}[]
+	}
+}
+
 export namespace v1 {
+
+export namespace AttachIdentity {
+	export interface IPathParams {}
+
+	export const path = () => `/api/1.0/attachIdentity`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** Login w/ access token provided by Auth0 magic link */
+		accessToken?: string
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		/** JWT that can be used for future authentication */
+		jwt: string
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
+export namespace AuthenticateWithDiscord {
+	export interface IPathParams {}
+
+	export const path = (options: IPathParams) => `/api/1.0/discord/authenticate`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** The Discord authentication code */
+		authCode: string
+		/** The Discord authentication callback url */
+		redirectUri: string
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		user: { [key: string]: any }
+		accessToken: string
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
 
 export namespace BulkMint {
 	export interface IPathParams {
@@ -922,11 +1043,14 @@ export namespace CreateMeemContract {
 		/** Whether tokens can be transferred */
 		isTransferLocked?: boolean
 
-		/** If true, will mint a token to the admin wallet addresses  */
-		shouldMintAdminTokens?: boolean
+		/** If true, will mint a token to the admin wallet addresses and any addresses in the members parameter  */
+		shouldMintTokens?: boolean
 
-		/** Admin token metadata */
-		adminTokenMetadata?: IMeemMetadataLike
+		/** Members to mint tokens to */
+		members?: string[]
+
+		/** Token metadata */
+		tokenMetadata?: IMeemMetadataLike
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
@@ -964,6 +1088,10 @@ export namespace CreateMeemContractRole {
 		permissions?: string[]
 		/** Wallet addresses of members */
 		members?: string[]
+		/** Whether the role should be token-based (true) or off-chain (false) */
+		isTokenBasedRole: boolean
+		/** If the role is token-based, is the token transferrable to other wallets */
+		isTokenTransferrable: boolean
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
@@ -1088,7 +1216,7 @@ export namespace CreateOrUpdateMeemContractIntegration {
 
 
 
-export namespace CreateOrUpdateMeemId {
+export namespace CreateOrUpdateUser {
 	export interface IPathParams {}
 
 	export const path = () => `/api/1.0/me`
@@ -1098,55 +1226,12 @@ export namespace CreateOrUpdateMeemId {
 	export interface IQueryParams {}
 
 	export interface IRequestBody {
-		// TODO: Add wallet address with signature to Identity. Remove from any other identity
-		// e.g. Identity merge
-		/** Wallet address to add or lookup by */
-		// address: string
-		/** Signature of wallet address */
-		// signature: string
-
 		/** Profile picture base64 string */
 		profilePicBase64?: string
 		/** Url to profile picture */
 		// profilePicUrl?: string
 		/** Display name of identity */
 		displayName?: string
-	}
-
-	export interface IResponseBody extends IApiResponseBody {
-		status: 'success'
-	}
-
-	export interface IDefinition {
-		pathParams: IPathParams
-		queryParams: IQueryParams
-		requestBody: IRequestBody
-		responseBody: IResponseBody
-	}
-
-	export type Response = IResponseBody | IError
-}
-
-
-
-export namespace CreateOrUpdateMeemIdIntegration {
-	export interface IPathParams {
-		/** The integration id to connect or update */
-		integrationId: string
-	}
-
-	export const path = (options: IPathParams) =>
-		`/api/1.0/me/integrations/${options.integrationId}`
-
-	export const method = HttpMethod.Post
-
-	export interface IQueryParams {}
-
-	export interface IRequestBody {
-		/** Set the visibility type of the integration */
-		visibility?: IMeemIdIntegrationVisibility
-		/** Metadata associated with this integration */
-		metadata?: { [key: string]: unknown }
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
@@ -1385,6 +1470,40 @@ export namespace GetConfig {
 
 
 
+export namespace GetDiscordServers {
+	export interface IPathParams {}
+
+	export const path = (options: IPathParams) => `/api/1.0/discord/servers`
+
+	export const method = HttpMethod.Get
+
+	export interface IQueryParams {
+		accessToken: string
+	}
+
+	export interface IRequestBody {
+		/** The Discord authentication code */
+		authCode: string
+		/** The Discord authentication callback url */
+		redirectUri: string
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		discordServers: IDiscordServer[]
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
 /** Get Info about Token */
 export namespace GetIPFSFile {
 	export interface IPathParams {}
@@ -1552,6 +1671,37 @@ export namespace GetMeemClippings {
 
 
 
+export namespace GetMeemContractGuild {
+	export interface IPathParams {
+		/** The MeemContract id of the guild to fetch */
+		meemContractId: string
+	}
+
+	export const path = (options: IPathParams) =>
+		`/api/1.0/meemContracts/${options.meemContractId}/guild`
+
+	export const method = HttpMethod.Get
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {}
+
+	export interface IResponseBody extends IApiResponseBody {
+		guild: IGuild | null
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
 export namespace GetMeemContractRole {
 	export interface IPathParams {
 		/** The MeemContract id to fetch roles of */
@@ -1601,7 +1751,6 @@ export namespace GetMeemContractRoles {
 	export interface IRequestBody {}
 
 	export interface IResponseBody extends IApiResponseBody {
-		/** The MeemId */
 		roles: any[]
 	}
 
@@ -2109,10 +2258,15 @@ export namespace Login {
 	export interface IRequestBody {
 		/** Login w/ access token provided by Auth0 magic link */
 		accessToken?: string
+
 		/** Login w/ wallet. Both address and signature must be provided */
 		address?: string
+
 		/** Login w/ wallet. Both address and signature must be provided */
 		signature?: string
+
+		/** Whether to connect the login method with the currently authenticated user */
+		shouldConnectUser?: boolean
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
@@ -2271,10 +2425,10 @@ export namespace ReInitializeMeemContract {
 		isTransferLocked?: boolean
 
 		/** If true, will mint a token to the admin wallet addresses  */
-		shouldMintAdminTokens?: boolean
+		shouldMintTokens?: boolean
 
 		/** Admin token metadata */
-		adminTokenMetadata?: IMeemMetadataLike
+		tokenMetadata?: IMeemMetadataLike
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
@@ -2547,6 +2701,11 @@ export namespace UpdateMeemContract {
 
 
 export namespace UpdateMeemContractRole {
+	export interface DiscordRoleIntegrationData {
+		discordServerId: string
+		discordGatedChannels: string[]
+		discordAccessToken: string
+	}
 	export interface IPathParams {
 		/** The meem contract id to fetch */
 		meemContractId: string
@@ -2568,6 +2727,13 @@ export namespace UpdateMeemContractRole {
 		permissions?: string[]
 		/** Wallet addresses of members */
 		members?: string[]
+		/** If the role is token-based, is the token transferrable to other wallets */
+		isTokenTransferrable?: boolean
+		/** Role integration data */
+		roleIntegrationsData?: (
+			| DiscordRoleIntegrationData
+			| { [key: string]: any }
+		)[]
 	}
 
 	export interface IResponseBody extends IApiResponseBody {

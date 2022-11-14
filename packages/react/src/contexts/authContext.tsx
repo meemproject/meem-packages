@@ -1,4 +1,3 @@
-/* eslint-disable import/named */
 import { ERC20, MeemAPI, makeFetcher } from '@meemproject/sdk'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers, ethers } from 'ethers'
@@ -62,7 +61,7 @@ export interface IChain {
 	}[]
 }
 
-interface IWalletContextState {
+interface IAuthContextState {
 	/** The Web3 provider */
 	web3Provider?: providers.Web3Provider
 
@@ -81,9 +80,6 @@ interface IWalletContextState {
 	/** Convenience to check whether a wallet is connected */
 	isConnected: boolean
 
-	// meemContract?: Meem
-
-	// auctionContract?: MeemMarket
 	auctionContract?: any
 
 	erc20Contract?: ERC20
@@ -107,10 +103,10 @@ interface IWalletContextState {
 	chainId?: number
 }
 
-const WalletContext = createContext({} as IWalletContextState)
-WalletContext.displayName = 'WalletContext'
+const AuthContext = createContext({} as IAuthContextState)
+AuthContext.displayName = 'AuthContext'
 
-export interface IWalletContextProps {
+export interface IAuthContextProps {
 	children?: ReactNode
 
 	/** Use custom RPC endpoints for a chain */
@@ -126,10 +122,10 @@ export interface IWalletContextProps {
 	}
 }
 
-export const WalletProvider: React.FC<IWalletContextProps> = ({
+export const AuthProvider: React.FC<IAuthContextProps> = ({
 	rpcs,
 	...props
-}: IWalletContextProps) => {
+}: IAuthContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
 	const [signature, setSignature] = useState('')
 	const [jwt, setJwt] = useState<string>()
@@ -200,9 +196,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		if (meemJwtToken) {
 			const result = JWT.decode(meemJwtToken) as Record<string, any>
 			if (result && result.exp && +result.exp > DateTime.now().toSeconds()) {
-				console.log({ result })
 				setLoginState(LoginState.Unknown)
-				setAccounts([result.walletAddress])
 				setJwt(meemJwtToken)
 				return
 			} else {
@@ -443,14 +437,14 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		]
 	)
 
-	return <WalletContext.Provider value={value} {...props} />
+	return <AuthContext.Provider value={value} {...props} />
 }
 
 export function useWallet() {
-	const context = useContext(WalletContext)
+	const context = useContext(AuthContext)
 
 	if (typeof context === 'undefined') {
-		throw new Error(`useWallet must be used within a WalletProvider`)
+		throw new Error(`useWallet must be used within a AuthProvider`)
 	}
 
 	return context
