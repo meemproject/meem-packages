@@ -77,3 +77,25 @@ export const detachUserIdentity = async (options: {
 
 	return result
 }
+
+export const updateUser = async (options: {
+	/** Profile picture base64 string */
+	profilePicBase64?: string
+
+	/** Display name of identity */
+	displayName?: string
+}) => {
+	const { profilePicBase64, displayName } = options
+	const result = await makeRequest<MeemAPI.v1.CreateOrUpdateUser.IDefinition>(
+		MeemAPI.v1.CreateOrUpdateUser.path(),
+		{
+			method: MeemAPI.v1.CreateOrUpdateUser.method,
+			body: {
+				profilePicBase64,
+				displayName
+			}
+		}
+	)
+
+	return result
+}
