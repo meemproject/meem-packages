@@ -1,0 +1,19 @@
+{
+    "description": "This schema describes version 20221116 of the Meem Agreement Role Contract Metadata Standard",
+    "title": "MeemAgreementRole_Contract_20221116",
+    "type": "object",
+    "allOf": [
+        {
+            "$ref": "Meem/20221116/Contract.json"
+        }
+    ],
+    "properties": {
+        "meem_agreement_address": {
+            "description": "The address of the Meem Agreement Contract associated with this Role.",
+            "examples": [
+                "0x....."
+            ],
+            "type": "string"
+        }
+    }
+}

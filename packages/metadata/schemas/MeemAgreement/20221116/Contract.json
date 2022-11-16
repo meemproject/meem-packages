@@ -1,10 +1,10 @@
 {
-    "description": "This schema describes version 20220718 of the Meem Club Contract Metadata Standard",
-    "title": "MeemClub_Contract_20220718",
+    "description": "This schema describes version 20221116 of the Meem Agreement Contract Metadata Standard",
+    "title": "MeemAgreement_Contract_20221116",
     "type": "object",
     "allOf": [
         {
-            "$ref": "Meem/20220718/Contract.json"
+            "$ref": "Meem/20221116/Contract.json"
         }
     ],
     "properties": {

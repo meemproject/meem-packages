@@ -2,9 +2,9 @@
  *
  */
 export const supportedVersions: { [key: string]: Array<string> } = {
-	Meem: ['20220718'],
-	MeemClub: ['20220718'],
-	MeemClubRole: ['20220718']
+	Meem: ['20221116'],
+	MeemAgreement: ['20221116'],
+	MeemAgreementRole: ['20221116']
 }
 
 /**
@@ -14,21 +14,21 @@ export const supportedVersionsTypeMapping: {
 	[key: string]: { [key: string]: { [key: string]: string } }
 } = {
 	Meem: {
-		20220718: {
-			Contract: 'Meem_Contract_20220718',
-			Token: 'Meem_Token_20220718'
+		20221116: {
+			Contract: 'Meem_Contract_20221116',
+			Token: 'Meem_Token_20221116'
 		}
 	},
-	MeemClub: {
-		20220718: {
-			Contract: 'MeemClub_Contract_20220718',
-			Token: 'MeemClub_Token_20220718'
+	MeemAgreement: {
+		20221116: {
+			Contract: 'MeemAgreement_Contract_20221116',
+			Token: 'MeemAgreement_Token_20221116'
 		}
 	},
-	MeemClubRole: {
-		20220718: {
-			Contract: 'MeemClubRole_Contract_20220718',
-			Token: 'MeemClubRole_Token_20220718'
+	MeemAgreementRole: {
+		20221116: {
+			Contract: 'MeemAgreementRole_Contract_20221116',
+			Token: 'MeemAgreementRole_Token_20221116'
 		}
 	}
 }

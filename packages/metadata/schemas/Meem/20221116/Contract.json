@@ -1,27 +1,27 @@
 {
-    "description": "This schema describes the 20220718 version of the Meem Contract Metadata Standard",
-    "title": "Meem_Contract_20220718",
-    "$id": "Meem/20220718/Contract.json",
+    "description": "This schema describes the 20221116 version of the Meem Contract Metadata Standard",
+    "title": "Meem_Contract_20221116",
+    "$id": "Meem/20221116/Contract.json",
     "type": "object",
     "properties": {
-        "meem_contract_type": {
-            "description": "The type of Meem Contract. See supported Meem contract types here: https://meem.wtf",
+        "meem_metadata_type": {
+            "description": "The type of metadata. See supported Meem metadata types here: https://meem.wtf",
             "examples": [
-                "meem-club"
+                "meem-contract"
             ],
             "type": "string"
         },
         "meem_metadata_version": {
-            "description": "The version of the Meem contract metadata schema. See supported Meem contract metadata schemas here: https://meem.wtf",
+            "description": "The version of the Meem metadata schema. See supported Meem metadata schemas here: https://meem.wtf",
             "examples": [
-                "Meem_Contract_20220718"
+                "Meem_Contract_20221116"
             ],
             "type": "string"
         },
         "description": {
             "description": "The description of the contract.",
             "examples": [
-                "Meemsters Union – Meemsters Unite!"
+                "Meemsters Union - Meemsters Unite!"
             ],
             "type": "string"
         },
@@ -45,33 +45,12 @@
             "examples": [
                 "https://clubs.link/meemsters-union"
             ]
-        },
-        "associations": {
-            "type": "array",
-            "description": "Associated contracts.",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "meem_contract_type": {
-                        "type": "string",
-                        "description": "The type of contract."
-                    },
-                    "address": {
-                        "type": "string",
-                        "description": "Address of the contract."
-                    }
-                },
-                "required": [
-                    "meem_contract_type",
-                    "address"
-                ]
-            }
         }
     },
     "examples": [
         {
-            "meem_contract_type": "meem-club",
-            "version": "20220718",
+            "meem_metadata_type": "meem-contract",
+            "meem_metadata_version": "20221116",
             "name": "Meemsters Union",
             "description": "Meemsters Unite!",
             "image": "https://ipfs.io/ipfs/1234",
@@ -79,7 +58,7 @@
         }
     ],
     "required": [
-        "meem_contract_type",
+        "meem_metadata_type",
         "meem_metadata_version",
         "name",
         "description"

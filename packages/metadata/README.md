@@ -7,12 +7,12 @@ This package contains types for all supported Meem metadata schemas. Import the 
 
 See the `types` folder for currently supported metadata types.
 
-    import { MeemClub_Contract_20220718 } from '@meemproject/metadata'
+    import { MeemAgreement_Contract_20221116 } from '@meemproject/metadata'
 
-    const metadata: MeemClub_Contract_20220718 = {
-        meem_metadata_version: "MeemClub_Contract_20220718",
-        meem_contract_type: "MeemClub",
-        name: "Strongly typed Club!",
+    const metadata: MeemAgreement_Contract_20221116 = {
+        meem_metadata_version: "MeemAgreement_Contract_20221116",
+        meem_metadata_type: "MeemAgreement",
+        name: "Strongly typed Agreement!",
         description: "Now with tokens!",
         external_url: "",
         image: ""
@@ -34,12 +34,12 @@ The parser can take a metadata object or JSON string and parse/validate it again
     }
 
 ## Validator
-Here's an example of how to validate metadata for a MeemClub contract
+Here's an example of how to validate metadata for a MeemAgreement contract
 
     const metadata = {
-        meem_metadata_version: "MeemClub_Contract_20220718",
-        meem_contract_type: "MeemClub",
-        name: "Strongly typed Club!",
+        meem_metadata_version: "MeemAgreement_Contract_20221116",
+        meem_metadata_type: "MeemAgreement",
+        name: "Strongly typed Agreement!",
         description: "Now with tokens!",
         external_url: "",
         image: ""
