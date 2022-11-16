@@ -1,0 +1,22 @@
+{
+    "description": "This schema describes version 20221116 of the Meem Agreement Contract Metadata Standard",
+    "title": "MeemAgreement_Contract_20221116",
+    "type": "object",
+    "allOf": [
+        {
+            "$ref": "Meem/20221116/Contract.json"
+        }
+    ],
+    "properties": {
+        "application_instructions": {
+            "description": "The instructions for applying to join the club",
+            "examples": [
+                "Message @user in Discord to join."
+            ],
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    }
+}
