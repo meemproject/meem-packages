@@ -1,17 +1,17 @@
-import { Meem_Contract_20220718 } from './Meem/20220718/Contract'
-import { Meem_Token_20220718 } from './Meem/20220718/Token'
-import { MeemClub_Contract_20220718 } from './MeemClub/20220718/Contract'
-import { MeemClub_Token_20220718 } from './MeemClub/20220718/Token'
+import { Meem_Contract_20221116 } from './Meem/20221116/Contract'
+import { Meem_Token_20221116 } from './Meem/20221116/Token'
+import { MeemAgreement_Contract_20221116 } from './MeemAgreement/20221116/Contract'
+import { MeemAgreement_Token_20221116 } from './MeemAgreement/20221116/Token'
 
-export { Meem_Contract_20220718, Meem_Token_20220718 }
-export { MeemClub_Contract_20220718, MeemClub_Token_20220718 }
+export { Meem_Contract_20221116, Meem_Token_20221116 }
+export { MeemAgreement_Contract_20221116, MeemAgreement_Token_20221116 }
 
 export type MeemContractMetadataLike =
-	| Meem_Contract_20220718
-	| MeemClub_Contract_20220718
+	| Meem_Contract_20221116
+	| MeemAgreement_Contract_20221116
 
 export type MeemTokenMetadataLike =
-	| Meem_Token_20220718
-	| MeemClub_Token_20220718
+	| Meem_Token_20221116
+	| MeemAgreement_Token_20221116
 
 export type MeemMetadataLike = MeemContractMetadataLike | MeemTokenMetadataLike
