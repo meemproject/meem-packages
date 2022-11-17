@@ -6,15 +6,15 @@
  */
 
 /**
- * This schema describes the 20220718 version of the Meem Contract Metadata Standard
+ * This schema describes the 20221116 version of the Meem Contract metadata standard.
  */
-export interface Meem_Contract_20220718 {
+export interface Meem_Contract_20221116 {
   /**
-   * The type of Meem Contract. See supported Meem contract types here: https://meem.wtf
+   * The type of metadata. See supported Meem metadata types here: https://meem.wtf
    */
-  meem_contract_type: string;
+  meem_metadata_type: string;
   /**
-   * The version of the Meem contract metadata schema. See supported Meem contract metadata schemas here: https://meem.wtf
+   * The calendar version of the Meem metadata schema. See supported Meem metadata schemas here: https://meem.wtf
    */
   meem_metadata_version: string;
   /**
@@ -33,19 +33,5 @@ export interface Meem_Contract_20220718 {
    * An optional url to a website with more information about the contract.
    */
   external_url?: string;
-  /**
-   * Associated contracts.
-   */
-  associations?: {
-    /**
-     * The type of contract.
-     */
-    meem_contract_type: string;
-    /**
-     * Address of the contract.
-     */
-    address: string;
-    [k: string]: unknown;
-  }[];
   [k: string]: unknown;
 }

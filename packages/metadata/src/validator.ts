@@ -1,5 +1,5 @@
 import { Validator as JsonValidator, ValidatorResult } from 'jsonschema'
-import { validateVersion } from './versions'
+import { validateMetadataVersion } from './versions'
 
 export class Validator {
 	public name: string
@@ -8,14 +8,23 @@ export class Validator {
 
 	public type: string
 
-	public constructor(version: string) {
-		// require version <name>_<type>_<calver>
-		validateVersion(version)
+	public constructor(metadata: {meem_metadata_type: string, meem_metadata_version: string}) {
+		const { meem_metadata_type, meem_metadata_version } = metadata
+		
+		if (!meem_metadata_type) {
+            throw new Error(`The metadata does not contain required meem_metadata_type`);
+        }
 
-		const [name, type, calVer] = version.split('_')
+        if (!meem_metadata_version) {
+            throw new Error(`The metadata does not contain required meem_metadata_version`);
+        }
+
+		validateMetadataVersion(metadata)
+
+		const [name, type] = meem_metadata_type.split('_')
 		this.name = name
 		this.type = type
-		this.calVer = calVer
+		this.calVer = meem_metadata_version
 	}
 
 	/**

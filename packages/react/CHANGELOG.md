@@ -3,6 +3,105 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.11](https://github.com/meemproject/meem-packages/compare/v0.9.10...v0.9.11) (2022-11-17)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.9.10](https://github.com/meemproject/meem-packages/compare/v0.9.9...v0.9.10) (2022-11-17)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.9.9](https://github.com/meemproject/meem-packages/compare/v0.9.8...v0.9.9) (2022-10-26)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.9.8](https://github.com/meemproject/meem-packages/compare/v0.9.7...v0.9.8) (2022-10-25)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.9.7](https://github.com/meemproject/meem-packages/compare/v0.9.6...v0.9.7) (2022-10-24)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.9.6](https://github.com/meemproject/meem-packages/compare/v0.9.5...v0.9.6) (2022-10-24)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.9.5](https://github.com/meemproject/meem-packages/compare/v0.9.4...v0.9.5) (2022-10-24)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.9.4](https://github.com/meemproject/meem-packages/compare/v0.9.3...v0.9.4) (2022-10-14)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.9.3](https://github.com/meemproject/meem-packages/compare/v0.9.2...v0.9.3) (2022-10-12)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.9.2](https://github.com/meemproject/meem-packages/compare/v0.9.1...v0.9.2) (2022-10-11)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.9.1](https://github.com/meemproject/meem-packages/compare/v0.9.0...v0.9.1) (2022-10-11)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+# [0.9.0](https://github.com/meemproject/meem-packages/compare/v0.8.11...v0.9.0) (2022-10-11)
+
+
+### Bug Fixes
+
+* better walletContext handling of edge cases; store jwt in localStorage instead of cookie ([cf8f9cd](https://github.com/meemproject/meem-packages/commit/cf8f9cd))
+
+
+
+
+
 ## [0.8.11](https://github.com/meemproject/meem-packages/compare/v0.8.10...v0.8.11) (2022-10-10)
 
 **Note:** Version bump only for package @meemproject/react

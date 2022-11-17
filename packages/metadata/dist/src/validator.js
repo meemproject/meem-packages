@@ -4,13 +4,19 @@ exports.Validator = void 0;
 const jsonschema_1 = require("jsonschema");
 const versions_1 = require("./versions");
 class Validator {
-    constructor(version) {
-        // require version <name>_<type>_<calver>
-        (0, versions_1.validateVersion)(version);
-        const [name, type, calVer] = version.split('_');
+    constructor(metadata) {
+        const { meem_metadata_type, meem_metadata_version } = metadata;
+        if (!meem_metadata_type) {
+            throw new Error(`The metadata does not contain required meem_metadata_type`);
+        }
+        if (!meem_metadata_version) {
+            throw new Error(`The metadata does not contain required meem_metadata_version`);
+        }
+        (0, versions_1.validateMetadataVersion)(metadata);
+        const [name, type] = meem_metadata_type.split('_');
         this.name = name;
         this.type = type;
-        this.calVer = calVer;
+        this.calVer = meem_metadata_version;
     }
     /**
      * Validates the passed json against the Validator's schema
