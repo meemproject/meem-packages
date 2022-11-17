@@ -6,7 +6,8 @@
   "typings": "dist/index.d.ts",
   "module": "dist/react.esm.js",
   "files": [
-    "dist"
+    "dist",
+    "generated"
   ],
   "engines": {
     "node": ">=10"
