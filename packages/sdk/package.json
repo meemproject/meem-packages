@@ -1,5 +1,5 @@
 {
-	"name": "@meemproject/api",
+	"name": "@meemproject/sdk",
 	"version": "0.9.11",
 	"main": "build/index.js",
 	"license": "MIT",
