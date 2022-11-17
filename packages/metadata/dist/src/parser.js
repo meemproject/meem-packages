@@ -11,11 +11,14 @@ class Parser {
      */
     parse(metadata) {
         const parsed = typeof metadata === 'string' ? JSON.parse(metadata) : metadata;
+        if (!parsed.meem_metadata_type) {
+            throw new Error(`The parsed metadata does not contain required meem_metadata_type`);
+        }
         if (!parsed.meem_metadata_version) {
             throw new Error(`The parsed metadata does not contain required meem_metadata_version`);
         }
-        (0, versions_1.validateVersion)(parsed.meem_metadata_version);
-        const validator = new validator_1.Validator(parsed.meem_metadata_version);
+        (0, versions_1.validateMetadataVersion)(parsed);
+        const validator = new validator_1.Validator(parsed);
         const validatorResult = validator.validate(parsed);
         if (!validatorResult.valid) {
             throw new Error(`The parsed metadata is invalid: ${validatorResult.errors.map((e) => e.message)}`);

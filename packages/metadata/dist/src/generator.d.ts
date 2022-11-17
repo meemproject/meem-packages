@@ -1,7 +1,10 @@
 export declare class Generator {
-    name: string;
+    type: string;
     version: string;
-    constructor(name: string, version: string);
+    constructor(metadata: {
+        meem_metadata_type: string;
+        meem_metadata_version: string;
+    });
     /**
      * Generates valid, minfied, and ordered (alphabetized keys) schema
      * Raises if the unordered json does not Validate against the Generator's schema

@@ -1,16 +1,17 @@
 import { Validator } from './validator'
-import { validateVersion } from './versions'
+import { validateMetadataVersion } from './versions'
 
 export class Generator {
-	public name: string
+	public type: string
 
 	public version: string
 
-	constructor(name: string, version: string) {
-		validateVersion(version)
+	constructor(metadata: { meem_metadata_type: string, meem_metadata_version: string }) {
+		const { meem_metadata_type, meem_metadata_version } = metadata
+		validateMetadataVersion(metadata)
 
-		this.name = name
-		this.version = version
+		this.type = meem_metadata_type
+		this.version = meem_metadata_version
 	}
 
 	/**
@@ -21,11 +22,10 @@ export class Generator {
 	 */
 	public generateJSON(unordered: { [key: string]: any }): string {
 		// validate the schema
-		const version = this.name.concat('_').concat(this.version)
-		const validator = new Validator(version)
+		const validator = new Validator({meem_metadata_type: this.type, meem_metadata_version: this.version})
 		const validated = validator.validate(unordered)
 		if (!validated) {
-			throw new Error(`JSON does not conform to the ${version} schema.`)
+			throw new Error(`JSON does not conform to the ${this.type}_${this.version} schema.`)
 		}
 
 		// alphabetize key
