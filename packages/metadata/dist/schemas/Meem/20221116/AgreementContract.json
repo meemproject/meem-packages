@@ -1,6 +1,6 @@
 {
-    "description": "This schema describes version 20221116 of the Meem Agreement Contract Metadata Standard",
-    "title": "MeemAgreement_Contract_20221116",
+    "description": "This schema describes version 20221116 of the Meem Agreement Contract metadata standard.",
+    "title": "Meem_AgreementContract_20221116",
     "type": "object",
     "allOf": [
         {
@@ -9,7 +9,7 @@
     ],
     "properties": {
         "application_instructions": {
-            "description": "The instructions for applying to join the club",
+            "description": "The instructions for applying to join the club's agreement contract.",
             "examples": [
                 "Message @user in Discord to join."
             ],

@@ -1,6 +1,6 @@
 {
-    "description": "This schema describes version 20221116 of the Meem Agreement Role Contract Metadata Standard",
-    "title": "MeemAgreementRole_Contract_20221116",
+    "description": "This schema describes version 20221116 of the Meem Agreement Role Contract metadata standard.",
+    "title": "Meem_AgreementRoleContract_20221116",
     "type": "object",
     "allOf": [
         {
@@ -15,5 +15,8 @@
             ],
             "type": "string"
         }
-    }
+    },
+    "required": [
+        "meem_agreement_address"
+    ]
 }

@@ -6,12 +6,12 @@
  */
 
 /**
- * This schema describes version 20221116 of the Meem Agreement Token Metadata Standard
+ * This schema describes version 20221116 of the Meem Agreement Role Token metadata standard.
  */
-export type MeemAgreement_Token_20221116 = Meem_Token_20221116;
+export type Meem_AgreementRoleToken_20221116 = Meem_Token_20221116;
 
 /**
- * This schema describes version 20221116 of the Meem Token Metadata Standard
+ * This schema describes version 20221116 of the Meem Token metadata standard.
  */
 export interface Meem_Token_20221116 {
   /**
@@ -19,7 +19,7 @@ export interface Meem_Token_20221116 {
    */
   meem_metadata_type: string;
   /**
-   * The version of the Meem token metadata schema. See supported Meem contract metadata schemas here: https://meem.wtf
+   * The calendar version of the Meem token metadata schema. See supported Meem contract metadata schemas here: https://meem.wtf
    */
   meem_metadata_version: string;
   /**

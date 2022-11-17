@@ -16,29 +16,23 @@ export const supportedVersionsTypeMapping: {
 	Meem: {
 		20221116: {
 			Contract: 'Meem_Contract_20221116',
-			Token: 'Meem_Token_20221116'
-		}
-	},
-	MeemAgreement: {
-		20221116: {
-			Contract: 'MeemAgreement_Contract_20221116',
-			Token: 'MeemAgreement_Token_20221116'
-		}
-	},
-	MeemAgreementRole: {
-		20221116: {
-			Contract: 'MeemAgreementRole_Contract_20221116',
-			Token: 'MeemAgreementRole_Token_20221116'
+			Token: 'Meem_Token_20221116',
+			AgreementContract: 'Meem_AgreementContract_20221116',
+			AgreementToken: 'Meem_AgreementToken_20221116',
+			AgreementRoleContract: 'Meem_AgreementRoleContract_20221116',
+			AgreementRoleToken: 'Meem_AgreementRoleToken_20221116'
 		}
 	}
 }
 
 /**
  *
- * @param verboseVersion
+ * @param metadata
  */
-export function validateVersion(verboseVersion: string): void {
-	const [name, type, calVer] = verboseVersion.split('_')
+export function validateMetadataVersion(metadata: { meem_metadata_type: string, meem_metadata_version: string }): void {
+	const { meem_metadata_type, meem_metadata_version } = metadata
+	const [name, type] = meem_metadata_type.split('_')
+	const calVer = meem_metadata_version
 
 	// require name exists in `versions`
 	if (!(name in supportedVersions)) {

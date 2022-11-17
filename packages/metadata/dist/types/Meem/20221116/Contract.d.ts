@@ -6,7 +6,7 @@
  */
 
 /**
- * This schema describes the 20221116 version of the Meem Contract Metadata Standard
+ * This schema describes the 20221116 version of the Meem Contract metadata standard.
  */
 export interface Meem_Contract_20221116 {
   /**
@@ -14,7 +14,7 @@ export interface Meem_Contract_20221116 {
    */
   meem_metadata_type: string;
   /**
-   * The version of the Meem metadata schema. See supported Meem metadata schemas here: https://meem.wtf
+   * The calendar version of the Meem metadata schema. See supported Meem metadata schemas here: https://meem.wtf
    */
   meem_metadata_version: string;
   /**

@@ -6,14 +6,13 @@
  */
 
 /**
- * This schema describes version 20221116 of the Meem Agreement Role Contract Metadata Standard
+ * This schema describes version 20221116 of the Meem Agreement Contract metadata standard.
  */
-export type MeemAgreementRole_Contract_20221116 = MeemAgreementRole_Contract_202211161 &
-  MeemAgreementRole_Contract_202211162;
-export type MeemAgreementRole_Contract_202211161 = Meem_Contract_20221116;
+export type Meem_AgreementContract_20221116 = Meem_AgreementContract_202211161 & Meem_AgreementContract_202211162;
+export type Meem_AgreementContract_202211161 = Meem_Contract_20221116;
 
 /**
- * This schema describes the 20221116 version of the Meem Contract Metadata Standard
+ * This schema describes the 20221116 version of the Meem Contract metadata standard.
  */
 export interface Meem_Contract_20221116 {
   /**
@@ -21,7 +20,7 @@ export interface Meem_Contract_20221116 {
    */
   meem_metadata_type: string;
   /**
-   * The version of the Meem metadata schema. See supported Meem metadata schemas here: https://meem.wtf
+   * The calendar version of the Meem metadata schema. See supported Meem metadata schemas here: https://meem.wtf
    */
   meem_metadata_version: string;
   /**
@@ -42,10 +41,10 @@ export interface Meem_Contract_20221116 {
   external_url?: string;
   [k: string]: unknown;
 }
-export interface MeemAgreementRole_Contract_202211162 {
+export interface Meem_AgreementContract_202211162 {
   /**
-   * The address of the Meem Agreement Contract associated with this Role.
+   * The instructions for applying to join the club's agreement contract.
    */
-  meem_agreement_address?: string;
+  application_instructions?: string[];
   [k: string]: unknown;
 }

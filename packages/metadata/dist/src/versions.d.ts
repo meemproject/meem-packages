@@ -16,6 +16,9 @@ export declare const supportedVersionsTypeMapping: {
 };
 /**
  *
- * @param verboseVersion
+ * @param metadata
  */
-export declare function validateVersion(verboseVersion: string): void;
+export declare function validateMetadataVersion(metadata: {
+    meem_metadata_type: string;
+    meem_metadata_version: string;
+}): void;

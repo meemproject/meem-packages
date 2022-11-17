@@ -1,5 +1,5 @@
 {
-    "description": "This schema describes the 20221116 version of the Meem Contract Metadata Standard",
+    "description": "This schema describes the 20221116 version of the Meem Contract metadata standard.",
     "title": "Meem_Contract_20221116",
     "$id": "Meem/20221116/Contract.json",
     "type": "object",
@@ -7,14 +7,14 @@
         "meem_metadata_type": {
             "description": "The type of metadata. See supported Meem metadata types here: https://meem.wtf",
             "examples": [
-                "meem-contract"
+                "Meem_Contract"
             ],
             "type": "string"
         },
         "meem_metadata_version": {
-            "description": "The version of the Meem metadata schema. See supported Meem metadata schemas here: https://meem.wtf",
+            "description": "The calendar version of the Meem metadata schema. See supported Meem metadata schemas here: https://meem.wtf",
             "examples": [
-                "Meem_Contract_20221116"
+                "20221116"
             ],
             "type": "string"
         },

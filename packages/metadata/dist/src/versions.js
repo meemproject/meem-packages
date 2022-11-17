@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateVersion = exports.supportedVersionsTypeMapping = exports.supportedVersions = void 0;
+exports.validateMetadataVersion = exports.supportedVersionsTypeMapping = exports.supportedVersions = void 0;
 /**
  *
  */
@@ -16,29 +16,23 @@ exports.supportedVersionsTypeMapping = {
     Meem: {
         20221116: {
             Contract: 'Meem_Contract_20221116',
-            Token: 'Meem_Token_20221116'
-        }
-    },
-    MeemAgreement: {
-        20221116: {
-            Contract: 'MeemAgreement_Contract_20221116',
-            Token: 'MeemAgreement_Token_20221116'
-        }
-    },
-    MeemAgreementRole: {
-        20221116: {
-            Contract: 'MeemAgreementRole_Contract_20221116',
-            Token: 'MeemAgreementRole_Token_20221116'
+            Token: 'Meem_Token_20221116',
+            AgreementContract: 'Meem_AgreementContract_20221116',
+            AgreementToken: 'Meem_AgreementToken_20221116',
+            AgreementRoleContract: 'Meem_AgreementRoleContract_20221116',
+            AgreementRoleToken: 'Meem_AgreementRoleToken_20221116'
         }
     }
 };
 /**
  *
- * @param verboseVersion
+ * @param metadata
  */
-function validateVersion(verboseVersion) {
+function validateMetadataVersion(metadata) {
     var _a, _b;
-    const [name, type, calVer] = verboseVersion.split('_');
+    const { meem_metadata_type, meem_metadata_version } = metadata;
+    const [name, type] = meem_metadata_type.split('_');
+    const calVer = meem_metadata_version;
     // require name exists in `versions`
     if (!(name in exports.supportedVersions)) {
         throw new Error(`There are no versions with the ${name} project name`);
@@ -52,5 +46,5 @@ function validateVersion(verboseVersion) {
         throw new Error(`There are no types in the ${name} namespace with the ${calVer} calendar version that match ${type}`);
     }
 }
-exports.validateVersion = validateVersion;
+exports.validateMetadataVersion = validateMetadataVersion;
 //# sourceMappingURL=versions.js.map

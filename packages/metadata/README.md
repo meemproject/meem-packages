@@ -37,14 +37,14 @@ The parser can take a metadata object or JSON string and parse/validate it again
 Here's an example of how to validate metadata for a MeemAgreement contract
 
     const metadata = {
-        meem_metadata_version: "MeemAgreement_Contract_20221116",
-        meem_metadata_type: "MeemAgreement",
+        meem_metadata_version: "20221116",
+        meem_metadata_type: "MeemAgreement_Contract",
         name: "Strongly typed Agreement!",
         description: "Now with tokens!",
         external_url: "",
         image: ""
     }
 
-    const validator = new Validator(metadata.meem_metadata_version)
+    const validator = new Validator(metadata)
     const result = validator.validate(metadata)
     const isValid = result.valid
