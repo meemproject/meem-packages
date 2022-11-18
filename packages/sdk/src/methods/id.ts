@@ -1,6 +1,7 @@
 import { MeemAPI } from '../api.generated'
 import { makeRequest } from '../lib/fetcher'
 
+/** Login with the Meem API */
 export const login = async (options: {
 	/** Login w/ access token provided by Auth0 magic link */
 	accessToken?: string
@@ -32,6 +33,7 @@ export const login = async (options: {
 	return result
 }
 
+/** Update info about a user identity belonging to a user */
 export const updateUserIdentity = async (options: {
 	/** The visibility of the integration */
 	visibility?: MeemAPI.IntegrationVisibility
@@ -60,6 +62,7 @@ export const updateUserIdentity = async (options: {
 	return result
 }
 
+/** Detach an integration from a user */
 export const detachUserIdentity = async (options: {
 	/** The id of the IdentityIntegration to remove */
 	identityIntegrationId: string
@@ -78,6 +81,7 @@ export const detachUserIdentity = async (options: {
 	return result
 }
 
+/** Update user info */
 export const updateUser = async (options: {
 	/** Profile picture base64 string */
 	profilePicBase64?: string
@@ -93,6 +97,25 @@ export const updateUser = async (options: {
 			body: {
 				profilePicBase64,
 				displayName
+			}
+		}
+	)
+
+	return result
+}
+
+/** Get a login nonce from the Meem API */
+export const getNonce = async (options: {
+	/** The address to get a nonce for */
+	address: string
+}) => {
+	const { address } = options
+	const result = await makeRequest<MeemAPI.v1.GetNonce.IDefinition>(
+		MeemAPI.v1.GetNonce.path(),
+		{
+			method: MeemAPI.v1.GetNonce.method,
+			query: {
+				address
 			}
 		}
 	)
