@@ -192,12 +192,20 @@ contract PermissionsFacet {
 	/// @param to The address the token is being transferred to
 	/// @param tokenId The token being transferred
 	function requireCanTransfer(
+		address msgSender,
 		address from,
 		address to,
 		uint256 tokenId
 	) public {
-		if (PermissionsStorage.dataStore().isTransferLocked) {
-			revert(PermissionsError.TransfersLocked);
+		if (tokenId != 0 && from != address(0)) {
+			MeemBaseERC721Facet(address(this)).requireTokenAdmin(
+				tokenId,
+				msgSender
+			);
+
+			if (PermissionsStorage.dataStore().isTransferLocked) {
+				revert(PermissionsError.TransfersLocked);
+			}
 		}
 	}
 

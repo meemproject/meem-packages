@@ -80,12 +80,18 @@ export async function makeRequest<TDefinition extends IEndpoint = IEndpoint>(
 	/** The URL path obtained from calling .path(). */
 	url: string,
 	options?: {
+		/** The Meem JWT. If not set will try to fetch from cookies */
+		jwt?: string
+
 		/** The HTTP method. GET by default */
 		method?: MeemAPI.HttpMethod
+
 		/** Headers to send with the request */
 		headers?: Record<string, string>
+
 		/** Query parameters */
 		query?: TDefinition['queryParams']
+
 		/** Request body */
 		body?: TDefinition['requestBody']
 	}
@@ -97,7 +103,7 @@ export async function makeRequest<TDefinition extends IEndpoint = IEndpoint>(
 	const method = options?.method ?? MeemAPI.HttpMethod.Get
 	// @ts-ignore
 	const req = superagent[method.toLowerCase()](uri)
-	const jwt = Cookies.get('meemJwtToken')
+	const jwt = options?.jwt ?? Cookies.get('meemJwtToken')
 	if (jwt) {
 		req.set('Authorization', `JWT ${jwt}`)
 	}

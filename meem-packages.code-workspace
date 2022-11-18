@@ -5,8 +5,8 @@
 			"path": "./"
 		},
 		{
-			"name": "@meemproject/api",
-			"path": "./packages/api"
+			"name": "@meemproject/sdk",
+			"path": "./packages/sdk"
 		},
 		{
 			"name": "@meemproject/metadata",

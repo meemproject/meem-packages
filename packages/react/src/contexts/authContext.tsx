@@ -1,5 +1,5 @@
-/* eslint-disable import/named */
-import { ERC20, MeemAPI, makeFetcher } from '@meemproject/api'
+import { ApolloError } from '@apollo/client'
+import { MeemAPI, makeFetcher } from '@meemproject/sdk'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers, ethers } from 'ethers'
 import Cookies from 'js-cookie'
@@ -62,8 +62,8 @@ export interface IChain {
 	}[]
 }
 
-interface IWalletContextState {
-	/** The Web3 provider */
+interface IAuthContextState {
+	/** Ethers.js Web3 provider */
 	web3Provider?: providers.Web3Provider
 
 	/** Array of connected wallet addresses */
@@ -72,45 +72,44 @@ interface IWalletContextState {
 	/** The network we're connected to */
 	network?: providers.Network
 
+	/** Ethers.js signer */
 	signer?: providers.JsonRpcSigner
 
-	connectWallet: () => Promise<void>
+	/** Trigger connection to the user's web3 wallet */
+	connectWallet: (to?: string) => Promise<void>
 
+	/** Disconnect the user's web3 wallet */
 	disconnectWallet: () => Promise<void>
 
 	/** Convenience to check whether a wallet is connected */
 	isConnected: boolean
 
-	// meemContract?: Meem
-
-	// auctionContract?: MeemMarket
-	auctionContract?: any
-
-	erc20Contract?: ERC20
-
+	/** The current login state. Used to check if the user has authenticated w/ the Meem API */
 	loginState?: LoginState
 
-	isMeemIdError: boolean
+	/** The error fetching user details from the GQL api */
+	isGetMeError?: ApolloError
 
-	isMeemIdLoading: boolean
+	/** Whether user details are being fetched */
+	isMeLoading: boolean
 
-	signature: string
-
-	updateSignature: (walletSignature: string) => void
-
+	/** Set the JWT token returned from the Meem API */
 	setJwt: (jwt: string) => void
 
+	/** The JWT token returned from the Meem API */
 	jwt?: string
 
+	/** Set the current chain. Will trigger a "Switch Network" event in the user's wallet (if possible) */
 	setChain: (chainId: number) => Promise<void>
 
+	/** The current chain id */
 	chainId?: number
 }
 
-const WalletContext = createContext({} as IWalletContextState)
-WalletContext.displayName = 'WalletContext'
+const AuthContext = createContext({} as IAuthContextState)
+AuthContext.displayName = 'AuthContext'
 
-export interface IWalletContextProps {
+export interface IAuthContextProps {
 	children?: ReactNode
 
 	/** Use custom RPC endpoints for a chain */
@@ -126,13 +125,11 @@ export interface IWalletContextProps {
 	}
 }
 
-export const WalletProvider: React.FC<IWalletContextProps> = ({
+export const AuthProvider: React.FC<IAuthContextProps> = ({
 	rpcs,
 	...props
-}: IWalletContextProps) => {
+}: IAuthContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
-	// const [meemContract, setMeemContract] = useState<Meem | undefined>()
-	const [signature, setSignature] = useState('')
 	const [jwt, setJwt] = useState<string>()
 	const [chainId, setChainId] = useState<number>()
 	const [loginState, setLoginState] = useState<LoginState>(LoginState.Unknown)
@@ -153,22 +150,30 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	})
 	const [rpcUrls] = useState(initialRpcUrls)
 
-	const getMeFetcher = useCallback(
-		() =>
-			makeFetcher<
-				MeemAPI.v1.GetMe.IQueryParams,
-				MeemAPI.v1.GetMe.IRequestBody,
-				MeemAPI.v1.GetMe.IResponseBody
-			>({
-				method: MeemAPI.v1.GetMe.method
-			}),
-		[jwt]
-	)
+	// const getMeFetcher = useCallback(
+	// 	() =>
+	// 		makeFetcher<
+	// 			MeemAPI.v1.GetMe.IQueryParams,
+	// 			MeemAPI.v1.GetMe.IRequestBody,
+	// 			MeemAPI.v1.GetMe.IResponseBody
+	// 		>({
+	// 			method: MeemAPI.v1.GetMe.method
+	// 		}),
+	// 	[jwt]
+	// )
+
+	const getMeFetcher = makeFetcher<
+		MeemAPI.v1.GetMe.IQueryParams,
+		MeemAPI.v1.GetMe.IRequestBody,
+		MeemAPI.v1.GetMe.IResponseBody
+	>({
+		method: MeemAPI.v1.GetMe.method
+	})
 
 	const {
 		data: meData,
-		error: isMeemIdError,
-		isValidating: isMeemIdLoading,
+		error: isGetMeError,
+		isValidating: isMeLoading,
 		mutate: meMutate
 	} = useSWR(jwt ? MeemAPI.v1.GetMe.path() : null, getMeFetcher, {
 		shouldRetryOnError: !!jwt
@@ -178,6 +183,7 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 
 	useEffect(() => {
 		if (meData) {
+			setAccounts([meData?.meemIdentity?.DefaultWallet.address])
 			setLoginState(LoginState.LoggedIn)
 		}
 	}, [meData])
@@ -189,14 +195,13 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 	}, [jwt, meMutate])
 
 	useEffect(() => {
-		if (isMeemIdError && jwt) {
+		if (isGetMeError && jwt) {
 			Cookies.remove('meemJwtToken')
 			setLoginState(LoginState.NotLoggedIn)
 		}
-	}, [isMeemIdError, jwt])
+	}, [isGetMeError, jwt])
 
 	useEffect(() => {
-		// const meemJwtToken = Cookies.get('meemJwtToken')
 		const meemJwtToken = Cookies.get('meemJwtToken')
 
 		if (meemJwtToken) {
@@ -214,42 +219,45 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 		setJwt(undefined)
 	}, [])
 
-	const connectWallet = useCallback(async () => {
-		let p: any
+	const connectWallet = useCallback(
+		async (to?: string) => {
+			let p: any
 
-		try {
-			// This is the initial `provider` that is returned when
-			// using web3Modal to connect. Can be MetaMask or WalletConnect.
-			p = await web3Modal?.connect()
-			log.debug('Connected')
-		} catch (e) {
-			log.warn(e)
-			log.warn(
-				'Error: unable to connect with web3modal. Did the user close the modal?'
-			)
-			return
-		}
+			try {
+				// This is the initial `provider` that is returned when
+				// using web3Modal to connect. Can be MetaMask or WalletConnect.
+				p = to ? await web3Modal?.connectTo(to) : await web3Modal?.connect()
+				log.debug('Connected')
+			} catch (e) {
+				log.warn(e)
+				log.warn(
+					'Error: unable to connect with web3modal. Did the user close the modal?'
+				)
+				return
+			}
 
-		// We plug the initial `provider` into ethers.js and get back
-		// a Web3Provider. This will add on methods from ethers.js and
-		// event listeners such as `.on()` will be different.
-		const w3p = new providers.Web3Provider(p, 'any')
+			// We plug the initial `provider` into ethers.js and get back
+			// a Web3Provider. This will add on methods from ethers.js and
+			// event listeners such as `.on()` will be different.
+			const w3p = new providers.Web3Provider(p, 'any')
 
-		const s = w3p.getSigner()
+			const s = w3p.getSigner()
 
-		const address = await s.getAddress()
+			const address = await s.getAddress()
 
-		const n = await w3p.getNetwork()
+			const n = await w3p.getNetwork()
 
-		setNetwork(n)
-		setChainId(n.chainId)
-		setProvider(p)
+			setNetwork(n)
+			setChainId(n.chainId)
+			setProvider(p)
 
-		setSigner(s)
-		setAccounts([address])
-		setWeb3Provider(w3p)
-		setIsConnected(true)
-	}, [web3Modal])
+			setSigner(s)
+			setAccounts([address])
+			setWeb3Provider(w3p)
+			setIsConnected(true)
+		},
+		[web3Modal]
+	)
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
@@ -275,16 +283,6 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			connectWallet()
 		}
 	}, [connectWallet, web3Modal])
-
-	const updateMeemId = useCallback((id: MeemAPI.IMeemId) => {
-		log.debug('setMeemId', id)
-		// setMeemId(id)
-	}, [])
-
-	const updateSignature = useCallback((sig: string) => {
-		log.debug('setSignature', sig)
-		setSignature(sig)
-	}, [])
 
 	const handleAccountsChanged = useCallback((acc: string[]) => {
 		setAccounts(acc)
@@ -419,12 +417,9 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			disconnectWallet,
 			isConnected,
 			setJwt: setMeemJwt,
-			isMeemIdLoading,
-			isMeemIdError,
+			isMeLoading,
+			isGetMeError,
 			loginState,
-			updateMeemId,
-			signature,
-			updateSignature,
 			jwt,
 			setChain,
 			chainId
@@ -438,26 +433,33 @@ export const WalletProvider: React.FC<IWalletContextProps> = ({
 			disconnectWallet,
 			isConnected,
 			setMeemJwt,
-			isMeemIdLoading,
-			isMeemIdError,
+			isMeLoading,
+			isGetMeError,
 			loginState,
-			updateMeemId,
-			signature,
-			updateSignature,
 			jwt,
 			setChain,
 			chainId
 		]
 	)
 
-	return <WalletContext.Provider value={value} {...props} />
+	return <AuthContext.Provider value={value} {...props} />
+}
+
+export function useAuth() {
+	const context = useContext(AuthContext)
+
+	if (typeof context === 'undefined') {
+		throw new Error(`useMeem must be used within a AuthProvider`)
+	}
+
+	return context
 }
 
 export function useWallet() {
-	const context = useContext(WalletContext)
+	const context = useContext(AuthContext)
 
 	if (typeof context === 'undefined') {
-		throw new Error(`useWallet must be used within a WalletProvider`)
+		throw new Error(`useMeem must be used within a AuthProvider`)
 	}
 
 	return context

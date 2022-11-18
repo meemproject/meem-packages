@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.1](https://github.com/meemproject/meem-packages/compare/v0.10.0...v0.10.1) (2022-11-17)
+
+**Note:** Version bump only for package meem-packages
+
+
+
+
+
+# [0.10.0](https://github.com/meemproject/meem-packages/compare/v0.9.11...v0.10.0) (2022-11-17)
+
+
+### Features
+
+* bulk burn tokens ([1d46391](https://github.com/meemproject/meem-packages/commit/1d46391))
+
+
+
+
+
+## [0.9.11](https://github.com/meemproject/meem-packages/compare/v0.9.10...v0.9.11) (2022-11-17)
+
+**Note:** Version bump only for package meem-packages
+
+
+
+
+
 ## [0.9.10](https://github.com/meemproject/meem-packages/compare/v0.9.9...v0.9.10) (2022-11-17)
 
 **Note:** Version bump only for package meem-packages
