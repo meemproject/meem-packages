@@ -32,7 +32,7 @@ export interface Meem_AgreementExtension_20221116 {
     /**
      * URL for the link.
      */
-    url?: string;
+    url: string;
     [k: string]: unknown;
   };
   /**

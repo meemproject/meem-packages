@@ -42,7 +42,10 @@
                         "https://meem.wtf"
                     ]
                 }
-            }
+            },
+            "required": [
+                "url"
+            ]
         },
         "extension_data": {
             "description": "Additional data associated with this extension.",
