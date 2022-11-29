@@ -6,7 +6,6 @@ import {
 import { IDiamondCut__factory } from '@meemproject/meem-contracts/dist/typechain'
 import { ethers } from 'ethers'
 import slug from 'slug'
-import AgreementABI from '../abis/Agreement.json'
 import { MeemAPI } from '../api.generated'
 import {
 	InitParamsStruct,
