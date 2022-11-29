@@ -6,7 +6,7 @@
 			"type": "node",
 			"request": "launch",
 			"runtimeArgs": [
-				"${workspaceFolder}/node_modules/.bin/hardhat",
+				"${workspaceFolder}/../meem-contracts/node_modules/.bin/hardhat",
 				"test",
 				"--network",
 				"hardhat",

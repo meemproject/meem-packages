@@ -150,24 +150,15 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 	})
 	const [rpcUrls] = useState(initialRpcUrls)
 
-	// const getMeFetcher = useCallback(
-	// 	() =>
-	// 		makeFetcher<
-	// 			MeemAPI.v1.GetMe.IQueryParams,
-	// 			MeemAPI.v1.GetMe.IRequestBody,
-	// 			MeemAPI.v1.GetMe.IResponseBody
-	// 		>({
-	// 			method: MeemAPI.v1.GetMe.method
-	// 		}),
-	// 	[jwt]
-	// )
-
 	const getMeFetcher = makeFetcher<
 		MeemAPI.v1.GetMe.IQueryParams,
 		MeemAPI.v1.GetMe.IRequestBody,
 		MeemAPI.v1.GetMe.IResponseBody
 	>({
-		method: MeemAPI.v1.GetMe.method
+		method: MeemAPI.v1.GetMe.method,
+		headers: () => ({
+			Authorization: `JWT ${jwt}`
+		})
 	})
 
 	const {
@@ -196,6 +187,7 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 
 	useEffect(() => {
 		if (isGetMeError && jwt) {
+			log.debug('Error fetching "me". Removing jwt')
 			Cookies.remove('meemJwtToken')
 			setLoginState(LoginState.NotLoggedIn)
 		}
@@ -294,12 +286,14 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 		setLoginState(LoginState.Unknown)
 		setJwt(newMeemJwt)
 		if (newMeemJwt) {
+			log.debug('Setting Meem JWT')
 			Cookies.set('meemJwtToken', newMeemJwt, {
 				sameSite: 'strict',
 				secure:
 					typeof window !== 'undefined' && window.location.protocol === 'https:'
 			})
 		} else {
+			log.debug('Removing Meem JWT')
 			Cookies.remove('meemJwtToken')
 			setLoginState(LoginState.NotLoggedIn)
 		}

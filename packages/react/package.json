@@ -63,7 +63,7 @@
     "babel-loader": "^8.2.4",
     "dotenv": "^16.0.3",
     "eslint": "^8.13.0",
-    "eslint-config-kengoldfarb": "^1.4.2",
+    "eslint-config-kengoldfarb": "^1.4.5",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-is": "^18.0.0",

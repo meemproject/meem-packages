@@ -4,6 +4,7 @@ import React from 'react'
 import { CustomApolloProvider } from './apolloContext'
 import { AuthProvider } from './authContext'
 import { MeemUserProvider } from './meemUserContext'
+import { SDKProvider } from './sdkContext'
 import { SocketProvider } from './socketContext'
 
 // export const MeemProvider = combineComponents(
@@ -31,7 +32,9 @@ export const MeemProvider: React.FC<{
 			>
 				<AuthProvider>
 					<CustomApolloProvider>
-						<MeemUserProvider>{children}</MeemUserProvider>
+						<MeemUserProvider>
+							<SDKProvider>{children}</SDKProvider>
+						</MeemUserProvider>
 					</CustomApolloProvider>
 				</AuthProvider>
 			</Auth0Provider>
