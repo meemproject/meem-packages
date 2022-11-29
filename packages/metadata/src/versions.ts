@@ -4,7 +4,8 @@
 export const supportedVersions: { [key: string]: Array<string> } = {
 	Meem: ['20221116'],
 	MeemAgreement: ['20221116'],
-	MeemAgreementRole: ['20221116']
+	MeemAgreementRole: ['20221116'],
+	MeemAgreementExtension: ['20221116']
 }
 
 /**
@@ -20,7 +21,8 @@ export const supportedVersionsTypeMapping: {
 			AgreementContract: 'Meem_AgreementContract_20221116',
 			AgreementToken: 'Meem_AgreementToken_20221116',
 			AgreementRoleContract: 'Meem_AgreementRoleContract_20221116',
-			AgreementRoleToken: 'Meem_AgreementRoleToken_20221116'
+			AgreementRoleToken: 'Meem_AgreementRoleToken_20221116',
+			AgreementExtension: 'Meem_AgreementExtension_20221116'
 		}
 	}
 }

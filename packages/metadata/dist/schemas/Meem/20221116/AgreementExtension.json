@@ -1,0 +1,60 @@
+{
+    "description": "This schema describes version 20221116 of the Meem Extension metadata standard.",
+    "title": "Meem_AgreementExtension_20221116",
+    "type": "object",
+    "properties": {
+        "meem_metadata_type": {
+            "description": "The type of metadata. See supported Meem metadata types here: https://meem.wtf",
+            "examples": [
+                "Meem_AgreementExtension"
+            ],
+            "type": "string"
+        },
+        "meem_metadata_version": {
+            "description": "The calendar version of the Meem metadata schema. See supported Meem metadata schemas here: https://meem.wtf",
+            "examples": [
+                "20221116"
+            ],
+            "type": "string"
+        },
+        "meem_agreement_address": {
+            "description": "The address of the Meem Agreement Contract associated with this extension.",
+            "examples": [
+                "0x....."
+            ],
+            "type": "string"
+        },
+        "external_link": {
+            "description": "External link associated with this extension.",
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string",
+                    "description": "Label to display for the link.",
+                    "examples": [
+                        "Launch Extension Page"
+                    ]
+                },
+                "url": {
+                    "type": "string",
+                    "description": "URL for the link.",
+                    "examples": [
+                        "https://meem.wtf"
+                    ]
+                }
+            },
+            "required": [
+                "url"
+            ]
+        },
+        "extension_data": {
+            "description": "Additional data associated with this extension.",
+            "type": "object"
+        }
+    },
+    "required": [
+        "meem_metadata_type",
+        "meem_metadata_version",
+        "meem_agreement_address"
+    ]
+}
