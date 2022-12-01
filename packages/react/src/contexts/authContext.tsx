@@ -174,7 +174,8 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 
 	useEffect(() => {
 		if (meData) {
-			setAccounts([meData?.meemIdentity?.DefaultWallet.address])
+			// setAccounts([meData?.meemIdentity?.DefaultWallet.address])
+			setAccounts([meData.address])
 			setLoginState(LoginState.LoggedIn)
 		}
 	}, [meData])
