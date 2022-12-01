@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 import superagent from 'superagent'
-import { MeemAPI } from '../api.generated'
+import { MeemAPI } from '../generated/api.generated'
 
 interface IMakeFetcher {
 	method?: MeemAPI.HttpMethod

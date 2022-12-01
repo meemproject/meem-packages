@@ -3,7 +3,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { Text, Space, Modal, Image, Divider, Grid, Center } from '@mantine/core'
 import React from 'react'
 import { GetIdentityIntegrationsQuery } from '../../generated/graphql'
-import { useCustomApollo } from '../contexts/apolloContext'
+import { useMeemApollo } from '../contexts/apolloContext'
 import { useAuth } from '../contexts/authContext'
 import { IDENTITY_INTEGRATIONS_QUERY } from '../gql/auth'
 import { useClubsTheme } from '../themes/ClubsTheme'
@@ -28,7 +28,7 @@ export const LoginModal: React.FC<IProps> = ({
 
 	const { loginWithRedirect } = useAuth0()
 
-	const { anonClient } = useCustomApollo()
+	const { anonClient } = useMeemApollo()
 
 	const { connectWallet } = useAuth()
 

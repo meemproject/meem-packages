@@ -2,7 +2,7 @@ import { ApolloError, useSubscription } from '@apollo/client'
 import React, { createContext, useMemo, useContext, ReactNode } from 'react'
 import { MeemIdSubscriptionSubscription } from '../../generated/graphql'
 import { MEEM_ID_SUBSCRIPTION } from '../gql/auth'
-import { useCustomApollo } from './apolloContext'
+import { useMeemApollo } from './apolloContext'
 import { useAuth } from './authContext'
 
 export type User = MeemIdSubscriptionSubscription['Users'][0]
@@ -30,7 +30,7 @@ export const MeemUserProvider: React.FC<IMeemUserContextProps> = ({
 	...props
 }: IMeemUserContextProps) => {
 	const { accounts } = useAuth()
-	const { userClient } = useCustomApollo()
+	const { userClient } = useMeemApollo()
 
 	const {
 		loading: isLoading,

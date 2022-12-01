@@ -1,8 +1,10 @@
 // Contexts
+export * from './contexts/apolloContext'
 export * from './contexts/socketContext'
 export * from './contexts/meemContext'
 export * from './contexts/authContext'
 export * from './contexts/meemUserContext'
+export * from './contexts/sdkContext'
 
 // Lib / utilities
 export * from './lib/getNodeSize'
