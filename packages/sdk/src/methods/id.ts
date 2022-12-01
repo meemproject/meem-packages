@@ -1,4 +1,4 @@
-import { MeemAPI } from '../api.generated'
+import { MeemAPI } from '../generated/api.generated'
 import { makeRequest } from '../lib/fetcher'
 
 export class Auth {

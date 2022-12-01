@@ -175,13 +175,11 @@ export const CustomApolloProvider: FC<IApolloProviderProps> = ({
 	)
 }
 
-export function useCustomApollo() {
+export function useMeemApollo() {
 	const context = useContext(CustomApolloContext)
 
 	if (typeof context === 'undefined') {
-		throw new Error(
-			`useCustomApollo must be used within a CustomApolloProvider`
-		)
+		throw new Error(`useMeemApollo must be used within a CustomApolloProvider`)
 	}
 
 	return context

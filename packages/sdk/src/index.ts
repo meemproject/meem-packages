@@ -1,7 +1,7 @@
 import { Agreement } from './methods/agreement'
 import { Auth } from './methods/id'
 
-export * from './api.generated'
+export * from './generated/api.generated'
 export * from './abis'
 export * from './lib/image'
 export * from './lib/meemdata'

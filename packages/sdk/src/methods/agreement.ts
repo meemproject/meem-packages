@@ -6,11 +6,11 @@ import {
 import { IDiamondCut__factory } from '@meemproject/meem-contracts/dist/typechain'
 import { ethers } from 'ethers'
 import slug from 'slug'
-import { MeemAPI } from '../api.generated'
 import {
 	InitParamsStruct,
 	SetRoleItemStruct
 } from '../generated/agreement.generated'
+import { MeemAPI } from '../generated/api.generated'
 import { GetBundleByIdQuery, GetContractQuery } from '../generated/graphql'
 import { GET_BUNDLE_BY_ID, GET_CONTRACT_QUERY } from '../gql/agreement.gql'
 import { makeRequest } from '../lib/fetcher'
@@ -58,14 +58,14 @@ export class Agreement {
 			symbol,
 			name,
 			maxSupply,
-			members,
+			// members,
 			mintPermissions,
-			shouldMintTokens,
+			// shouldMintTokens,
 			contractURI,
 			roles,
 			splits,
-			isTransferLocked,
-			isMaxSupplyLocked
+			isTransferLocked
+			// isMaxSupplyLocked
 		} = options
 		const useMeemAPI = options.useMeemAPI !== false
 
@@ -185,7 +185,9 @@ export class Agreement {
 
 			await tx.wait()
 
-			return { status: 'success' } as MeemAPI.v1.CreateAgreement.IResponseBody
+			// return { status: 'success' } as MeemAPI.v1.CreateAgreement.IResponseBody
 		}
 	}
+
+	public async mint() {}
 }

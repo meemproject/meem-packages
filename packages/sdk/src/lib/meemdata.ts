@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 import { DateTime } from 'luxon'
-import { MeemAPI } from '../api.generated'
+import { MeemAPI } from '../generated/api.generated'
 import { getMeemProject, MeemProject } from '../meemProject'
 import { normalizeImageUrl } from './image'
 
