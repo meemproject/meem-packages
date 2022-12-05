@@ -5,10 +5,14 @@ import {
 } from '@meemproject/meem-contracts'
 import { IDiamondCut__factory } from '@meemproject/meem-contracts/dist/typechain'
 import { ethers } from 'ethers'
+import type { PayableOverrides } from 'ethers'
 import slug from 'slug'
 import {
+	Agreement__factory,
+	Agreement as AgreementContract,
 	InitParamsStruct,
-	SetRoleItemStruct
+	SetRoleItemStruct,
+	PromiseOrValue
 } from '../generated/agreement.generated'
 import { MeemAPI } from '../generated/api.generated'
 import { GetBundleByIdQuery, GetContractQuery } from '../generated/graphql'
@@ -36,6 +40,25 @@ export interface ICreateAgreementOptions
 
 	/** Optional when useMeemAPI===false. Sets roles at the contract level. */
 	roles?: SetRoleItemStruct[]
+}
+
+export const getAgreementContract = (options: {
+	/** The contract address */
+	address: string
+
+	/** The abi to use. If omitted will use the latest version Agreement abi. */
+	abi?: Record<string, any>[]
+
+	/** The signer to use. If omitted will use the default signer. */
+	signer: ethers.Signer
+}) => {
+	const { address, abi, signer } = options
+
+	const agreement = abi
+		? new ethers.Contract(address, abi, signer)
+		: Agreement__factory.connect(address, signer)
+
+	return agreement as AgreementContract
 }
 
 export class Agreement {
@@ -189,5 +212,158 @@ export class Agreement {
 		}
 	}
 
-	public async mint() {}
+	public async reInitialize(options: {
+		/** The agreement to update */
+		agreementId: string
+
+		/** The name of the contract */
+		name?: string
+
+		/** The max number of tokens */
+		maxSupply?: string
+
+		/** Agreement contract metadata */
+		metadata?: MeemAPI.IMeemMetadataLike
+
+		/** The contract symbol. If omitted, will use slug generated from name */
+		symbol?: string
+
+		/** Contract admin addresses */
+		admins?: string[]
+
+		/** Special minter permissions */
+		minters?: string[]
+
+		/** Minting permissions */
+		mintPermissions?: Omit<MeemAPI.IMeemPermission, 'merkleRoot'>[]
+
+		/** Splits for minting / transfers */
+		splits?: MeemAPI.IMeemSplit[]
+
+		/** Whether tokens can be transferred */
+		isTransferLocked?: boolean
+	}) {
+		const { agreementId } = options
+		const result =
+			await makeRequest<MeemAPI.v1.ReInitializeAgreement.IDefinition>(
+				MeemAPI.v1.ReInitializeAgreement.path({ agreementId }),
+				{
+					jwt: this.jwt,
+					method: MeemAPI.v1.ReInitializeAgreement.method,
+					body: options
+				}
+			)
+
+		return result
+	}
+
+	public async bulkMint(options: {
+		agreementId: string
+		tokens: {
+			/** The token metadata */
+			metadata?: MeemAPI.IMeemMetadataLike
+
+			/** The address where the token will be minted */
+			to: string
+		}[]
+	}) {
+		const { agreementId, tokens } = options
+
+		const result =
+			await makeRequest<MeemAPI.v1.BulkMintAgreementTokens.IDefinition>(
+				MeemAPI.v1.BulkMintAgreementTokens.path({ agreementId }),
+				{
+					jwt: this.jwt,
+					method: MeemAPI.v1.BulkMintAgreementTokens.method,
+					body: {
+						tokens
+					}
+				}
+			)
+
+		return result
+	}
+
+	/** Mint a token directly on the contract. */
+	public async mint(options: {
+		/** The wallet used to mint the token */
+		signer: ethers.Signer
+
+		/** The agreement contract address */
+		address: string
+
+		/**
+		 * The token metadata.
+		 * Will save the metadata on-chain.
+		 *
+		 * If you're saving large metadata, it's recommended you save to IPFS first
+		 * and then pass tokenURI instead
+		 *
+		 * Required if tokenURI is not specified. */
+		metadata?: MeemAPI.IMeemMetadataLike
+
+		/** The token URI. Required if metadata is not specified. */
+		tokenURI?: string
+
+		/** The address where the token will be minted */
+		to: string
+
+		/** The token type */
+		tokenType?: MeemAPI.MeemType
+
+		/** Wait for the transaction to complete before returning. Default true. */
+		shouldWait?: boolean
+
+		/** Transaction overrides */
+		overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+	}) {
+		const { signer, address, metadata, to, tokenType, shouldWait } = options
+		let { tokenURI } = options
+
+		if (!tokenURI && metadata) {
+			const buf = Buffer.from(JSON.stringify(metadata))
+			tokenURI = `data:application/json;base64,${buf.toString('base64')}`
+		}
+
+		if (!tokenURI) {
+			throw new Error('MISSING_PARAMETERS')
+		}
+
+		const agreement = getAgreementContract({
+			address,
+			signer
+		})
+
+		const tx = await agreement.mint({
+			to,
+			tokenType: tokenType ?? MeemAPI.MeemType.Original,
+			tokenURI
+		})
+
+		if (shouldWait !== false) {
+			await tx.wait()
+		}
+
+		return tx
+	}
+
+	public async getMintingProof(options: {
+		/** The agreement to update */
+		agreementId: string
+
+		/** Where to mint the token to */
+		to: string
+	}) {
+		const { agreementId } = options
+
+		const result = await makeRequest<MeemAPI.v1.GetMintingProof.IDefinition>(
+			MeemAPI.v1.GetMintingProof.path({ agreementId }),
+			{
+				jwt: this.jwt,
+				method: MeemAPI.v1.GetMintingProof.method
+			}
+		)
+
+		return result
+	}
 }
