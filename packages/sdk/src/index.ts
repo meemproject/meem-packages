@@ -1,5 +1,5 @@
 import { Agreement } from './methods/agreement'
-import { Auth } from './methods/id'
+import { Id } from './methods/id'
 
 export * from './generated/api.generated'
 export * from './abis'
@@ -10,7 +10,7 @@ export * from './methods/id'
 export * from './methods/agreement'
 
 export class MeemSDK {
-	public auth: Auth
+	public id: Id
 
 	public agreement: Agreement
 
@@ -18,13 +18,14 @@ export class MeemSDK {
 
 	public constructor(options: { jwt?: string }) {
 		this.jwt = options.jwt
-		this.auth = new Auth({ jwt: this.jwt })
+		this.id = new Id({ jwt: this.jwt })
 		this.agreement = new Agreement({ jwt: this.jwt })
 	}
 
+	/** Sets the JWT used in api calls */
 	public setJwt(jwt?: string) {
 		this.jwt = jwt
-		this.auth.setJwt(jwt)
+		this.id.setJwt(jwt)
 		this.agreement.setJwt(jwt)
 	}
 }

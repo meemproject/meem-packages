@@ -469,20 +469,18 @@ export interface IMetadataMeem extends IMeem {
 }
 
 export interface IERC721Metadata {
-	name?: string
-	image?: string
-	description?: string
+	[key: string]: any
 }
 
 // TODO: Define metadata types for extensions (e.g. type: APP, LINK)
 export interface IAgreementExtensionMetadata {
 	externalUrl?: string
-	[key: string]: unknown
+	[key: string]: any
 }
 
 // TODO: Define metadata types for extensions (e.g. type: APP, LINK)
 export interface IAgreementRoleExtensionMetadata {
-	[key: string]: unknown
+	[key: string]: any
 }
 
 export interface INFT {
@@ -1104,7 +1102,14 @@ export namespace CreateAgreementRole {
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		status: 'success'
+		/** The Transaction id for deploying the contract. Transaction #1 */
+		deployContractTxId: string
+
+		/** The Transaction id for initializing the contract. Transaction #2 */
+		cutTxId: string
+
+		/** The Transaction id for minting tokens. Transaction #3 */
+		mintTxId?: string
 	}
 
 	export interface IDefinition {
@@ -1138,7 +1143,7 @@ export namespace CreateAgreementSafe {
 		safeOwners: string[]
 
 		/** Chain id of the safe */
-		chainId: number
+		chainId?: number
 
 		/** The number of signatures required */
 		threshold?: number
@@ -1393,6 +1398,44 @@ export namespace ReInitializeAgreement {
 
 
 
+/** Set the agreement safe address */
+export namespace SetAgreementSafeAddress {
+	export interface IPathParams {
+		agreementId: string
+	}
+
+	export const path = (options: IPathParams) =>
+		`/api/1.0/agreements/${options.agreementId}/safe`
+
+	export const method = HttpMethod.Patch
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** The safe address */
+		address: string
+
+		/** Chain id of the safe */
+		chainId?: number
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		status: 'success'
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
+
 /** Update an agreement extension */
 export namespace UpdateAgreementExtension {
 	export interface IPathParams {
@@ -1470,7 +1513,8 @@ export namespace UpdateAgreementRole {
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		status: 'success'
+		/** The Transaction id for updating the contract */
+		txId: string
 	}
 
 	export interface IDefinition {

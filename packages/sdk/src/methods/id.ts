@@ -1,13 +1,14 @@
 import { MeemAPI } from '../generated/api.generated'
 import { makeRequest } from '../lib/fetcher'
 
-export class Auth {
+export class Id {
 	private jwt?: string
 
 	public constructor(options: { jwt?: string }) {
 		this.jwt = options.jwt
 	}
 
+	/** Sets the JWT used in api calls */
 	public setJwt(jwt?: string) {
 		this.jwt = jwt
 	}
