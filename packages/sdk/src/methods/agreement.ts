@@ -68,6 +68,7 @@ export class Agreement {
 		this.jwt = options.jwt
 	}
 
+	/** Sets the JWT used in api calls */
 	public setJwt(jwt?: string) {
 		this.jwt = jwt
 	}
@@ -81,14 +82,19 @@ export class Agreement {
 			symbol,
 			name,
 			maxSupply,
-			// members,
+			members,
 			mintPermissions,
-			// shouldMintTokens,
+			shouldMintTokens,
 			contractURI,
 			roles,
 			splits,
-			isTransferLocked
-			// isMaxSupplyLocked
+			isTransferLocked,
+			metadata,
+			minters,
+			chainId,
+			isMaxSupplyLocked,
+			admins,
+			tokenMetadata
 		} = options
 		const useMeemAPI = options.useMeemAPI !== false
 
@@ -98,7 +104,22 @@ export class Agreement {
 				{
 					jwt: this.jwt,
 					method: MeemAPI.v1.CreateAgreement.method,
-					body: options
+					body: {
+						name,
+						metadata,
+						chainId,
+						maxSupply,
+						isMaxSupplyLocked,
+						symbol,
+						admins,
+						minters,
+						mintPermissions,
+						splits,
+						isTransferLocked,
+						shouldMintTokens,
+						members,
+						tokenMetadata
+					}
 				}
 			)
 
@@ -207,11 +228,10 @@ export class Agreement {
 			)
 
 			await tx.wait()
-
-			// return { status: 'success' } as MeemAPI.v1.CreateAgreement.IResponseBody
 		}
 	}
 
+	/** Re-initialize the contract and change the contract settings. */
 	public async reInitialize(options: {
 		/** The agreement to update */
 		agreementId: string
@@ -243,20 +263,42 @@ export class Agreement {
 		/** Whether tokens can be transferred */
 		isTransferLocked?: boolean
 	}) {
-		const { agreementId } = options
+		const {
+			agreementId,
+			name,
+			maxSupply,
+			metadata,
+			symbol,
+			admins,
+			minters,
+			mintPermissions,
+			splits,
+			isTransferLocked
+		} = options
 		const result =
 			await makeRequest<MeemAPI.v1.ReInitializeAgreement.IDefinition>(
 				MeemAPI.v1.ReInitializeAgreement.path({ agreementId }),
 				{
 					jwt: this.jwt,
 					method: MeemAPI.v1.ReInitializeAgreement.method,
-					body: options
+					body: {
+						name,
+						maxSupply,
+						metadata,
+						symbol,
+						admins,
+						minters,
+						mintPermissions,
+						splits,
+						isTransferLocked
+					}
 				}
 			)
 
 		return result
 	}
 
+	/** Bulk mint tokens */
 	public async bulkMint(options: {
 		agreementId: string
 		tokens: {
@@ -347,11 +389,12 @@ export class Agreement {
 		return tx
 	}
 
+	/** Fetch the merkle proof required for this user to mint. */
 	public async getMintingProof(options: {
-		/** The agreement to update */
+		/** The agreement */
 		agreementId: string
 
-		/** Where to mint the token to */
+		/** The address where the token will be minted */
 		to: string
 	}) {
 		const { agreementId } = options
@@ -363,6 +406,86 @@ export class Agreement {
 				method: MeemAPI.v1.GetMintingProof.method
 			}
 		)
+
+		return result
+	}
+
+	/** Upgrade an agreement */
+	public async upgradeAgreement(options: {
+		/** The agreement to upgrade */
+		agreementId: string
+
+		/** Specify the bundle id to upgrade to. Defaults to latest Agreements bundle */
+		bundleId?: string
+	}) {
+		const { agreementId, bundleId } = options
+
+		const result = await makeRequest<MeemAPI.v1.UpgradeAgreement.IDefinition>(
+			MeemAPI.v1.UpgradeAgreement.path({ agreementId }),
+			{
+				jwt: this.jwt,
+				method: MeemAPI.v1.UpgradeAgreement.method,
+				body: {
+					bundleId
+				}
+			}
+		)
+
+		return result
+	}
+
+	/** Create a new agreement */
+	public async createSafe(options: {
+		/** The agreement to create the club safe for */
+		agreementId: string
+
+		/** Addresses of the safe owners */
+		safeOwners: string[]
+
+		/** Set the chain where the safe should be created. Defaults to the chain where the agreement lives. */
+		chainId?: number
+
+		/** The number of signatures required */
+		threshold?: number
+	}) {
+		const { agreementId, safeOwners, chainId, threshold } = options
+		const result =
+			await makeRequest<MeemAPI.v1.CreateAgreementSafe.IDefinition>(
+				MeemAPI.v1.CreateAgreementSafe.path({ agreementId }),
+				{
+					jwt: this.jwt,
+					method: MeemAPI.v1.CreateAgreementSafe.method,
+					body: {
+						safeOwners,
+						chainId,
+						threshold
+					}
+				}
+			)
+
+		return result
+	}
+
+	/** Sets the address of the Agreement safe */
+	public async setSafeAddress(options: {
+		/** The agreement */
+		agreementId: string
+
+		/** The safe address */
+		address: string
+	}) {
+		const { agreementId, address } = options
+		const result =
+			await makeRequest<MeemAPI.v1.SetAgreementSafeAddress.IDefinition>(
+				MeemAPI.v1.SetAgreementSafeAddress.path({ agreementId }),
+				{
+					jwt: this.jwt,
+					method: MeemAPI.v1.SetAgreementSafeAddress.method,
+					body: {
+						address
+					}
+				}
+			)
 
 		return result
 	}
