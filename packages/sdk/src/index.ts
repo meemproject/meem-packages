@@ -7,6 +7,7 @@ export * from './lib/image'
 export * from './lib/meemdata'
 export * from './lib/fetcher'
 export * from './methods/id'
+export * from './methods/agreement'
 
 export class MeemSDK {
 	public auth: Auth
