@@ -6,7 +6,7 @@ import {
 import { IDiamondCut__factory } from '@meemproject/meem-contracts/dist/typechain'
 import { ethers } from 'ethers'
 import type { PayableOverrides } from 'ethers'
-import slug from 'slug'
+import makeSlug from 'slug'
 import {
 	Agreement__factory,
 	Agreement as AgreementContract,
@@ -22,23 +22,23 @@ import { apolloClient } from '../lib/GQLClient'
 import log from '../lib/log'
 
 export interface ICreateAgreementBaseOptions {
-		/** Default: true. When set to false will call the contract directly. Will require the user to pay gas. */
-		useMeemAPI?: boolean
+	/** Default: true. When set to false will call the contract directly. Will require the user to pay gas. */
+	useMeemAPI?: boolean
 
-		/** Required when useMeemAPI===false. The proxy contract id from EPM to deploy and initialize. */
-		proxyContractId?: string
-	
-		/** Required when useMeemAPI===false. The bundle contract id from EPM to use with the proxy contract. */
-		bundleId?: string
-	
-		/** Required when useMeemAPI===false. The signer to use to deploy the contract. */
-		signer?: ethers.Signer
-	
-		/** Required when useMeemAPI===false. The URI containing metadata for the contract. */
-		contractURI?: string
-	
-		/** Optional when useMeemAPI===false. Sets roles at the contract level. */
-		roles?: SetRoleItemStruct[]
+	/** Required when useMeemAPI===false. The proxy contract id from EPM to deploy and initialize. */
+	proxyContractId?: string
+
+	/** Required when useMeemAPI===false. The bundle contract id from EPM to use with the proxy contract. */
+	bundleId?: string
+
+	/** Required when useMeemAPI===false. The signer to use to deploy the contract. */
+	signer?: ethers.Signer
+
+	/** Required when useMeemAPI===false. The URI containing metadata for the contract. */
+	contractURI?: string
+
+	/** Optional when useMeemAPI===false. Sets roles at the contract level. */
+	roles?: SetRoleItemStruct[]
 }
 
 export const getAgreementContract = (options: {
@@ -73,7 +73,10 @@ export class Agreement {
 	}
 
 	/** Create a new agreement */
-	public async createAgreement(options: ICreateAgreementBaseOptions & MeemAPI.v1.CreateAgreement.IRequestBody) {
+	public async createAgreement(
+		options: ICreateAgreementBaseOptions &
+			MeemAPI.v1.CreateAgreement.IRequestBody
+	) {
 		const {
 			proxyContractId,
 			signer,
@@ -163,7 +166,7 @@ export class Agreement {
 			}
 
 			const contractInitParams: InitParamsStruct = {
-				symbol: symbol ?? slug(name, { lower: true }),
+				symbol: symbol ?? makeSlug(name, { lower: true }),
 				name,
 				contractURI,
 				roles: roles ?? [],
@@ -490,23 +493,26 @@ export class Agreement {
 	}
 
 	/** Create a new agreement */
-	public async createAgreementRole(options: ICreateAgreementBaseOptions & MeemAPI.v1.CreateAgreementRole.IRequestBody & {
-		/** The id of the agreement */
-		agreementId: string
-	}) {
+	public async createAgreementRole(
+		options: ICreateAgreementBaseOptions &
+			MeemAPI.v1.CreateAgreementRole.IRequestBody & {
+				/** The id of the agreement */
+				agreementId: string
+			}
+	) {
 		const {
 			agreementId,
-			proxyContractId,
-			signer,
-			bundleId,
+			// proxyContractId,
+			// signer,
+			// bundleId,
 			symbol,
 			name,
 			maxSupply,
 			members,
 			shouldMintTokens,
-			contractURI,
-			roles,
-			splits, 
+			// contractURI,
+			// roles,
+			splits,
 			isTransferLocked,
 			metadata,
 			isMaxSupplyLocked,
@@ -515,27 +521,28 @@ export class Agreement {
 		const useMeemAPI = options.useMeemAPI !== false
 
 		if (useMeemAPI) {
-			const result = await makeRequest<MeemAPI.v1.CreateAgreementRole.IDefinition>(
-				MeemAPI.v1.CreateAgreementRole.path({
-					agreementId
-				}),
-				{
-					jwt: this.jwt,
-					method: MeemAPI.v1.CreateAgreementRole.method,
-					body: {
-						name,
-						metadata,
-						maxSupply,
-						isMaxSupplyLocked,
-						symbol,
-						splits,
-						isTransferLocked,
-						shouldMintTokens,
-						members,
-						tokenMetadata
+			const result =
+				await makeRequest<MeemAPI.v1.CreateAgreementRole.IDefinition>(
+					MeemAPI.v1.CreateAgreementRole.path({
+						agreementId
+					}),
+					{
+						jwt: this.jwt,
+						method: MeemAPI.v1.CreateAgreementRole.method,
+						body: {
+							name,
+							metadata,
+							maxSupply,
+							isMaxSupplyLocked,
+							symbol,
+							splits,
+							isTransferLocked,
+							shouldMintTokens,
+							members,
+							tokenMetadata
+						}
 					}
-				}
-			)
+				)
 
 			return result
 		} else {
@@ -554,10 +561,8 @@ export class Agreement {
 			// if (!result.data.Contracts[0].bytecode) {
 			// 	throw new Error('CONTRACT_NOT_FOUND')
 			// }
-
 			// // Build mint permissions
 			// const builtMintPermissions: MeemAPI.IMeemPermission[] = []
-
 			// if (mintPermissions) {
 			// 	mintPermissions.forEach(m => {
 			// 		if (m.permission === MeemAPI.Permission.Addresses) {
@@ -576,7 +581,6 @@ export class Agreement {
 			// 		}
 			// 	})
 			// }
-
 			// const contractInitParams: InitParamsStruct = {
 			// 	symbol: symbol ?? slug(name, { lower: true }),
 			// 	name,
@@ -594,9 +598,7 @@ export class Agreement {
 			// 	},
 			// 	signer
 			// )
-
 			// const deployerAddress = await signer.getAddress()
-
 			// const proxyContract = await proxyContractFactory.deploy(
 			// 	deployerAddress,
 			// 	[],
@@ -634,13 +636,11 @@ export class Agreement {
 			// 	contractInitParams
 			// ])
 			// log.debug(contractInitParams)
-
 			// const tx = await diamondCutContract.diamondCut(
 			// 	cuts,
 			// 	proxyContract.address,
 			// 	functionCall
 			// )
-
 			// await tx.wait()
 		}
 	}
@@ -683,7 +683,10 @@ export class Agreement {
 		} = options
 		const result =
 			await makeRequest<MeemAPI.v1.ReInitializeAgreement.IDefinition>(
-				MeemAPI.v1.ReInitializeAgreementRole.path({ agreementId, agreementRoleId }),
+				MeemAPI.v1.ReInitializeAgreementRole.path({
+					agreementId,
+					agreementRoleId
+				}),
 				{
 					jwt: this.jwt,
 					method: MeemAPI.v1.ReInitializeAgreement.method,
@@ -714,16 +717,17 @@ export class Agreement {
 	}) {
 		const { agreementId, agreementRoleId, bundleId } = options
 
-		const result = await makeRequest<MeemAPI.v1.UpgradeAgreementRole.IDefinition>(
-			MeemAPI.v1.UpgradeAgreementRole.path({ agreementId, agreementRoleId }),
-			{
-				jwt: this.jwt,
-				method: MeemAPI.v1.UpgradeAgreement.method,
-				body: {
-					bundleId
+		const result =
+			await makeRequest<MeemAPI.v1.UpgradeAgreementRole.IDefinition>(
+				MeemAPI.v1.UpgradeAgreementRole.path({ agreementId, agreementRoleId }),
+				{
+					jwt: this.jwt,
+					method: MeemAPI.v1.UpgradeAgreement.method,
+					body: {
+						bundleId
+					}
 				}
-			}
-		)
+			)
 
 		return result
 	}
@@ -746,7 +750,10 @@ export class Agreement {
 
 		const result =
 			await makeRequest<MeemAPI.v1.BulkMintAgreementRoleTokens.IDefinition>(
-				MeemAPI.v1.BulkMintAgreementRoleTokens.path({ agreementId, agreementRoleId }),
+				MeemAPI.v1.BulkMintAgreementRoleTokens.path({
+					agreementId,
+					agreementRoleId
+				}),
 				{
 					jwt: this.jwt,
 					method: MeemAPI.v1.BulkMintAgreementRoleTokens.method,
@@ -825,11 +832,20 @@ export class Agreement {
 			metadata?: MeemAPI.IMeemMetadataLike
 		}
 	}) {
-		const { agreementId, agreementExtensionId, metadata, externalLink, widget } = options
+		const {
+			agreementId,
+			agreementExtensionId,
+			metadata,
+			externalLink,
+			widget
+		} = options
 
 		const result =
 			await makeRequest<MeemAPI.v1.UpdateAgreementExtension.IDefinition>(
-				MeemAPI.v1.UpdateAgreementExtension.path({ agreementId, agreementExtensionId }),
+				MeemAPI.v1.UpdateAgreementExtension.path({
+					agreementId,
+					agreementExtensionId
+				}),
 				{
 					jwt: this.jwt,
 					method: MeemAPI.v1.UpdateAgreementExtension.method,
