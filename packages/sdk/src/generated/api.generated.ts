@@ -483,6 +483,14 @@ export interface IAgreementRoleExtensionMetadata {
 	[key: string]: any
 }
 
+export enum IAgreementExtensionVisibility {
+	/** Anyone can view the integration */
+	Anyone = 'anyone',
+
+	/** Users that are token-holders of the same agreement */
+	TokenHolders = 'token-holders'
+}
+
 export interface INFT {
 	/** The address of the contract of the NFT */
 	tokenAddress: string
@@ -547,8 +555,8 @@ export enum IntegrationVisibility {
 	/** Anyone can view the integration */
 	Anyone = 'anyone',
 
-	/** Users that are members of the same agreement */
-	MutualClubMembers = 'mutual-agreement-members',
+	/** Users that are token-holders of the same agreement */
+	TokenHolders = 'token-holders',
 
 	/** Private. Only the current user can view */
 	JustMe = 'just-me'
@@ -602,7 +610,7 @@ export enum ContractType {
 	DiamondFacet = 'diamondFacet'
 }
 
-export interface IMeemIdentity {
+export interface IMeemUser {
 	id: string
 	displayName: string
 	profilePicUrl: string
@@ -623,7 +631,7 @@ export interface IAgreementRole {
 	name: string
 	isAdminRole: boolean
 	AgreementId: string
-	memberMeemIds: IMeemIdentity[]
+	members: IMeemUser[]
 }
 
 export interface IGuild {
@@ -873,7 +881,8 @@ export namespace BulkMintAgreementRoleTokens {
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		status: 'success'
+		/** The Transaction id */
+		txId: string
 	}
 
 	export interface IDefinition {
@@ -1026,8 +1035,24 @@ export namespace CreateAgreementExtension {
 	export interface IRequestBody {
 		/** The slug of the extension to enable */
 		slug: string
-		/** Metadata to store for this extension */
-		metadata: IMeemMetadataLike
+		/** Optional metadata associated with this extension */
+		metadata?: IMeemMetadataLike
+		/** Optional external link associated with this extension */
+		externalLink?: {
+			/** Url for the link */
+			url: string
+			/** The link label */
+			label?: string
+			/** Visibility of the link extension */
+			visibility?: IAgreementExtensionVisibility
+		}
+		/** Optional widget data associated with this extension */
+		widget?: {
+			/** Metadata associated with the extension widget */
+			metadata?: IMeemMetadataLike
+			/** Visibility of the widget extension */
+			visibility?: IAgreementExtensionVisibility
+		}
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
@@ -1050,6 +1075,7 @@ export namespace CreateAgreementExtension {
 /** Create an agreement role contract */
 export namespace CreateAgreementRole {
 	export interface IPathParams {
+		/** The id of the agreement */
 		agreementId: string
 	}
 
@@ -1075,15 +1101,6 @@ export namespace CreateAgreementRole {
 
 		/** The contract symbol. If omitted, will use slug generated from name */
 		symbol?: string
-
-		/** Contract admin addresses */
-		admins?: string[]
-
-		/** Special minter permissions */
-		minters?: string[]
-
-		/** Minting permissions */
-		mintPermissions?: Omit<IMeemPermission, 'merkleRoot'>[]
 
 		/** Splits for minting / transfers */
 		splits?: IMeemSplit[]
@@ -1341,6 +1358,7 @@ export namespace IsSlugAvailable {
 /** Reinitialize an agreement contract */
 export namespace ReInitializeAgreement {
 	export interface IPathParams {
+		/** The id of the agreement */
 		agreementId: string
 	}
 
@@ -1398,6 +1416,94 @@ export namespace ReInitializeAgreement {
 
 
 
+/** Reinitialize an agreement contract */
+export namespace ReInitializeAgreementRole {
+	export interface IPathParams {
+		/** The id of the agreement */
+		agreementId: string
+		/** The id of the agreement role */
+		agreementRoleId: string
+	}
+
+	export const path = (options: IPathParams) =>
+		`/api/1.0/agreements/${options.agreementId}/roles/${options.agreementRoleId}/reinitialize`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** The name of the contract */
+		name?: string
+
+		/** The max number of tokens */
+		maxSupply?: string
+
+		/** Agreement role contract metadata */
+		metadata?: IMeemMetadataLike
+
+		/** The contract symbol. If omitted, will use slug generated from name */
+		symbol?: string
+
+		/** Splits for minting / transfers */
+		splits?: IMeemSplit[]
+
+		/** Whether tokens can be transferred */
+		isTransferLocked?: boolean
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		/** The Transaction id for updating the contract */
+		txId: string
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
+
+/** Set the agreement admin role */
+export namespace SetAgreementAdminRole {
+	export interface IPathParams {
+		agreementId: string
+	}
+
+	export const path = (options: IPathParams) =>
+		`/api/1.0/agreements/${options.agreementId}/setAdminRole`
+
+	export const method = HttpMethod.Patch
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** The id of the agreement role to set as admin role */
+		adminAgreementRoleId: string
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		/** The Transaction id */
+		txId: string
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+}
+
+
+
+
 /** Set the agreement safe address */
 export namespace SetAgreementSafeAddress {
 	export interface IPathParams {
@@ -1442,20 +1548,40 @@ export namespace UpdateAgreementExtension {
 		/** The id of the agreement */
 		agreementId: string
 
-		/** The extension slug */
-		slug: string
+		/** The agreement extension id */
+		agreementExtensionId: string
 	}
 
 	export const path = (options: IPathParams) =>
-		`/api/1.0/agreements/${options.agreementId}/extensions/${options.slug}`
+		`/api/1.0/agreements/${options.agreementId}/extensions/${options.agreementExtensionId}`
 
 	export const method = HttpMethod.Put
 
 	export interface IQueryParams {}
 
 	export interface IRequestBody {
-		/** Metadata to store for this extension */
+		/** Optional metadata associated with this extension */
 		metadata?: IMeemMetadataLike
+		/** Optional external link associated with this extension */
+		externalLink?: {
+			/** Url for the link */
+			url: string
+			/** The link label */
+			label?: string
+			/** Whether link should be enabled */
+			isEnabled?: boolean
+			/** Visibility of the extension link */
+			visibility?: IAgreementExtensionVisibility
+		}
+		/** Optional widget data associated with this extension */
+		widget?: {
+			/** Metadata associated with the extension widget */
+			metadata?: IMeemMetadataLike
+			/** Whether widget should be enabled */
+			isEnabled?: boolean
+			/** Visibility of the extension widget */
+			visibility?: IAgreementExtensionVisibility
+		}
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
@@ -1537,6 +1663,45 @@ export namespace UpgradeAgreement {
 
 	export const path = (options: IPathParams) =>
 		`/api/1.0/agreements/${options.agreementId}/upgrade`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** Specify the bundle id to upgrade to. Defaults to latest Agreements bundle */
+		bundleId?: string
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		/** The Transaction id */
+		txId: string
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
+
+/** Upgrade an agreement role contract */
+export namespace UpgradeAgreementRole {
+	export interface IPathParams {
+		/** The id of the agreement */
+		agreementId: string
+		/** The id of the agreement role */
+		agreementRoleId: string
+	}
+
+	export const path = (options: IPathParams) =>
+		`/api/1.0/agreements/${options.agreementId}/roles/${options.agreementRoleId}/upgrade`
 
 	export const method = HttpMethod.Post
 
@@ -1938,7 +2103,7 @@ export namespace CreateOrUpdateUser {
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		user: any
+		user: IMeemUser
 	}
 
 	export interface IDefinition {
@@ -2033,7 +2198,7 @@ export namespace GetMe {
 		address: string
 
 		/** The authenticated user */
-		user: any
+		user: IMeemUser
 	}
 
 	export interface IDefinition {
