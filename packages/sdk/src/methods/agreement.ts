@@ -780,13 +780,15 @@ export class Agreement {
 			url: string
 			/** The link label */
 			label?: string
+			/** Visibility of the link extension */
+			visibility?: MeemAPI.IAgreementExtensionVisibility
 		}
 		/** Optional widget data associated with this extension */
 		widget?: {
-			/** Whether widget should be enabled */
-			isEnabled: boolean
 			/** Metadata associated with the extension widget */
 			metadata?: MeemAPI.IMeemMetadataLike
+			/** Visibility of the extension widget */
+			visibility?: MeemAPI.IAgreementExtensionVisibility
 		}
 	}) {
 		const { agreementId, slug, metadata, externalLink, widget } = options
@@ -823,6 +825,8 @@ export class Agreement {
 			url: string
 			/** The link label */
 			label?: string
+			/** Visibility of the link extension */
+			visibility?: MeemAPI.IAgreementExtensionVisibility
 		}
 		/** Optional widget data associated with this extension */
 		widget?: {
