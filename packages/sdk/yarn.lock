@@ -1588,10 +1588,10 @@
   resolved "https://registry.yarnpkg.com/@kengoldfarb/log/-/log-1.0.5.tgz#7b83c4c43f86358e5b2f0fb7cce5b08534ca9b4c"
   integrity sha512-lVTKWRS5JR36Uuo3rbtslAv701igH+JCUYKWsw12ngLs1e7pdWvmpw/b7AJQ0rSqoqKgcoZ8PDgZEN7rYGMiDA==
 
-"@meemproject/meem-contracts@^0.10.0":
-  version "0.10.4"
-  resolved "https://registry.yarnpkg.com/@meemproject/meem-contracts/-/meem-contracts-0.10.4.tgz#9e358b1250414fffb685a635b6bec94546b4a177"
-  integrity sha512-eyn1k81wCndpz2zTx215SoPlHQTZAUMe34ixzqBTDJl9u1B2VuBinTiaQKYtDaXH3EfIc8iCEvNBgM96PBEcaQ==
+"@meemproject/meem-contracts@^0.10.8":
+  version "0.10.8"
+  resolved "https://registry.yarnpkg.com/@meemproject/meem-contracts/-/meem-contracts-0.10.8.tgz#77134c7bd95199c450c7d1697562be1ebe5b2cf4"
+  integrity sha512-gB83k3f8pXvkowUFVSa7rzQp44u9V6BIGMGRm6Rb3ite9YX5esaUbWUeSMaSLMXqNIFqAiVl9BYClWq5P/8FMQ==
   dependencies:
     "@kengoldfarb/log" "^1.0.5"
     "@openzeppelin/contracts" "^4.7.3"
