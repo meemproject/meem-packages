@@ -59,7 +59,11 @@
 	"dependencies": {
 		"@apollo/client": "^3.7.1",
 		"@kengoldfarb/log": "^1.0.5",
+		"@lit-protocol/lit-node-client": "^2.0.35",
+		"@lit-protocol/sdk-browser": "^1.1.238",
 		"@meemproject/meem-contracts": "^0.10.5",
+		"@meemproject/utils": "^0.10.5",
+		"@tableland/sdk": "^3.1.5",
 		"@typechain/ethers-v5": "^10.0.0",
 		"@types/js-cookie": "^3.0.1",
 		"@types/luxon": "^2.3.1",
