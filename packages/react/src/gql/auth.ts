@@ -4,10 +4,8 @@ export const MEEM_ID_SUBSCRIPTION = gql`
 	subscription MeemIdSubscription($walletAddress: String) {
 		Users(where: { Wallets: { address: { _ilike: $walletAddress } } }) {
 			id
-			updatedAt
 			profilePicUrl
 			displayName
-			createdAt
 			DefaultWallet {
 				address
 				ens

@@ -7,7 +7,8 @@ import React, {
 	useContext,
 	ReactNode,
 	useEffect,
-	useCallback
+	useCallback,
+	useState
 } from 'react'
 import { useAuth } from './authContext'
 
@@ -56,7 +57,9 @@ export interface ISDKProps {
 }
 
 export const SDKProvider: React.FC<ISDKProps> = ({ ...props }: ISDKProps) => {
-	const { jwt } = useAuth()
+	const { jwt, setJwt } = useAuth()
+
+	const [hasSetJWT, setHasSetJWT] = useState(false)
 
 	const sdk = new MeemSDK({ jwt })
 
@@ -77,6 +80,7 @@ export const SDKProvider: React.FC<ISDKProps> = ({ ...props }: ISDKProps) => {
 			const result = await sdk.id.login(options)
 
 			sdk.setJwt(result.jwt)
+			setJwt(result.jwt)
 
 			Cookies.set('meemMessageToSign', result.messageToSign, {
 				sameSite: 'strict',
@@ -97,6 +101,12 @@ export const SDKProvider: React.FC<ISDKProps> = ({ ...props }: ISDKProps) => {
 
 	useEffect(() => {
 		sdk.setJwt(jwt)
+		if (jwt) {
+			setHasSetJWT(true)
+		} else if (hasSetJWT) {
+			Cookies.remove('meemMessageToSign')
+			Cookies.remove('meemSignature')
+		}
 	}, [jwt])
 
 	useEffect(() => {

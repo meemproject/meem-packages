@@ -10,8 +10,6 @@ import {
 } from '@meemproject/utils'
 import { connect } from '@tableland/sdk'
 import type { Connection } from '@tableland/sdk'
-import { MeemAPI } from '../generated/api.generated'
-import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
 
 export interface IPartialAccessControlCondition
@@ -91,11 +89,6 @@ export class Storage {
 
 		const defaultLitChain = chainIdToLitChainName(chainId)
 
-		// const authSig = await Lit.checkAndSignAuthMessage({
-		// 	chain: defaultLitChain
-		// })
-
-		// TODO: Fix lint error
 		const builtAccessControlConditions: AccessControlConditions =
 			accessControlConditions.map(accessControlCondition => {
 				return {
@@ -122,6 +115,7 @@ export class Storage {
 		}
 
 		const encryptedSymmetricKey = await litClient.saveEncryptionKey({
+			// unifiedAccessControlConditions: builtAccessControlConditions,
 			accessControlConditions: builtAccessControlConditions,
 			symmetricKey,
 			authSig,
@@ -166,23 +160,72 @@ export class Storage {
 
 		const litClient = await this.getLitInstance()
 
-		console.log(options)
-
-		const encryptionKey = await litClient.getEncryptionKey({
+		const symmetricKey = await litClient.getEncryptionKey({
 			accessControlConditions,
 			toDecrypt: encryptedSymmetricKey,
 			chain,
 			authSig
 		})
 
-		console.log({ encryptionKey })
-
-		if (!encryptionKey) {
+		if (!symmetricKey) {
 			throw new Error('LIT_DECRYPTION_FAILED')
 		}
 
-		const decryptedString = await Lit.decryptString(strToDecrypt, encryptionKey)
+		const decryptedString = await Lit.decryptString(strToDecrypt, symmetricKey)
 
-		return { decryptedString }
+		let data: Record<string, any> = {}
+		if (decryptedString) {
+			try {
+				data = JSON.parse(decryptedString)
+			} catch (e) {
+				log.warn('Error parsing decrypted string as JSON')
+				log.warn(e)
+			}
+		}
+
+		return { decryptedString, data }
+	}
+
+	/** Fetch data from a Tableland table */
+	public async read(options: {
+		/** The chain */
+		chainId: number
+
+		/** The Tableland table name */
+		tableName: string
+
+		/** Column names to fetch */
+		columns?: string[]
+
+		/** Limit the number of items returned */
+		limit?: number
+
+		/** The column name to order by */
+		orderBy?: string
+
+		/** The sort direction */
+		order?: 'ASC' | 'DESC'
+	}) {
+		const { chainId, tableName, columns } = options
+
+		const limit = options.limit ?? 50
+		const orderBy = options.orderBy ?? 'createdAt'
+		const order = options.order ?? 'DESC'
+
+		const tableland = await this.getTablelandInstance({
+			chainId
+		})
+
+		let selector = '*'
+
+		if (columns) {
+			selector = columns.map(c => `"${c}"`).join(', ')
+		}
+
+		const query = `SELECT ${selector} FROM ${tableName} ORDER BY "${orderBy}" ${order} LIMIT ${limit}`
+
+		const data = await tableland.read(query)
+
+		return data
 	}
 }

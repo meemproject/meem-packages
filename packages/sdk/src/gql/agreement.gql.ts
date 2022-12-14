@@ -25,3 +25,12 @@ export const GET_BUNDLE_BY_ID = gql`
 		}
 	}
 `
+
+export const GET_AGREEMENT_EXTENSION_BY_ID = gql`
+	query GetAgreementExtensionById($id: uuid!) {
+		AgreementExtensions(where: { id: { _eq: $id } }) {
+			id
+			metadata
+		}
+	}
+`
