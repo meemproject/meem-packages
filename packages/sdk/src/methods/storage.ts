@@ -24,8 +24,10 @@ export interface IPartialAccessControlCondition
 export class Storage {
 	private jwt?: string
 
+	/** Mapping of chainId:Tableland instance */
 	private tablelands: Record<number, Connection> = {}
 
+	/** The LIT protocol client */
 	private lit?: Lit.LitNodeClient
 
 	public constructor(options: { jwt?: string }) {
@@ -37,6 +39,7 @@ export class Storage {
 		this.jwt = jwt
 	}
 
+	/** Get an instance of the Tableland SDK */
 	public async getTablelandInstance(options: { chainId: number }) {
 		const { chainId } = options
 		if (this.tablelands[chainId]) {
@@ -53,6 +56,7 @@ export class Storage {
 		return tableland
 	}
 
+	/** Get a LIT protocol client */
 	public async getLitInstance() {
 		if (this.lit) {
 			return this.lit
@@ -66,8 +70,9 @@ export class Storage {
 		return client
 	}
 
-	public async encryptAndSave(options: {
-		/** The lit protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig() */
+	/** Encrypt data using LIT protocol */
+	public async encrypt(options: {
+		/** The LIT protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig() */
 		authSig: JsonAuthSig
 
 		/** The chainId to encrypt on */
@@ -132,8 +137,9 @@ export class Storage {
 		}
 	}
 
+	/** Decrypt data using LIT protocol */
 	public async decrypt(options: {
-		/** The lit protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig() */
+		/** The LIT protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig() */
 		authSig: JsonAuthSig
 
 		/** The chainId to decrypt on */
@@ -186,6 +192,108 @@ export class Storage {
 		return { decryptedString, data }
 	}
 
+	/** Encrypt the "data" field and then write to tableland */
+	public async encryptAndWrite(options: {
+		/** The chain */
+		chainId: number
+
+		/** The Tableland table name */
+		tableName: string
+
+		/** The values to be written to the db in the form of columnName:value */
+		writeColumns: {
+			[columnName: string]: any
+		}
+
+		/**
+		 * The token(s) that may be held in order to decrypt the string
+		 *
+		 * For advanced customization options see: https://developer.litprotocol.com/SDK/Explanation/encryption
+		 */
+		accessControlConditions: IPartialAccessControlCondition[]
+
+		/**
+		 * The LIT protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig()
+		 *
+		 * If set will encrypt the "data" column before writing to tableland
+		 */
+		authSig: JsonAuthSig
+	}) {
+		const {
+			chainId,
+			tableName,
+			accessControlConditions: partialAccessControlConditions,
+			writeColumns,
+			authSig
+		} = options
+
+		const { accessControlConditions, encryptedStr, encryptedSymmetricKey } =
+			await this.encrypt({
+				accessControlConditions: partialAccessControlConditions,
+				authSig,
+				chainId,
+				data: writeColumns
+			})
+
+		const data = await this.blobToBase64(encryptedStr)
+
+		const newWriteColumns = {
+			accessControlConditions: JSON.stringify(accessControlConditions),
+			data,
+			encryptedSymmetricKey
+		}
+
+		const result = await this.write({
+			tableName,
+			chainId,
+			writeColumns: newWriteColumns
+		})
+
+		return result
+	}
+
+	/** Insert data in a Tableland table */
+	public async write(options: {
+		/** The chain */
+		chainId: number
+
+		/** The Tableland table name */
+		tableName: string
+
+		/** The values to be written to the db in the form of columnName:value */
+		writeColumns: {
+			[columnName: string]: any
+		}
+	}) {
+		const { chainId, tableName, writeColumns } = options
+
+		const tl = await this.getTablelandInstance({ chainId })
+
+		if (!tl.signer && typeof window !== 'undefined') {
+			await tl.siwe()
+		} else {
+			throw new Error('NO_TABLELAND_SIGNER')
+		}
+
+		const now = Math.floor(new Date().getTime() / 1000)
+
+		const columnNames: string[] = ['createdAt', 'updatedAt']
+		const columnValues: (string | number)[] = [now, now]
+
+		Object.keys(writeColumns).forEach(columnName => {
+			columnNames.push(`"${columnName}"`)
+			columnValues.push(`'${writeColumns[columnName]}'`)
+		})
+
+		const result = await tl.write(
+			`INSERT INTO ${tableName} (${columnNames.join(
+				','
+			)}) VALUES (${columnValues.join(',')})`
+		)
+
+		return result
+	}
+
 	/** Fetch data from a Tableland table */
 	public async read(options: {
 		/** The chain */
@@ -194,19 +302,22 @@ export class Storage {
 		/** The Tableland table name */
 		tableName: string
 
-		/** Column names to fetch */
+		/** Column names to fetch. Default all columns */
 		columns?: string[]
 
-		/** Limit the number of items returned */
+		/** Limit the number of items returned. Default 100 */
 		limit?: number
 
-		/** The column name to order by */
+		/** The column name to order by. Default "createdAt" */
 		orderBy?: string
 
-		/** The sort direction */
+		/** The sort direction. Default DESC */
 		order?: 'ASC' | 'DESC'
 
-		/** If set will attempt to decrypt the rows "data" column using LIT protocol */
+		/**
+		 * If set will attempt to decrypt the rows "data" column using LIT protocol and
+		 * filter out any rows that fail decryption
+		 */
 		authSig?: JsonAuthSig
 	}): Promise<
 		{
@@ -215,7 +326,7 @@ export class Storage {
 	> {
 		const { chainId, tableName, columns, authSig } = options
 
-		const limit = options.limit ?? 50
+		const limit = options.limit ?? 100
 		const orderBy = options.orderBy ?? 'createdAt'
 		const order = options.order ?? 'DESC'
 
@@ -276,17 +387,23 @@ export class Storage {
 			results.forEach((result, i) => {
 				if (result.status === 'fulfilled') {
 					rows[i].data = result.value.data
+				} else {
+					log.debug(result.status, result.reason)
 				}
 			})
 		}
 
+		log.debug('Retrieved Tableland Rows', { rows })
+
 		if (authSig) {
+			log.debug('Found "authSig". Filtering out rows that failed decryption')
 			return rows.filter(r => typeof r.data === 'object')
 		}
 
 		return rows
 	}
 
+	/** Converts a Blob to a base64 string */
 	public blobToBase64(blob: Blob): Promise<string> {
 		return new Promise((resolve, _) => {
 			const reader = new FileReader()
@@ -295,6 +412,7 @@ export class Storage {
 		})
 	}
 
+	/** Converts a base64 URI into a Blob */
 	public base64URIToBlob(dataURI: string): Blob {
 		try {
 			const byteString = atob(dataURI.split(',')[1])
