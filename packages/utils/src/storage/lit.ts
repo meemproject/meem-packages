@@ -1,37 +1,7 @@
 export const chainIdToLitChainName = (chainId: number) => {
 	/*
 		Supported LIT chains:
-
-		ethereum
-		polygon
-		fantom
-		xdai
-		bsc
-		arbitrum
-		avalanche
-		fuji
-		harmony
-		kovan
-		mumbai
-		goerli
-		ropsten
-		rinkeby
-		cronos
-		optimism
-		celo
-		aurora
-		eluvio
-		alfajores
-		xdc
-		evmos
-		evmosTestnet
-		solana
-		solanaDevnet
-		solanaTestnet
-		cosmos
-		kyve
-		evmosCosmos
-		evmosCosmosTestnet
+		"ethereum" | "optimism" | "polygon" | "arbitrum" | "ethereum-goerli" | "optimism-goerli" | "arbitrum-goerli" | "polygon-mumbai" | "optimism-goerli-staging" | "local-tableland" | "custom"
 	*/
 	switch (chainId) {
 		case 1:
@@ -50,14 +20,16 @@ export const chainIdToLitChainName = (chainId: number) => {
 			return 'arbitrum'
 			break
 
+		case 420:
+			return 'optimism-goerli'
+			break
+
 		case 5:
-		default:
 			return 'goerli'
 			break
 
-		// case 420:
-		// 	return 'optimism-goerli'
-		// 	break
+		default:
+			throw new Error('LIT_UNSUPPORTED_CHAIN')
 
 		// case 421613:
 		// 	return 'arbitrum-goerli'

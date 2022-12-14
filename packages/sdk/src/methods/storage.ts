@@ -1,5 +1,9 @@
-import type { AccessControlConditions } from '@lit-protocol/constants'
-import Lit, { LitNodeClient } from '@lit-protocol/lit-node-client'
+import type {
+	AccessControlConditions,
+	AccsDefaultParams,
+	JsonAuthSig
+} from '@lit-protocol/constants'
+import * as Lit from '@lit-protocol/lit-node-client'
 import {
 	chainIdToTablelandChainName,
 	chainIdToLitChainName
@@ -10,15 +14,21 @@ import { MeemAPI } from '../generated/api.generated'
 import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
 
-export interface IPartialAccessControlConditions
-	extends Partial<AccessControlConditions> {}
+export interface IPartialAccessControlCondition
+	extends Partial<AccsDefaultParams> {
+	returnValueTest?: {
+		key?: string
+		comparator: string
+		value: string
+	}
+}
 
 export class Storage {
 	private jwt?: string
 
 	private tablelands: Record<number, Connection> = {}
 
-	private lit?: LitNodeClient
+	private lit?: Lit.LitNodeClient
 
 	public constructor(options: { jwt?: string }) {
 		this.jwt = options.jwt
@@ -59,53 +69,39 @@ export class Storage {
 	}
 
 	public async encryptAndSave(options: {
+		/** The lit protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig() */
+		authSig: JsonAuthSig
+
 		/** The chainId to encrypt on */
 		chainId: number
 
-		/** The string to encrypt */
-		strToEncrypt: string
+		/** The data to encrypt */
+		data: Record<string, any>
 
 		/**
 		 * The token(s) that may be held in order to decrypt the string
 		 *
 		 * For advanced customization options see: https://developer.litprotocol.com/SDK/Explanation/encryption
 		 */
-		accessControlConditions: {
-			/** The token contract address */
-			contractAddress: string
-
-			/** The chain id to check. Default is the top level chainId */
-			chainId?: number
-
-			/** Default is balanceOf */
-			method?: 'balanceOf' | 'eth_getBalance'
-
-			/** Default is ERC721 */
-			standardContractType?: 'ERC721' | 'ERC1155'
-
-			/** Default is [:userAddress] */
-			parameters?: string[]
-
-			/** The test to check if the user hold the correct amount. Default is > 0 */
-			returnValueTest?: number
-		}[]
+		accessControlConditions: IPartialAccessControlCondition[]
 	}) {
-		const { strToEncrypt, accessControlConditions, chainId } = options
+		const { authSig, data, accessControlConditions, chainId } = options
+
+		const strToEncrypt = JSON.stringify(data)
 
 		const defaultLitChain = chainIdToLitChainName(chainId)
 
-		const authSig = await Lit.checkAndSignAuthMessage({
-			chain: defaultLitChain
-		})
+		// const authSig = await Lit.checkAndSignAuthMessage({
+		// 	chain: defaultLitChain
+		// })
 
+		// TODO: Fix lint error
 		const builtAccessControlConditions: AccessControlConditions =
 			accessControlConditions.map(accessControlCondition => {
 				return {
 					standardContractType:
 						accessControlCondition.standardContractType ?? 'ERC721',
-					chain: accessControlCondition.chainId
-						? chainIdToLitChainName(accessControlCondition.chainId)
-						: defaultLitChain,
+					chain: chainId ? chainIdToLitChainName(chainId) : defaultLitChain,
 					method: accessControlCondition.method ?? 'balanceOf',
 					parameters: accessControlCondition.parameters ?? [':userAddress'],
 					returnValueTest: accessControlCondition.returnValueTest ?? {
@@ -116,10 +112,14 @@ export class Storage {
 				}
 			})
 
-		const { encryptedString: encryptedStr, symmetricKey } =
-			await Lit.encryptString(strToEncrypt)
-
 		const litClient = await this.getLitInstance()
+		const result = await Lit.encryptString(strToEncrypt)
+		const symmetricKey = result?.symmetricKey
+		const encryptedStr = result?.encryptedString
+
+		if (!symmetricKey || !encryptedStr) {
+			throw new Error('LIT_ENCRYPTION_FAILURE')
+		}
 
 		const encryptedSymmetricKey = await litClient.saveEncryptionKey({
 			accessControlConditions: builtAccessControlConditions,
@@ -130,20 +130,26 @@ export class Storage {
 
 		return {
 			accessControlConditions: builtAccessControlConditions,
-			encryptedSymmetricKey,
+			encryptedSymmetricKey: Lit.uint8arrayToString(
+				encryptedSymmetricKey,
+				'base16'
+			) as string,
 			encryptedStr
 		}
 	}
 
 	public async decrypt(options: {
+		/** The lit protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig() */
+		authSig: JsonAuthSig
+
 		/** The chainId to decrypt on */
 		chainId: number
 
 		/** The string to decrypt */
-		strToDecrypt: string
+		strToDecrypt: Blob
 
 		/** The access control conditions */
-		accessControlConditions: LitAccessControlConditions
+		accessControlConditions: AccessControlConditions
 
 		/** The lit encrypted symmetric key obtained from the saveEncryptionKey method */
 		encryptedSymmetricKey: string
@@ -152,25 +158,30 @@ export class Storage {
 			strToDecrypt,
 			accessControlConditions,
 			chainId,
+			authSig,
 			encryptedSymmetricKey
 		} = options
 
 		const chain = chainIdToLitChainName(chainId)
 
-		const authSig = await Lit.checkAndSignAuthMessage({
-			chain
-		})
+		const litClient = await this.getLitInstance()
 
-		const litClient = await this.getLitInstance({ chainId })
+		console.log(options)
 
-		const symmetricKey = await litClient.getEncryptionKey({
+		const encryptionKey = await litClient.getEncryptionKey({
 			accessControlConditions,
 			toDecrypt: encryptedSymmetricKey,
 			chain,
 			authSig
 		})
 
-		const decryptedString = await Lit.decryptString(strToDecrypt, symmetricKey)
+		console.log({ encryptionKey })
+
+		if (!encryptionKey) {
+			throw new Error('LIT_DECRYPTION_FAILED')
+		}
+
+		const decryptedString = await Lit.decryptString(strToDecrypt, encryptionKey)
 
 		return { decryptedString }
 	}

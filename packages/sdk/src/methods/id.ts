@@ -1,7 +1,16 @@
+import type { JsonAuthSig } from '@lit-protocol/constants'
+import { ethers } from 'ethers'
+import { SiweMessage } from 'siwe'
 import { MeemAPI } from '../generated/api.generated'
 import { makeRequest } from '../lib/fetcher'
 
 export class Id {
+	/** The last message the was signed */
+	public lastSignedMessage?: string
+
+	/** The last signature of the lastMessageSigned */
+	public lastSignature?: string
+
 	private jwt?: string
 
 	public constructor(options: { jwt?: string }) {
@@ -13,13 +22,107 @@ export class Id {
 		this.jwt = jwt
 	}
 
-	/** Login with the Meem API */
+	public getLitAuthSig(): JsonAuthSig {
+		if (!this.lastSignedMessage || !this.lastSignature) {
+			throw new Error('NOT_LOGGED_IN')
+		}
+
+		const recoveredAddress = ethers.utils.verifyMessage(
+			this.lastSignedMessage,
+			this.lastSignature as string
+		)
+
+		const authSig = {
+			sig: this.lastSignature,
+			derivedVia: 'web3.eth.personal.sign',
+			signedMessage: this.lastSignedMessage,
+			address: recoveredAddress
+		}
+
+		return authSig as JsonAuthSig
+	}
+
 	public async login(options: {
+		/** The message that will appear in the user's wallet to sign */
+		message: string
+
+		/** The signer */
+		signer: ethers.providers.JsonRpcSigner
+
+		/** The chainId */
+		chainId: number
+
+		/** The URI where the login is taking place */
+		uri: string
+	}) {
+		const { signer, chainId, uri, message } = options
+
+		const address = await signer.getAddress()
+
+		const matches = uri.match(/\/\/([^/]+)/)
+
+		if (!matches || !matches[1]) {
+			throw new Error('INVALID_URI')
+		}
+
+		const siweMessage = new SiweMessage({
+			domain: matches[1],
+			address,
+			statement: message,
+			uri: origin,
+			version: '1',
+			chainId
+		})
+
+		const messageToSign = siweMessage.prepareMessage()
+
+		const signature = await signer.signMessage(messageToSign)
+
+		const recoveredAddress = ethers.utils.verifyMessage(
+			messageToSign,
+			signature
+		)
+
+		const authSig = {
+			sig: signature,
+			derivedVia: 'web3.eth.personal.sign',
+			signedMessage: messageToSign,
+			address: recoveredAddress
+		}
+
+		const { jwt } = await this.loginWithAPI({
+			message: messageToSign,
+			signature
+		})
+
+		this.lastSignedMessage = messageToSign
+		this.lastSignature = signature
+
+		return { signature, authSig, jwt, messageToSign }
+	}
+
+	// /** Returns the  */
+	// public getAuthSig() {
+	// 	const recoveredAddress = ethers.utils.verifyMessage(
+	// 		messageToSign,
+	// 		signature
+	// 	)
+
+	// 	const authSig = {
+	// 		sig: signature,
+	// 		derivedVia: 'web3.eth.personal.sign',
+	// 		signedMessage: messageToSign,
+	// 		address: recoveredAddress
+	// 	}
+	// }
+
+	/** Login with the Meem API */
+	public async loginWithAPI(options: {
 		/** Login w/ access token provided by Auth0 magic link */
 		accessToken?: string
 
-		/** Login w/ wallet. Both address and signature must be provided */
-		address?: string
+		/** Login w/ wallet. Both message and signature must be provided */
+		message?: string
 
 		/** Login w/ wallet. Both address and signature must be provided */
 		signature?: string
@@ -27,7 +130,7 @@ export class Id {
 		/** Whether to connect the login method with the currently authenticated user */
 		shouldConnectUser?: boolean
 	}) {
-		const { accessToken, address, signature, shouldConnectUser } = options
+		const { accessToken, message, signature, shouldConnectUser } = options
 
 		const result = await makeRequest<MeemAPI.v1.Login.IDefinition>(
 			MeemAPI.v1.Login.path(),
@@ -35,7 +138,7 @@ export class Id {
 				method: MeemAPI.v1.Login.method,
 				body: {
 					accessToken,
-					address,
+					message,
 					signature,
 					shouldConnectUser
 				}
