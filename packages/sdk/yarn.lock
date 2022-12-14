@@ -2612,6 +2612,7 @@
     tweetnacl-util "^0.15.1"
     utf-8-validate "^5.0.8"
 
+<<<<<<< HEAD
 "@lit-protocol/uint8arrays@2.0.35":
   version "2.0.35"
   resolved "https://registry.yarnpkg.com/@lit-protocol/uint8arrays/-/uint8arrays-2.0.35.tgz#d9174956daa25bd729ba404fb6cd2e0a924becd3"
@@ -2621,6 +2622,12 @@
   version "0.10.9"
   resolved "https://registry.yarnpkg.com/@meemproject/meem-contracts/-/meem-contracts-0.10.9.tgz#b66590125f5550af3824958d200bc0315c8027e4"
   integrity sha512-NegXTlLKo5CVzLleF97bbKE9funQap/0qXZYX8EL0WkgkYacUImaI0YDzBNxcq7oBWuSXA04iq5LoXRlZE/WvA==
+=======
+"@meemproject/meem-contracts@^0.10.8":
+  version "0.10.8"
+  resolved "https://registry.yarnpkg.com/@meemproject/meem-contracts/-/meem-contracts-0.10.8.tgz#77134c7bd95199c450c7d1697562be1ebe5b2cf4"
+  integrity sha512-gB83k3f8pXvkowUFVSa7rzQp44u9V6BIGMGRm6Rb3ite9YX5esaUbWUeSMaSLMXqNIFqAiVl9BYClWq5P/8FMQ==
+>>>>>>> e853fc37c35d04f45e51599a7a992914a18cef2f
   dependencies:
     "@kengoldfarb/log" "^1.0.5"
     "@openzeppelin/contracts" "^4.7.3"
