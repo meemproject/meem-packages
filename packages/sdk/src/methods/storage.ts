@@ -205,8 +205,15 @@ export class Storage {
 
 		/** The sort direction */
 		order?: 'ASC' | 'DESC'
-	}) {
-		const { chainId, tableName, columns } = options
+
+		/** If set will attempt to decrypt the rows "data" column using LIT protocol */
+		authSig?: JsonAuthSig
+	}): Promise<
+		{
+			[columnName: string]: any
+		}[]
+	> {
+		const { chainId, tableName, columns, authSig } = options
 
 		const limit = options.limit ?? 50
 		const orderBy = options.orderBy ?? 'createdAt'
@@ -226,6 +233,80 @@ export class Storage {
 
 		const data = await tableland.read(query)
 
-		return data
+		const accColumnIdx = data.columns.findIndex(
+			c => c.name === 'accessControlConditions'
+		)
+		const escColumnIdx = data.columns.findIndex(
+			c => c.name === 'encryptedSymmetricKey'
+		)
+
+		const promises: Promise<{
+			decryptedString?: string
+			data: Record<string, any>
+		}>[] = []
+
+		const rows = data.rows.map((row: any[]) => {
+			const builtRow: Record<string, any> = {}
+			row.forEach((val, i) => {
+				const columnName = data.columns[i].name
+				if (
+					columnName === 'data' &&
+					authSig &&
+					accColumnIdx > -1 &&
+					escColumnIdx > -1
+				) {
+					promises.push(
+						this.decrypt({
+							authSig,
+							chainId,
+							strToDecrypt: this.base64URIToBlob(val),
+							accessControlConditions: row[accColumnIdx],
+							encryptedSymmetricKey: row[escColumnIdx]
+						})
+					)
+				}
+				builtRow[data.columns[i].name] = val
+			})
+
+			return builtRow
+		})
+
+		if (promises.length > 0) {
+			const results = await Promise.allSettled(promises)
+			results.forEach((result, i) => {
+				if (result.status === 'fulfilled') {
+					rows[i].data = result.value.data
+				}
+			})
+		}
+
+		if (authSig) {
+			return rows.filter(r => typeof r.data === 'object')
+		}
+
+		return rows
+	}
+
+	public blobToBase64(blob: Blob): Promise<string> {
+		return new Promise((resolve, _) => {
+			const reader = new FileReader()
+			reader.onloadend = () => resolve(reader.result as string)
+			reader.readAsDataURL(blob)
+		})
+	}
+
+	public base64URIToBlob(dataURI: string): Blob {
+		try {
+			const byteString = atob(dataURI.split(',')[1])
+			const ab = new ArrayBuffer(byteString.length)
+			const ia = new Uint8Array(ab)
+
+			for (let i = 0; i < byteString.length; i++) {
+				ia[i] = byteString.charCodeAt(i)
+			}
+			return new Blob([ab], { type: 'image/jpeg' })
+		} catch (e) {
+			return new Blob()
+		}
 	}
 }
