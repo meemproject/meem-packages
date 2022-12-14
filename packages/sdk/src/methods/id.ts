@@ -134,4 +134,16 @@ export class Id {
 
 		return result
 	}
+
+	/** Refresh the ENS name for the current user's wallet address */
+	public async refreshENS() {
+		const result = await makeRequest<MeemAPI.v1.RefreshENS.IDefinition>(
+			MeemAPI.v1.RefreshENS.path(),
+			{
+				method: MeemAPI.v1.RefreshENS.method
+			}
+		)
+
+		return result
+	}
 }

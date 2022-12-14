@@ -492,6 +492,30 @@ export class Agreement {
 		return result
 	}
 
+	/** Set the agreement admin role */
+	public async setAgreementAdminRole(options: {
+		/** The agreement */
+		agreementId: string
+
+		/** The id of the agreement role to set as agreement admin role */
+		adminAgreementRoleId: string
+	}) {
+		const { agreementId, adminAgreementRoleId } = options
+		const result =
+			await makeRequest<MeemAPI.v1.SetAgreementAdminRole.IDefinition>(
+				MeemAPI.v1.SetAgreementAdminRole.path({ agreementId }),
+				{
+					jwt: this.jwt,
+					method: MeemAPI.v1.SetAgreementAdminRole.method,
+					body: {
+						adminAgreementRoleId
+					}
+				}
+			)
+
+		return result
+	}
+
 	/** Create a new agreement */
 	public async createAgreementRole(
 		options: ICreateAgreementBaseOptions &
