@@ -104,6 +104,9 @@ interface IAuthContextState {
 
 	/** The current chain id */
 	chainId?: number
+
+	/** The current user */
+	me?: MeemAPI.v1.GetMe.IResponseBody
 }
 
 const AuthContext = createContext({} as IAuthContextState)
@@ -417,7 +420,8 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 			loginState,
 			jwt,
 			setChain,
-			chainId
+			chainId,
+			me: meData
 		}),
 		[
 			web3Provider,
@@ -433,7 +437,8 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 			loginState,
 			jwt,
 			setChain,
-			chainId
+			chainId,
+			meData
 		]
 	)
 

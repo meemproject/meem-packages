@@ -551,7 +551,7 @@ export interface IMeemId {
 	}
 }
 
-export enum IntegrationVisibility {
+export enum IUserIdentityVisibility {
 	/** Anyone can view the integration */
 	Anyone = 'anyone',
 
@@ -690,7 +690,53 @@ export enum TransactionStatus {
 export enum QueueEvent {
 	CallContract = 'callContract',
 	DeployContract = 'deployContract',
-	DiamondCut = 'diamondCut'
+	DiamondCut = 'diamondCut',
+	CreateTablelandTable = 'createTablelandTable'
+}
+
+export enum StorageDataType {
+	Integer = 'INTEGER',
+	Text = 'TEXT'
+}
+
+export enum StorageType {
+	Tableland = 'tableland'
+}
+
+export interface IExtensionStorageDefinition {
+	tableland?: {
+		tables?: [
+			{
+				name: string
+				schema: {
+					[columnName: string]: StorageDataType
+				}
+				permissions: {
+					adminRoleContract: string
+					canInsert: boolean
+					insertRoleContract: string
+					canUpdate: boolean
+					updateRoleContract: string
+					canDelete: boolean
+					deleteRoleContract: string
+					updateableColumns: string[]
+				}
+			}
+		]
+	}
+}
+
+export interface IAgreementExtensionMetadata extends IMeemMetadataLike {
+	tableland?: {
+		/** The extension table name */
+		[extensionTableName: string]: {
+			/** The tableland table name */
+			tablelandTableName: string
+
+			/** The tableland table id */
+			tableId: string
+		}
+	}
 }
 
 export namespace v1 {
@@ -826,10 +872,10 @@ export namespace Login {
 		/** Login w/ access token provided by Auth0 magic link */
 		accessToken?: string
 
-		/** Login w/ wallet. Both address and signature must be provided */
-		address?: string
+		/** Login w/ wallet. Both message and signature must be provided */
+		message?: string
 
-		/** Login w/ wallet. Both address and signature must be provided */
+		/** Login w/ wallet. Both message and signature must be provided */
 		signature?: string
 
 		/** Whether to connect the login method with the currently authenticated user */
@@ -1033,10 +1079,12 @@ export namespace CreateAgreementExtension {
 	export interface IQueryParams {}
 
 	export interface IRequestBody {
-		/** The slug of the extension to enable */
-		slug: string
+		/** The id of the extension to enable */
+		extensionId: string
+
 		/** Optional metadata associated with this extension */
 		metadata?: IMeemMetadataLike
+
 		/** Optional external link associated with this extension */
 		externalLink?: {
 			/** Url for the link */
@@ -1046,6 +1094,7 @@ export namespace CreateAgreementExtension {
 			/** Visibility of the link extension */
 			visibility?: IAgreementExtensionVisibility
 		}
+
 		/** Optional widget data associated with this extension */
 		widget?: {
 			/** Metadata associated with the extension widget */
@@ -1057,6 +1106,9 @@ export namespace CreateAgreementExtension {
 
 	export interface IResponseBody extends IApiResponseBody {
 		status: 'success'
+
+		/** The Transaction ids that must be completed as part of creating the extension. May be empty if no transactions are required. */
+		txIds: string[]
 	}
 
 	export interface IDefinition {
@@ -1473,6 +1525,7 @@ export namespace ReInitializeAgreementRole {
 /** Set the agreement admin role */
 export namespace SetAgreementAdminRole {
 	export interface IPathParams {
+		/** The id of the agreement */
 		agreementId: string
 	}
 
@@ -2119,38 +2172,6 @@ export namespace CreateOrUpdateUser {
 
 
 
-/** Remove a user identity integration from the current user identity */
-export namespace DetachUserIdentity {
-	export interface IPathParams {
-		integrationId: string
-	}
-
-	export const path = (options: IPathParams) =>
-		`/api/1.0/me/integrations/${options.integrationId}`
-
-	export const method = HttpMethod.Delete
-
-	export interface IQueryParams {}
-
-	export interface IRequestBody {}
-
-	export interface IResponseBody extends IApiResponseBody {
-		status: 'success'
-	}
-
-	export interface IDefinition {
-		pathParams: IPathParams
-		queryParams: IQueryParams
-		requestBody: IRequestBody
-		responseBody: IResponseBody
-	}
-
-	export type Response = IResponseBody | IError
-}
-
-
-
-
 export namespace GetApiKey {
 	export interface IPathParams {}
 
@@ -2243,24 +2264,57 @@ export namespace RefreshENS {
 
 
 
-/** Update current user identity */
-export namespace UpdateUserIdentity {
+/** Remove a user identity from the current user */
+export namespace RemoveUserIdentity {
 	export interface IPathParams {
-		/** The user identity integration id to connect or update */
-		integrationId: string
+		/** The id of the user identity to remove */
+		userIdentityId: string
 	}
 
 	export const path = (options: IPathParams) =>
-		`/api/1.0/me/integrations/${options.integrationId}`
+		`/api/1.0/me/identity/${options.userIdentityId}`
 
-	export const method = HttpMethod.Post
+	export const method = HttpMethod.Delete
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {}
+
+	export interface IResponseBody extends IApiResponseBody {
+		status: 'success'
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
+
+/** Update current user identity */
+export namespace UpdateUserIdentity {
+	export interface IPathParams {
+		/** The id of the user identity to update */
+		userIdentityId: string
+	}
+
+	export const path = (options: IPathParams) =>
+		`/api/1.0/me/identity/${options.userIdentityId}`
+
+	export const method = HttpMethod.Patch
 
 	export interface IQueryParams {}
 
 	export interface IRequestBody {
-		/** Set the visibility type of the user identity integration */
-		visibility?: IntegrationVisibility
-		/** Metadata associated with this user identity integration */
+		/** Set the visibility type of the user identity */
+		visibility?: IUserIdentityVisibility
+		/** Metadata associated with this user identity */
 		metadata?: { [key: string]: unknown }
 	}
 
@@ -2277,6 +2331,44 @@ export namespace UpdateUserIdentity {
 
 	export type Response = IResponseBody | IError
 }
+
+
+
+
+/** Save some data to IPFS */
+export namespace SaveToIPFS {
+	export interface IPathParams {}
+
+	export const path = () => `/api/1.0/ipfs`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** The data to save. Only one of "data" or "json" should be sent */
+		data?: string
+
+		/** The JSON to save. Only one of "data" or "json" should be sent */
+		json?: Record<string, any>
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		/** The IPFS hash for the saved data */
+		ipfsHash: string
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+// TODO: How to specify json in OpenAPI definition
 
 
 }
