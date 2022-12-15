@@ -794,8 +794,8 @@ export class Agreement {
 	public async createAgreementExtension(options: {
 		/** The id of the agreement */
 		agreementId: string
-		/** The slug of the extension to enable */
-		slug: string
+		/** The id of the extension to enable */
+		extensionId: string
 		/** Optional metadata associated with this extension */
 		metadata?: MeemAPI.IMeemMetadataLike
 		/** Optional external link associated with this extension */
@@ -815,7 +815,7 @@ export class Agreement {
 			visibility?: MeemAPI.IAgreementExtensionVisibility
 		}
 	}) {
-		const { agreementId, slug, metadata, externalLink, widget } = options
+		const { agreementId, extensionId, metadata, externalLink, widget } = options
 
 		const result =
 			await makeRequest<MeemAPI.v1.CreateAgreementExtension.IDefinition>(
@@ -824,7 +824,7 @@ export class Agreement {
 					jwt: this.jwt,
 					method: MeemAPI.v1.CreateAgreementExtension.method,
 					body: {
-						slug,
+						extensionId,
 						metadata,
 						externalLink,
 						widget

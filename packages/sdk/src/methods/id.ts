@@ -47,20 +47,20 @@ export class Id {
 
 	/** Update info about a user identity belonging to a user */
 	public async updateUserIdentity(options: {
+		/** The id of the user identity to update */
+		userIdentityId: string
+
 		/** The visibility of the integration */
-		visibility?: MeemAPI.IntegrationVisibility
+		visibility?: MeemAPI.IUserIdentityVisibility
 
 		/** Arbitrary metadata */
 		metadata?: Record<string, any>
-
-		/** The id of the IdentityIntegration to remove */
-		identityIntegrationId: string
 	}) {
-		const { visibility, metadata, identityIntegrationId } = options
+		const { visibility, metadata, userIdentityId } = options
 
 		const result = await makeRequest<MeemAPI.v1.UpdateUserIdentity.IDefinition>(
 			MeemAPI.v1.UpdateUserIdentity.path({
-				integrationId: identityIntegrationId
+				userIdentityId
 			}),
 			{
 				method: MeemAPI.v1.UpdateUserIdentity.method,
@@ -74,19 +74,19 @@ export class Id {
 		return result
 	}
 
-	/** Detach an integration from a user */
-	public async detachUserIdentity(options: {
-		/** The id of the IdentityIntegration to remove */
-		identityIntegrationId: string
+	/** Remove a user identity from the current user */
+	public async removeUserIdentity(options: {
+		/** The id of the user identity to remove */
+		userIdentityId: string
 	}) {
-		const { identityIntegrationId } = options
+		const { userIdentityId } = options
 
-		const result = await makeRequest<MeemAPI.v1.DetachUserIdentity.IDefinition>(
-			MeemAPI.v1.DetachUserIdentity.path({
-				integrationId: identityIntegrationId
+		const result = await makeRequest<MeemAPI.v1.RemoveUserIdentity.IDefinition>(
+			MeemAPI.v1.RemoveUserIdentity.path({
+				userIdentityId
 			}),
 			{
-				method: MeemAPI.v1.DetachUserIdentity.method
+				method: MeemAPI.v1.RemoveUserIdentity.method
 			}
 		)
 
