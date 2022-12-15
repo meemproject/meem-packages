@@ -14,8 +14,8 @@ export const MEEM_ID_SUBSCRIPTION = gql`
 				id
 				metadata
 				visibility
-				IdentityIntegrationId
-				IdentityIntegration {
+				IdentityProviderId
+				IdentityProvider {
 					id
 					description
 					icon
@@ -28,9 +28,9 @@ export const MEEM_ID_SUBSCRIPTION = gql`
 	}
 `
 
-export const IDENTITY_INTEGRATIONS_QUERY = gql`
-	query GetIdentityIntegrations {
-		IdentityIntegrations {
+export const IDENTITY_PROVIDERS_QUERY = gql`
+	query GetIdentityProviders {
+		IdentityProviders {
 			id
 			description
 			icon
