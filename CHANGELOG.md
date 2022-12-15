@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/meemproject/meem-packages/compare/v0.10.9...v0.11.0) (2022-12-15)
+
+
+### Features
+
+* hook up LIT + tableland ([ef0dbad](https://github.com/meemproject/meem-packages/commit/ef0dbad))
+
+
+
+
+
 ## [0.10.9](https://github.com/meemproject/meem-packages/compare/v0.10.8...v0.10.9) (2022-12-12)
 
 **Note:** Version bump only for package meem-packages
