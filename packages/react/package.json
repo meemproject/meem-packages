@@ -29,7 +29,7 @@
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "link": "yarn link",
-    "#codegen": "graphql-codegen -r dotenv/config --config codegen.js"
+    "codegen": "graphql-codegen -r dotenv/config --config codegen.js"
   },
   "publishConfig": {
     "access": "public",
