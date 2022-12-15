@@ -101,21 +101,6 @@ export class Id {
 		return { signature, authSig, jwt, messageToSign }
 	}
 
-	// /** Returns the  */
-	// public getAuthSig() {
-	// 	const recoveredAddress = ethers.utils.verifyMessage(
-	// 		messageToSign,
-	// 		signature
-	// 	)
-
-	// 	const authSig = {
-	// 		sig: signature,
-	// 		derivedVia: 'web3.eth.personal.sign',
-	// 		signedMessage: messageToSign,
-	// 		address: recoveredAddress
-	// 	}
-	// }
-
 	/** Login with the Meem API */
 	public async loginWithAPI(options: {
 		/** Login w/ access token provided by Auth0 magic link */
