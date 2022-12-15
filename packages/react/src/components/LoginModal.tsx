@@ -2,10 +2,10 @@ import { useQuery } from '@apollo/client'
 import { useAuth0 } from '@auth0/auth0-react'
 import { Text, Space, Modal, Image, Divider, Grid, Center } from '@mantine/core'
 import React from 'react'
-import { GetIdentityIntegrationsQuery } from '../../generated/graphql'
+import { GetIdentityProvidersQuery } from '../../generated/graphql'
 import { useMeemApollo } from '../contexts/apolloContext'
 import { useAuth } from '../contexts/authContext'
-import { IDENTITY_INTEGRATIONS_QUERY } from '../gql/auth'
+import { IDENTITY_PROVIDERS_QUERY } from '../gql/auth'
 import { useClubsTheme } from '../themes/ClubsTheme'
 
 interface IProps {
@@ -32,8 +32,8 @@ export const LoginModal: React.FC<IProps> = ({
 
 	const { connectWallet } = useAuth()
 
-	const { data: integrationsData } = useQuery<GetIdentityIntegrationsQuery>(
-		IDENTITY_INTEGRATIONS_QUERY,
+	const { data: identityProvidersData } = useQuery<GetIdentityProvidersQuery>(
+		IDENTITY_PROVIDERS_QUERY,
 		{
 			client: anonClient
 		}
@@ -112,8 +112,8 @@ export const LoginModal: React.FC<IProps> = ({
 								</Center>
 							</div>
 						</Grid.Col>
-						{integrationsData?.IdentityIntegrations.map(identityIntegration => (
-							<Grid.Col md={6} lg={6} xl={4} key={identityIntegration.id}>
+						{identityProvidersData?.IdentityProviders.map(identityProvider => (
+							<Grid.Col md={6} lg={6} xl={4} key={identityProvider.id}>
 								<div
 									className={clubsTheme.connectMethodGridItem}
 									style={{
@@ -121,20 +121,20 @@ export const LoginModal: React.FC<IProps> = ({
 									}}
 									onClick={() => {
 										loginWithRedirect({
-											connection: identityIntegration.connectionName
+											connection: identityProvider.connectionName
 										})
 									}}
 								>
 									<Center>
 										<div className={clubsTheme.connectMethodGridItemContent}>
 											<Image
-												src={identityIntegration.icon}
+												src={identityProvider.icon}
 												height={50}
 												fit={'contain'}
 											/>
 											<Space h={16} />
 											<Text className={clubsTheme.tSmallBold}>
-												{identityIntegration.name}
+												{identityProvider.name}
 											</Text>
 										</div>
 									</Center>
