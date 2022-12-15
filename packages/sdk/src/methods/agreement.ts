@@ -492,6 +492,30 @@ export class Agreement {
 		return result
 	}
 
+	/** Set the agreement admin role */
+	public async setAgreementAdminRole(options: {
+		/** The agreement */
+		agreementId: string
+
+		/** The id of the agreement role to set as agreement admin role */
+		adminAgreementRoleId: string
+	}) {
+		const { agreementId, adminAgreementRoleId } = options
+		const result =
+			await makeRequest<MeemAPI.v1.SetAgreementAdminRole.IDefinition>(
+				MeemAPI.v1.SetAgreementAdminRole.path({ agreementId }),
+				{
+					jwt: this.jwt,
+					method: MeemAPI.v1.SetAgreementAdminRole.method,
+					body: {
+						adminAgreementRoleId
+					}
+				}
+			)
+
+		return result
+	}
+
 	/** Create a new agreement */
 	public async createAgreementRole(
 		options: ICreateAgreementBaseOptions &
@@ -770,8 +794,8 @@ export class Agreement {
 	public async createAgreementExtension(options: {
 		/** The id of the agreement */
 		agreementId: string
-		/** The slug of the extension to enable */
-		slug: string
+		/** The id of the extension to enable */
+		extensionId: string
 		/** Optional metadata associated with this extension */
 		metadata?: MeemAPI.IMeemMetadataLike
 		/** Optional external link associated with this extension */
@@ -791,7 +815,7 @@ export class Agreement {
 			visibility?: MeemAPI.IAgreementExtensionVisibility
 		}
 	}) {
-		const { agreementId, slug, metadata, externalLink, widget } = options
+		const { agreementId, extensionId, metadata, externalLink, widget } = options
 
 		const result =
 			await makeRequest<MeemAPI.v1.CreateAgreementExtension.IDefinition>(
@@ -800,7 +824,7 @@ export class Agreement {
 					jwt: this.jwt,
 					method: MeemAPI.v1.CreateAgreementExtension.method,
 					body: {
-						slug,
+						extensionId,
 						metadata,
 						externalLink,
 						widget

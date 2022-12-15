@@ -11,6 +11,7 @@ export const MEEM_ID_SUBSCRIPTION = gql`
 				ens
 			}
 			UserIdentities {
+				id
 				metadata
 				visibility
 				IdentityIntegrationId
