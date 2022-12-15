@@ -10,6 +10,9 @@ import {
 } from '@meemproject/utils'
 import { connect } from '@tableland/sdk'
 import type { Connection } from '@tableland/sdk'
+import request from 'superagent'
+import { MeemAPI } from '../generated/api.generated'
+import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
 
 export interface IPartialAccessControlCondition
@@ -137,6 +140,39 @@ export class Storage {
 		}
 	}
 
+	public async fetchFromIPFSAndDecrypt(options: {
+		/** The LIT protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig() */
+		authSig: JsonAuthSig
+
+		/** The chainId to decrypt on */
+		chainId: number
+
+		/** The IPFS URI to decrypt */
+		ipfsURI: string
+
+		/** The access control conditions */
+		accessControlConditions: AccessControlConditions
+
+		/** The lit encrypted symmetric key obtained from the saveEncryptionKey method */
+		encryptedSymmetricKey: string
+
+		/** Fetch using a custom IPFS gateway. Defaults to the Meem IPFS gateway */
+		ipfsGateway?: string
+	}) {
+		const { ipfsURI, ipfsGateway, ...rest } = options
+
+		const gateway = ipfsGateway ?? 'https://meem.mypinata.cloud/ipfs/'
+
+		const ipfsHash = ipfsURI.replace('ipfs://', '')
+
+		const response = await request.get(`${gateway}${ipfsHash}`)
+
+		return this.decrypt({
+			...rest,
+			strToDecrypt: this.base64URIToBlob(response.text)
+		})
+	}
+
 	/** Decrypt data using LIT protocol */
 	public async decrypt(options: {
 		/** The LIT protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig() */
@@ -237,9 +273,13 @@ export class Storage {
 
 		const data = await this.blobToBase64(encryptedStr)
 
+		const { ipfsHash } = await this.saveToIPFS({
+			data
+		})
+
 		const newWriteColumns = {
 			accessControlConditions: JSON.stringify(accessControlConditions),
-			data,
+			data: `ipfs://${ipfsHash}`,
 			encryptedSymmetricKey
 		}
 
@@ -366,15 +406,27 @@ export class Storage {
 					accColumnIdx > -1 &&
 					escColumnIdx > -1
 				) {
-					promises.push(
-						this.decrypt({
-							authSig,
-							chainId,
-							strToDecrypt: this.base64URIToBlob(val),
-							accessControlConditions: row[accColumnIdx],
-							encryptedSymmetricKey: row[escColumnIdx]
-						})
-					)
+					if (/^ipfs:\/\//.test(val)) {
+						promises.push(
+							this.fetchFromIPFSAndDecrypt({
+								authSig,
+								chainId,
+								ipfsURI: val,
+								accessControlConditions: row[accColumnIdx],
+								encryptedSymmetricKey: row[escColumnIdx]
+							})
+						)
+					} else {
+						promises.push(
+							this.decrypt({
+								authSig,
+								chainId,
+								strToDecrypt: this.base64URIToBlob(val),
+								accessControlConditions: row[accColumnIdx],
+								encryptedSymmetricKey: row[escColumnIdx]
+							})
+						)
+					}
 				}
 				builtRow[data.columns[i].name] = val
 			})
@@ -401,6 +453,27 @@ export class Storage {
 		}
 
 		return rows
+	}
+
+	/** Save data or JSON to IPFS */
+	public async saveToIPFS(options: {
+		data?: string
+		json?: Record<string, any>
+	}) {
+		const { data, json } = options
+
+		const result = await makeRequest<MeemAPI.v1.SaveToIPFS.IDefinition>(
+			MeemAPI.v1.SaveToIPFS.path(),
+			{
+				method: MeemAPI.v1.SaveToIPFS.method,
+				body: {
+					data,
+					json
+				}
+			}
+		)
+
+		return result
 	}
 
 	/** Converts a Blob to a base64 string */
