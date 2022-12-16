@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0](https://github.com/meemproject/meem-packages/compare/v0.11.1...v0.12.0) (2022-12-16)
+
+
+### Features
+
+* separate data/write columns, where query support ([2c80133](https://github.com/meemproject/meem-packages/commit/2c80133))
+
+
+
+
+
 ## [0.11.1](https://github.com/meemproject/meem-packages/compare/v0.11.0...v0.11.1) (2022-12-16)
 
 **Note:** Version bump only for package @meemproject/sdk
