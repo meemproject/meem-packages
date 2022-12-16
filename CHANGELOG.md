@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.1](https://github.com/meemproject/meem-packages/compare/v0.11.0...v0.11.1) (2022-12-16)
+
+
+### Bug Fixes
+
+* export context state interfaces ([4fb4a3f](https://github.com/meemproject/meem-packages/commit/4fb4a3f))
+
+
+
+
+
 # [0.11.0](https://github.com/meemproject/meem-packages/compare/v0.10.9...v0.11.0) (2022-12-15)
 
 
