@@ -10,7 +10,7 @@ export type Wallet = MeemIdSubscriptionSubscription['Users'][0]['DefaultWallet']
 export type UserIdentity =
 	MeemIdSubscriptionSubscription['Users'][0]['UserIdentities'][0]
 
-interface IMeemUserContextState {
+export interface IMeemUserContextState {
 	/** The currently logged in user. Uses a gql subscription so information is refreshed in real-time.  */
 	user?: User
 

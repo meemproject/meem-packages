@@ -15,7 +15,7 @@ export interface ISockets {
 	): void
 }
 
-interface ISocketContextState {
+export interface ISocketContextState {
 	connect: () => void
 	websocket?: WebSocket
 	sockets?: ISockets
