@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/authContext'
 import { IDENTITY_PROVIDERS_QUERY } from '../gql/auth'
 import { useClubsTheme } from '../themes/ClubsTheme'
 
-interface IProps {
+export interface ILoginModalProps {
 	/** Whether the modal is open */
 	isOpen: boolean
 
@@ -19,7 +19,7 @@ interface IProps {
 	isLoginForced?: boolean
 }
 
-export const LoginModal: React.FC<IProps> = ({
+export const LoginModal: React.FC<ILoginModalProps> = ({
 	isOpen,
 	onRequestClose,
 	isLoginForced

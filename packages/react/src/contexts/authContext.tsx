@@ -62,7 +62,7 @@ export interface IChain {
 	}[]
 }
 
-interface IAuthContextState {
+export interface IAuthContextState {
 	/** Ethers.js Web3 provider */
 	web3Provider?: providers.Web3Provider
 
