@@ -237,7 +237,12 @@ export class Storage {
 		tableName: string
 
 		/** The values to be written to the db in the form of columnName:value */
-		writeColumns: {
+		writeColumns?: {
+			[columnName: string]: any
+		}
+
+		/** The values to be encrypted and written to the db "data" column in the form of columnName:value */
+		data: {
 			[columnName: string]: any
 		}
 
@@ -260,6 +265,7 @@ export class Storage {
 			tableName,
 			accessControlConditions: partialAccessControlConditions,
 			writeColumns,
+			data,
 			authSig
 		} = options
 
@@ -268,16 +274,17 @@ export class Storage {
 				accessControlConditions: partialAccessControlConditions,
 				authSig,
 				chainId,
-				data: writeColumns
+				data
 			})
 
-		const data = await this.blobToBase64(encryptedStr)
+		const base64EncryptedStr = await this.blobToBase64(encryptedStr)
 
 		const { ipfsHash } = await this.saveToIPFS({
-			data
+			data: base64EncryptedStr
 		})
 
 		const newWriteColumns = {
+			...writeColumns,
 			accessControlConditions: JSON.stringify(accessControlConditions),
 			data: `ipfs://${ipfsHash}`,
 			encryptedSymmetricKey
@@ -355,6 +362,14 @@ export class Storage {
 		order?: 'ASC' | 'DESC'
 
 		/**
+		 * Add a WHERE clause. Only exact matches are supported
+		 *
+		 * Example: { id: 1 }
+		 *
+		 * */
+		where?: Record<string, any>
+
+		/**
 		 * If set will attempt to decrypt the rows "data" column using LIT protocol and
 		 * filter out any rows that fail decryption
 		 */
@@ -364,7 +379,7 @@ export class Storage {
 			[columnName: string]: any
 		}[]
 	> {
-		const { chainId, tableName, columns, authSig } = options
+		const { chainId, tableName, columns, authSig, where } = options
 
 		const limit = options.limit ?? 100
 		const orderBy = options.orderBy ?? 'createdAt'
@@ -380,7 +395,20 @@ export class Storage {
 			selector = columns.map(c => `"${c}"`).join(', ')
 		}
 
-		const query = `SELECT ${selector} FROM ${tableName} ORDER BY "${orderBy}" ${order} LIMIT ${limit}`
+		let whereClause = ''
+
+		if (where) {
+			Object.keys(where).forEach((key, i) => {
+				if (i > 0) {
+					whereClause += ' AND '
+				}
+				whereClause += `"${key}"='${where[key]}'`
+			})
+		}
+
+		const query = `SELECT ${selector} FROM ${tableName} ${
+			whereClause.length > 0 ? `WHERE ${whereClause}` : ''
+		} ORDER BY "${orderBy}" ${order} LIMIT ${limit}`
 
 		const data = await tableland.read(query)
 
