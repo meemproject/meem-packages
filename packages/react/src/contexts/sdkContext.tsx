@@ -47,6 +47,9 @@ export interface ISDKContextState {
 		/** The JWT token */
 		jwt: string
 	}>
+
+	/** Whether the SDK has initialized */
+	hasInitialized: boolean
 }
 
 const MeemSDKContext = createContext({} as ISDKContextState)
@@ -115,6 +118,7 @@ export const SDKProvider: React.FC<ISDKProps> = ({ ...props }: ISDKProps) => {
 
 		sdk.id.lastSignedMessage = meemMessageToSign
 		sdk.id.lastSignature = meemSignature
+		sdk.id.hasInitialized = true
 	}, [sdk])
 
 	const value = useMemo(
