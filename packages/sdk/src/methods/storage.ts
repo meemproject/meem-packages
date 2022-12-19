@@ -52,6 +52,7 @@ export class Storage {
 		const tableland = await connect({
 			network: 'testnet',
 			chain: chainName
+			// rpcRelay: false
 		})
 
 		this.tablelands[chainId] = tableland
@@ -339,6 +340,49 @@ export class Storage {
 		)
 
 		return result
+	}
+
+	/** Count records in a Tableland table */
+	public async count(options: {
+		/** The chain */
+		chainId: number
+
+		/** The Tableland table name */
+		tableName: string
+
+		/**
+		 * Add a WHERE clause. Only exact matches are supported
+		 *
+		 * Example: { id: 1 }
+		 *
+		 * */
+		where?: Record<string, any>
+	}) {
+		const { chainId, tableName, where } = options
+		const tableland = await this.getTablelandInstance({
+			chainId
+		})
+
+		let whereClause = ''
+
+		if (where) {
+			Object.keys(where).forEach((key, i) => {
+				if (i > 0) {
+					whereClause += ' AND '
+				}
+				whereClause += `"${key}"='${where[key]}'`
+			})
+		}
+
+		const query = `SELECT count(1) FROM ${tableName} ${
+			whereClause.length > 0 ? `WHERE ${whereClause}` : ''
+		}`
+
+		const data = await tableland.read(query)
+
+		const count = (data.rows[0] && data.rows[0][0]) ?? 0
+
+		return count
 	}
 
 	/** Fetch data from a Tableland table */
