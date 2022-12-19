@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.13.0](https://github.com/meemproject/meem-packages/compare/v0.12.1...v0.13.0) (2022-12-19)
+
+
+### Features
+
+* storage method to count() rows ([d0103ae](https://github.com/meemproject/meem-packages/commit/d0103ae))
+
+
+
+
+
 ## [0.12.1](https://github.com/meemproject/meem-packages/compare/v0.12.0...v0.12.1) (2022-12-19)
 
 
