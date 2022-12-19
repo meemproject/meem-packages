@@ -47,9 +47,6 @@ export interface ISDKContextState {
 		/** The JWT token */
 		jwt: string
 	}>
-
-	/** Whether the SDK has initialized */
-	hasInitialized: boolean
 }
 
 const MeemSDKContext = createContext({} as ISDKContextState)
