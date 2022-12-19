@@ -11,6 +11,9 @@ export class Id {
 	/** The last signature of the lastMessageSigned */
 	public lastSignature?: string
 
+	/** Whether the SDK id has initialized */
+	public hasInitialized = false
+
 	private jwt?: string
 
 	public constructor(options: { jwt?: string }) {

@@ -115,6 +115,7 @@ export const SDKProvider: React.FC<ISDKProps> = ({ ...props }: ISDKProps) => {
 
 		sdk.id.lastSignedMessage = meemMessageToSign
 		sdk.id.lastSignature = meemSignature
+		sdk.id.hasInitialized = true
 	}, [sdk])
 
 	const value = useMemo(
