@@ -124,7 +124,6 @@ export class Storage {
 		}
 
 		const encryptedSymmetricKey = await litClient.saveEncryptionKey({
-			// unifiedAccessControlConditions: builtAccessControlConditions,
 			accessControlConditions: builtAccessControlConditions,
 			symmetricKey,
 			authSig,
@@ -357,7 +356,7 @@ export class Storage {
 		 *
 		 * */
 		where?: Record<string, any>
-	}) {
+	}): Promise<number> {
 		const { chainId, tableName, where } = options
 		const tableland = await this.getTablelandInstance({
 			chainId
@@ -446,7 +445,12 @@ export class Storage {
 				if (i > 0) {
 					whereClause += ' AND '
 				}
-				whereClause += `"${key}"='${where[key]}'`
+				if (typeof where[key] === 'string') {
+					whereClause += `"${key}"='${where[key]}'`
+				} else if (Array.isArray(where[key])) {
+					const values = where[key].map((v: string) => `'${v}'`).join(', ')
+					whereClause += `"${key}" in (${values})`
+				}
 			})
 		}
 
