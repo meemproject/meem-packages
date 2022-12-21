@@ -96,7 +96,8 @@ export class Agreement {
 			chainId,
 			isMaxSupplyLocked,
 			admins,
-			tokenMetadata
+			tokenMetadata,
+			shouldCreateAdminRole
 		} = options
 		const useMeemAPI = options.useMeemAPI !== false
 
@@ -120,7 +121,8 @@ export class Agreement {
 						isTransferLocked,
 						shouldMintTokens,
 						members,
-						tokenMetadata
+						tokenMetadata,
+						shouldCreateAdminRole
 					}
 				}
 			)

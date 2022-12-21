@@ -473,12 +473,6 @@ export interface IERC721Metadata {
 }
 
 // TODO: Define metadata types for extensions (e.g. type: APP, LINK)
-export interface IAgreementExtensionMetadata {
-	externalUrl?: string
-	[key: string]: any
-}
-
-// TODO: Define metadata types for extensions (e.g. type: APP, LINK)
 export interface IAgreementRoleExtensionMetadata {
 	[key: string]: any
 }
@@ -726,7 +720,8 @@ export interface IExtensionStorageDefinition {
 	}
 }
 
-export interface IAgreementExtensionMetadata extends IMeemMetadataLike {
+export interface IAgreementExtensionMetadata {
+	externalUrl?: string
 	tableland?: {
 		/** The extension table name */
 		[extensionTableName: string]: {
@@ -737,6 +732,12 @@ export interface IAgreementExtensionMetadata extends IMeemMetadataLike {
 			tableId: string
 		}
 	}
+	transactions?: {
+		/** The Transaction id */
+		TransactionId: string
+		status: TransactionStatus
+	}[]
+	[key: string]: any
 }
 
 export namespace v1 {
@@ -900,6 +901,73 @@ export namespace Login {
 
 
 
+export namespace AuthenticateWithDiscord {
+	export interface IPathParams {}
+
+	export const path = (options: IPathParams) => `/api/1.0/discord/authenticate`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** The Discord authentication code */
+		authCode: string
+		/** The Discord authentication callback url */
+		redirectUri: string
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		user: { [key: string]: any }
+		accessToken: string
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
+export namespace GetDiscordServers {
+	export interface IPathParams {}
+
+	export const path = (options: IPathParams) => `/api/1.0/discord/servers`
+
+	export const method = HttpMethod.Get
+
+	export interface IQueryParams {
+		accessToken: string
+	}
+
+	export interface IRequestBody {
+		/** The Discord authentication code */
+		authCode: string
+		/** The Discord authentication callback url */
+		redirectUri: string
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		discordServers: IDiscordServer[]
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
 /** Bulk mint agreement role tokens */
 export namespace BulkMintAgreementRoleTokens {
 	export interface IPathParams {
@@ -1038,6 +1106,9 @@ export namespace CreateAgreement {
 
 		/** Token metadata to use if shouldMintTokens is true */
 		tokenMetadata?: IMeemMetadataLike
+
+		/** If true, will create an admin role contract and set it as the admin contract for this agreement */
+		shouldCreateAdminRole?: boolean
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
@@ -1049,6 +1120,18 @@ export namespace CreateAgreement {
 
 		/** The Transaction id for minting tokens. Transaction #3 */
 		mintTxId?: string
+
+		/** The Transaction id for deploying the admin role contract. Transaction #4 */
+		adminRoleDeployContractTxId?: string
+
+		/** The Transaction id for initializing the admin role contract. Transaction #5 */
+		adminRoleCutTxId?: string
+
+		/** The Transaction id for setting the role contract as the admin contract on the agreement. Transaction #6 */
+		adminRoleSetAdminContractTxId?: string
+
+		/** The Transaction id for minting admin role tokens. Transaction #7 */
+		adminRoleMintTxId?: string
 	}
 
 	export interface IDefinition {
@@ -1081,6 +1164,9 @@ export namespace CreateAgreementExtension {
 	export interface IRequestBody {
 		/** The id of the extension to enable */
 		extensionId: string
+
+		/** Whether the extension initialization is complete */
+		isInitialized?: boolean
 
 		/** Optional metadata associated with this extension */
 		metadata?: IMeemMetadataLike
@@ -1613,6 +1699,8 @@ export namespace UpdateAgreementExtension {
 	export interface IQueryParams {}
 
 	export interface IRequestBody {
+		/** Whether the extension initialization is complete */
+		isInitialized?: boolean
 		/** Optional metadata associated with this extension */
 		metadata?: IMeemMetadataLike
 		/** Optional external link associated with this extension */
@@ -1780,73 +1868,6 @@ export namespace UpgradeAgreementRole {
 	export type Response = IResponseBody | IError
 }
 
-
-
-
-export namespace AuthenticateWithDiscord {
-	export interface IPathParams {}
-
-	export const path = (options: IPathParams) => `/api/1.0/discord/authenticate`
-
-	export const method = HttpMethod.Post
-
-	export interface IQueryParams {}
-
-	export interface IRequestBody {
-		/** The Discord authentication code */
-		authCode: string
-		/** The Discord authentication callback url */
-		redirectUri: string
-	}
-
-	export interface IResponseBody extends IApiResponseBody {
-		user: { [key: string]: any }
-		accessToken: string
-	}
-
-	export interface IDefinition {
-		pathParams: IPathParams
-		queryParams: IQueryParams
-		requestBody: IRequestBody
-		responseBody: IResponseBody
-	}
-
-	export type Response = IResponseBody | IError
-}
-
-
-
-export namespace GetDiscordServers {
-	export interface IPathParams {}
-
-	export const path = (options: IPathParams) => `/api/1.0/discord/servers`
-
-	export const method = HttpMethod.Get
-
-	export interface IQueryParams {
-		accessToken: string
-	}
-
-	export interface IRequestBody {
-		/** The Discord authentication code */
-		authCode: string
-		/** The Discord authentication callback url */
-		redirectUri: string
-	}
-
-	export interface IResponseBody extends IApiResponseBody {
-		discordServers: IDiscordServer[]
-	}
-
-	export interface IDefinition {
-		pathParams: IPathParams
-		queryParams: IQueryParams
-		requestBody: IRequestBody
-		responseBody: IResponseBody
-	}
-
-	export type Response = IResponseBody | IError
-}
 
 
 
