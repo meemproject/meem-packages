@@ -70,6 +70,7 @@
 		"cross-fetch": "^3.1.5",
 		"ethers": "^5.6.4",
 		"graphql": "^16.6.0",
+		"gun": "https://github.com/amark/gun.git#master",
 		"js-cookie": "^3.0.1",
 		"luxon": "^3.0.1",
 		"siwe": "^1.1.6",
