@@ -20,12 +20,12 @@ export const chainIdToLitChainName = (chainId: number) => {
 			return 'arbitrum'
 			break
 
-		case 420:
-			return 'optimism-goerli'
-			break
-
 		case 5:
 			return 'goerli'
+			break
+
+		case 80001:
+			return 'mumbai'
 			break
 
 		default:
@@ -33,10 +33,6 @@ export const chainIdToLitChainName = (chainId: number) => {
 
 		// case 421613:
 		// 	return 'arbitrum-goerli'
-		// 	break
-
-		// case 80001:
-		// 	return 'polygon-mumbai'
 		// 	break
 
 		// case 1:
