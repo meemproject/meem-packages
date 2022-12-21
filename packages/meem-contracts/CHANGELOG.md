@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.1](https://github.com/meemproject/meem-packages/compare/v0.13.0...v0.13.1) (2022-12-20)
+
+**Note:** Version bump only for package @meemproject/meem-contracts
+
+
+
+
+
+# [0.13.0](https://github.com/meemproject/meem-packages/compare/v0.12.1...v0.13.0) (2022-12-19)
+
+**Note:** Version bump only for package @meemproject/meem-contracts
+
+
+
+
+
+## [0.12.1](https://github.com/meemproject/meem-packages/compare/v0.12.0...v0.12.1) (2022-12-19)
+
+**Note:** Version bump only for package @meemproject/meem-contracts
+
+
+
+
+
+# [0.12.0](https://github.com/meemproject/meem-packages/compare/v0.11.1...v0.12.0) (2022-12-16)
+
+**Note:** Version bump only for package @meemproject/meem-contracts
+
+
+
+
+
+## [0.11.1](https://github.com/meemproject/meem-packages/compare/v0.11.0...v0.11.1) (2022-12-16)
+
+**Note:** Version bump only for package @meemproject/meem-contracts
+
+
+
+
+
+# [0.11.0](https://github.com/meemproject/meem-packages/compare/v0.10.9...v0.11.0) (2022-12-15)
+
+**Note:** Version bump only for package @meemproject/meem-contracts
+
+
+
+
+
 ## [0.10.9](https://github.com/meemproject/meem-packages/compare/v0.10.8...v0.10.9) (2022-12-12)
 
 **Note:** Version bump only for package @meemproject/meem-contracts

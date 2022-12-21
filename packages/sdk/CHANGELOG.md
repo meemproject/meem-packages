@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.1](https://github.com/meemproject/meem-packages/compare/v0.13.0...v0.13.1) (2022-12-20)
+
+**Note:** Version bump only for package @meemproject/sdk
+
+
+
+
+
+# [0.13.0](https://github.com/meemproject/meem-packages/compare/v0.12.1...v0.13.0) (2022-12-19)
+
+
+### Features
+
+* storage method to count() rows ([d0103ae](https://github.com/meemproject/meem-packages/commit/d0103ae))
+
+
+
+
+
+## [0.12.1](https://github.com/meemproject/meem-packages/compare/v0.12.0...v0.12.1) (2022-12-19)
+
+
+### Bug Fixes
+
+* add flag for sdk.id.hasInitialized ([4d3718b](https://github.com/meemproject/meem-packages/commit/4d3718b))
+
+
+
+
+
+# [0.12.0](https://github.com/meemproject/meem-packages/compare/v0.11.1...v0.12.0) (2022-12-16)
+
+
+### Features
+
+* separate data/write columns, where query support ([2c80133](https://github.com/meemproject/meem-packages/commit/2c80133))
+
+
+
+
+
+## [0.11.1](https://github.com/meemproject/meem-packages/compare/v0.11.0...v0.11.1) (2022-12-16)
+
+**Note:** Version bump only for package @meemproject/sdk
+
+
+
+
+
+# [0.11.0](https://github.com/meemproject/meem-packages/compare/v0.10.9...v0.11.0) (2022-12-15)
+
+
+### Features
+
+* hook up LIT + tableland ([ef0dbad](https://github.com/meemproject/meem-packages/commit/ef0dbad))
+
+
+
+
+
 ## [0.10.9](https://github.com/meemproject/meem-packages/compare/v0.10.8...v0.10.9) (2022-12-12)
 
 **Note:** Version bump only for package @meemproject/sdk

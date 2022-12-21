@@ -1,6 +1,6 @@
 {
     "name": "@meemproject/metadata",
-    "version": "0.10.9",
+    "version": "0.13.1",
     "description": "Meem metadata types and validator.",
     "author": "Meem Project",
     "homepage": "https://meem.wtf",
