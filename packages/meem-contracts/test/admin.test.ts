@@ -150,10 +150,11 @@ describe('Admin', function Test() {
 	})
 
 	it('Can re-initialize', async () => {
+		const newContractURI = 'https://example.com/123234234'
 		await contracts.adminFacet.connect(signers[0]).reinitialize({
-			symbol: 'asd',
-			name: 'alskdfj',
-			contractURI,
+			symbol: 'testsym',
+			name: 'testname',
+			contractURI: newContractURI,
 			maxSupply: 2000,
 			roles: [
 				{
@@ -174,8 +175,8 @@ describe('Admin', function Test() {
 		})
 
 		const ci = await contracts.adminFacet.getContractInfo()
-		assert.equal(ci.name, 'alskdfj')
-		assert.equal(ci.symbol, 'asd')
-		assert.equal(ci.contractURI, contractURI)
+		assert.equal(ci.name, 'testname')
+		assert.equal(ci.symbol, 'testsym')
+		assert.equal(ci.contractURI, newContractURI)
 	})
 })

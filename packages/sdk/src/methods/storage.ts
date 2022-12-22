@@ -1,3 +1,4 @@
+import EventEmitter from 'events'
 import type {
 	AccessControlConditions,
 	AccsDefaultParams,
@@ -12,6 +13,7 @@ import { connect } from '@tableland/sdk'
 import type { Connection } from '@tableland/sdk'
 import Gun from 'gun/gun'
 import request from 'superagent'
+import type TypedEmitter from 'typed-emitter'
 import { MeemAPI } from '../generated/api.generated'
 import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
@@ -26,6 +28,10 @@ export interface IPartialAccessControlCondition
 	}
 }
 
+export type EmitterEvents = {
+	data: (data: any, key: string) => void
+}
+
 export class Storage {
 	private jwt?: string
 
@@ -37,11 +43,14 @@ export class Storage {
 
 	private gun: ReturnType<typeof Gun>
 
+	private emitter: TypedEmitter<EmitterEvents>
+
 	public constructor(options: { jwt?: string }) {
 		this.jwt = options.jwt
 		this.gun = Gun({
 			peers: ['http://localhost:3005/gun']
 		})
+		this.emitter = new EventEmitter() as TypedEmitter<EmitterEvents>
 	}
 
 	/** Sets the JWT used in api calls */
@@ -49,7 +58,7 @@ export class Storage {
 		this.jwt = jwt
 	}
 
-	public async getGunInstance() {
+	public getGunInstance() {
 		return this.gun
 	}
 
@@ -239,6 +248,55 @@ export class Storage {
 		return { decryptedString, data }
 	}
 
+	public async on(options: {
+		path: string
+		cb: (data: any) => void
+		chainId: number
+		authSig: JsonAuthSig
+	}) {
+		const { path, cb, chainId, authSig } = options
+
+		this.emitter.addListener('data', cb)
+
+		this.gun
+			.get(path)
+			.map()
+			.on(async (data: any, key: string) => {
+				try {
+					console.log({ data, key })
+					const parsedData = JSON.parse(data)
+					if (parsedData.accessControlConditions) {
+						const accessControlConditions = JSON.parse(
+							parsedData.accessControlConditions
+						)
+						const params = {
+							authSig,
+							chainId,
+							strToDecrypt: this.base64URIToBlob(parsedData.data),
+							accessControlConditions,
+							encryptedSymmetricKey: parsedData.encryptedSymmetricKey
+						}
+
+						const { data: decryptedData } = await this.decrypt(params)
+
+						this.emitter.emit('data', {
+							key,
+							chainId,
+							accessControlConditions,
+							data: decryptedData
+						})
+					}
+				} catch (e) {
+					log.warn('Unable to parse data as JSON')
+					log.warn(e)
+				}
+			})
+	}
+
+	public async off(path: string, cb: (data: any) => void) {
+		this.emitter.removeListener('data', cb)
+	}
+
 	/** Encrypt the "data" field and then write to GunDB */
 	public async encryptAndWrite(options: {
 		/** The chain */
@@ -290,14 +348,15 @@ export class Storage {
 
 		const base64EncryptedStr = await this.blobToBase64(encryptedStr)
 
-		const { ipfsHash } = await this.saveToIPFS({
-			data: base64EncryptedStr
-		})
+		// const { ipfsHash } = await this.saveToIPFS({
+		// 	data: base64EncryptedStr
+		// })
 
 		const newWriteColumns = {
 			...writeColumns,
 			accessControlConditions: JSON.stringify(accessControlConditions),
-			data: `ipfs://${ipfsHash}`,
+			// data: `ipfs://${ipfsHash}`,
+			data: base64EncryptedStr,
 			encryptedSymmetricKey
 		}
 
@@ -320,14 +379,15 @@ export class Storage {
 			throw new Error('SEA_WORK_FAILED')
 		}
 
-		console.log({ path, hash, newWriteColumns })
-
-		const result = this.gun
+		const item = this.gun
+			// .get('meem')
 			.get(path)
 			.get(`#${hash}`)
 			.put(JSON.stringify(newWriteColumns))
 
-		return result
+		// const result = this.gun.get(path).set(item)
+
+		return item
 	}
 
 	/** Encrypt the "data" field and then write to tableland */
@@ -487,82 +547,82 @@ export class Storage {
 	}
 
 	/** Subscribe to data at the "path" */
-	public async on(options: {
-		/** The data path */
-		path: string
+	// public async on(options: {
+	// 	/** The data path */
+	// 	path: string
 
-		/**
-		 * If set will attempt to decrypt the rows "data" column using LIT protocol and
-		 * filter out any rows that fail decryption
-		 */
-		authSig?: JsonAuthSig
-	}) {
-		const { path, authSig } = options
+	// 	/**
+	// 	 * If set will attempt to decrypt the rows "data" column using LIT protocol and
+	// 	 * filter out any rows that fail decryption
+	// 	 */
+	// 	authSig?: JsonAuthSig
+	// }) {
+	// 	const { path, authSig } = options
 
-		const gun = await this.getGunInstance()
+	// 	const gun = await this.getGunInstance()
 
-		gun.get(path).map(async (item: Record<string, any>) => {
-			console.log({ item })
-		})
+	// 	gun.get(path).map(async (item: Record<string, any>) => {
+	// 		console.log({ item })
+	// 	})
 
-		// const rows = data.rows.map((row: any[]) => {
-		// 	const builtRow: Record<string, any> = {}
-		// 	row.forEach((val, i) => {
-		// 		const columnName = data.columns[i].name
-		// 		if (
-		// 			columnName === 'data' &&
-		// 			authSig &&
-		// 			accColumnIdx > -1 &&
-		// 			escColumnIdx > -1
-		// 		) {
-		// 			if (/^ipfs:\/\//.test(val)) {
-		// 				promises.push(
-		// 					this.fetchFromIPFSAndDecrypt({
-		// 						authSig,
-		// 						chainId,
-		// 						ipfsURI: val,
-		// 						accessControlConditions: row[accColumnIdx],
-		// 						encryptedSymmetricKey: row[escColumnIdx]
-		// 					})
-		// 				)
-		// 			} else {
-		// 				promises.push(
-		// 					this.decrypt({
-		// 						authSig,
-		// 						chainId,
-		// 						strToDecrypt: this.base64URIToBlob(val),
-		// 						accessControlConditions: row[accColumnIdx],
-		// 						encryptedSymmetricKey: row[escColumnIdx]
-		// 					})
-		// 				)
-		// 			}
-		// 		}
-		// 		builtRow[data.columns[i].name] = val
-		// 	})
+	// 	// const rows = data.rows.map((row: any[]) => {
+	// 	// 	const builtRow: Record<string, any> = {}
+	// 	// 	row.forEach((val, i) => {
+	// 	// 		const columnName = data.columns[i].name
+	// 	// 		if (
+	// 	// 			columnName === 'data' &&
+	// 	// 			authSig &&
+	// 	// 			accColumnIdx > -1 &&
+	// 	// 			escColumnIdx > -1
+	// 	// 		) {
+	// 	// 			if (/^ipfs:\/\//.test(val)) {
+	// 	// 				promises.push(
+	// 	// 					this.fetchFromIPFSAndDecrypt({
+	// 	// 						authSig,
+	// 	// 						chainId,
+	// 	// 						ipfsURI: val,
+	// 	// 						accessControlConditions: row[accColumnIdx],
+	// 	// 						encryptedSymmetricKey: row[escColumnIdx]
+	// 	// 					})
+	// 	// 				)
+	// 	// 			} else {
+	// 	// 				promises.push(
+	// 	// 					this.decrypt({
+	// 	// 						authSig,
+	// 	// 						chainId,
+	// 	// 						strToDecrypt: this.base64URIToBlob(val),
+	// 	// 						accessControlConditions: row[accColumnIdx],
+	// 	// 						encryptedSymmetricKey: row[escColumnIdx]
+	// 	// 					})
+	// 	// 				)
+	// 	// 			}
+	// 	// 		}
+	// 	// 		builtRow[data.columns[i].name] = val
+	// 	// 	})
 
-		// 	return builtRow
-		// })
+	// 	// 	return builtRow
+	// 	// })
 
-		// if (promises.length > 0) {
-		// 	const results = await Promise.allSettled(promises)
-		// 	results.forEach((result, i) => {
-		// 		if (result.status === 'fulfilled') {
-		// 			rows[i].data = result.value.data
-		// 		} else {
-		// 			log.debug(result.status, result.reason)
-		// 		}
-		// 	})
-		// }
+	// 	// if (promises.length > 0) {
+	// 	// 	const results = await Promise.allSettled(promises)
+	// 	// 	results.forEach((result, i) => {
+	// 	// 		if (result.status === 'fulfilled') {
+	// 	// 			rows[i].data = result.value.data
+	// 	// 		} else {
+	// 	// 			log.debug(result.status, result.reason)
+	// 	// 		}
+	// 	// 	})
+	// 	// }
 
-		// log.debug('Retrieved Tableland Rows', { rows })
+	// 	// log.debug('Retrieved Tableland Rows', { rows })
 
-		// if (authSig) {
-		// 	log.debug('Found "authSig". Filtering out rows that failed decryption')
-		// 	return rows.filter(r => typeof r.data === 'object')
-		// }
+	// 	// if (authSig) {
+	// 	// 	log.debug('Found "authSig". Filtering out rows that failed decryption')
+	// 	// 	return rows.filter(r => typeof r.data === 'object')
+	// 	// }
 
-		// return rows
-	}
+	// 	// return rows
+	// }
 
 	/** Fetch data from a Tableland table */
 	public async read(options: {
