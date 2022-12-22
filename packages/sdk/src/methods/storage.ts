@@ -14,10 +14,12 @@ import type { Connection } from '@tableland/sdk'
 import Gun from 'gun/gun'
 import request from 'superagent'
 import type TypedEmitter from 'typed-emitter'
+import { v4 as uuidv4 } from 'uuid'
 import { MeemAPI } from '../generated/api.generated'
 import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
 import 'gun/sea'
+import 'gun/lib/open'
 
 export interface IPartialAccessControlCondition
 	extends Partial<AccsDefaultParams> {
@@ -29,7 +31,7 @@ export interface IPartialAccessControlCondition
 }
 
 export type EmitterEvents = {
-	data: (data: any, key: string) => void
+	data: (items: { [id: string]: any }) => void
 }
 
 export class Storage {
@@ -202,7 +204,7 @@ export class Storage {
 		chainId: number
 
 		/** The string to decrypt */
-		strToDecrypt: Blob
+		strToDecrypt: Blob | string
 
 		/** The access control conditions */
 		accessControlConditions: AccessControlConditions
@@ -210,13 +212,14 @@ export class Storage {
 		/** The lit encrypted symmetric key obtained from the saveEncryptionKey method */
 		encryptedSymmetricKey: string
 	}) {
-		const {
-			strToDecrypt,
-			accessControlConditions,
-			chainId,
-			authSig,
-			encryptedSymmetricKey
-		} = options
+		const { accessControlConditions, chainId, authSig, encryptedSymmetricKey } =
+			options
+
+		let { strToDecrypt } = options
+
+		if (typeof strToDecrypt === 'string') {
+			strToDecrypt = this.base64URIToBlob(strToDecrypt)
+		}
 
 		const chain = chainIdToLitChainName(chainId)
 
@@ -248,6 +251,61 @@ export class Storage {
 		return { decryptedString, data }
 	}
 
+	public async decryptItem(options: {
+		item: Record<string, any>
+		chainId: number
+		authSig: JsonAuthSig
+	}) {
+		const { item, chainId, authSig } = options
+
+		try {
+			const itemKeys = Object.keys(item)
+
+			const decryptedItem: Record<string, any> = {}
+
+			for (let i = 0; i < itemKeys.length; i++) {
+				const itemKey = itemKeys[i]
+				const itemVal = item[itemKey]
+
+				if (/^#/.test(itemKey)) {
+					const parsedData = JSON.parse(itemVal)
+					// decrypt
+					const accessControlConditions = JSON.parse(
+						parsedData.accessControlConditions
+					)
+					const params = {
+						authSig,
+						chainId,
+						strToDecrypt: this.base64URIToBlob(parsedData.data),
+						accessControlConditions,
+						encryptedSymmetricKey: parsedData.encryptedSymmetricKey
+					}
+
+					const { data: decryptedData } = await this.decrypt(params)
+
+					decryptedItem.data = decryptedData
+				} else if (typeof itemVal === 'object') {
+					// Recursively decrypt
+					decryptedItem[itemKey] = await this.decryptItem({
+						chainId,
+						authSig,
+						item: decryptedItem[itemKey]
+					})
+				} else {
+					// Leave it
+					decryptedItem[itemKey] = itemVal
+				}
+			}
+
+			return decryptedItem
+		} catch (e) {
+			log.warn('Unable to decrypt item', { item })
+			log.warn(e)
+		}
+
+		return item
+	}
+
 	public async on(options: {
 		path: string
 		cb: (data: any) => void
@@ -260,32 +318,56 @@ export class Storage {
 
 		this.gun
 			.get(path)
-			.map()
-			.on(async (data: any, key: string) => {
+			// .map()
+			.open(async (data: any /*, key: string */) => {
 				try {
-					console.log({ data, key })
-					const parsedData = JSON.parse(data)
-					if (parsedData.accessControlConditions) {
-						const accessControlConditions = JSON.parse(
-							parsedData.accessControlConditions
-						)
-						const params = {
-							authSig,
-							chainId,
-							strToDecrypt: this.base64URIToBlob(parsedData.data),
-							accessControlConditions,
-							encryptedSymmetricKey: parsedData.encryptedSymmetricKey
-						}
+					// console.log(`Fetching path ${path}`)
+					const keys = Object.keys(data)
+					const items: Record<string, any> = {}
+					// console.log({ keys })
+					for (let i = 0; i < keys.length; i++) {
+						const key = keys[i]
+						const item = data[key]
 
-						const { data: decryptedData } = await this.decrypt(params)
+						// console.log({ key, item })
 
-						this.emitter.emit('data', {
-							key,
+						const decryptedItem = await this.decryptItem({
+							item,
 							chainId,
-							accessControlConditions,
-							data: decryptedData
+							authSig
 						})
+
+						// console.log({ decryptedItem })
+
+						items[key] = decryptedItem
 					}
+
+					this.emitter.emit('data', items)
+
+					// const parsedData = JSON.parse(data.item)
+					// if (parsedData.accessControlConditions) {
+					// 	const accessControlConditions = JSON.parse(
+					// 		parsedData.accessControlConditions
+					// 	)
+					// 	const params = {
+					// 		authSig,
+					// 		chainId,
+					// 		strToDecrypt: this.base64URIToBlob(parsedData.data),
+					// 		accessControlConditions,
+					// 		encryptedSymmetricKey: parsedData.encryptedSymmetricKey
+					// 	}
+
+					// 	const { data: decryptedData } = await this.decrypt(params)
+
+					// 	this.emitter.emit('data', {
+					// 		key,
+					// 		chainId,
+					// 		item: {
+					// 			accessControlConditions,
+					// 			data: decryptedData
+					// 		}
+					// 	})
+					// }
 				} catch (e) {
 					log.warn('Unable to parse data as JSON')
 					log.warn(e)
@@ -379,15 +461,24 @@ export class Storage {
 			throw new Error('SEA_WORK_FAILED')
 		}
 
-		const item = this.gun
-			// .get('meem')
+		const id = uuidv4()
+
+		// const result = this.gun
+		// 	.get('meem/items')
+		// 	.get(`#${hash}`)
+		// 	.put(JSON.stringify(newWriteColumns), ack => console.log({ ack }))
+
+		// console.log({ result })
+
+		// const item = this.gun.get('meem/items').get(`#${hash}`)
+
+		const r = this.gun
 			.get(path)
+			.get(id)
 			.get(`#${hash}`)
-			.put(JSON.stringify(newWriteColumns))
+			.put(JSON.stringify(newWriteColumns), ack => console.log({ ack }))
 
-		// const result = this.gun.get(path).set(item)
-
-		return item
+		return { id, hash }
 	}
 
 	/** Encrypt the "data" field and then write to tableland */
