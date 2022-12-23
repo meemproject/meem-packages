@@ -86,7 +86,7 @@ export async function epmUpload(options: {
 				log.superInfo(`Uploading contract for: ${filename}`)
 				try {
 					await request
-						.post(`${apiHost}/api/1.0/contracts`)
+						.post(`${apiHost}/api/1.0/epm/contracts`)
 						.set('Authorization', `JWT ${apiKey}`)
 						.send({
 							name: `${filename} ${args.name}`,
