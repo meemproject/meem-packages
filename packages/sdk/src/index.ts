@@ -29,7 +29,7 @@ export class MeemSDK {
 		this.id = new Id({ jwt: this.jwt })
 		this.agreement = new Agreement({ jwt: this.jwt })
 		this.agreementExtension = new AgreementExtension({ jwt: this.jwt })
-		this.storage = new Storage({ jwt: this.jwt })
+		this.storage = new Storage({ id: this.id, jwt: this.jwt })
 	}
 
 	/** Sets the JWT used in api calls */

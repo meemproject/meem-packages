@@ -20,6 +20,7 @@ import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
 import 'gun/sea'
 import 'gun/lib/open'
+import { Id } from './id'
 
 export interface IPartialAccessControlCondition
 	extends Partial<AccsDefaultParams> {
@@ -31,10 +32,12 @@ export interface IPartialAccessControlCondition
 }
 
 export type EmitterEvents = {
-	data: (items: { [id: string]: any }) => void
+	[path: string]: (items: { [id: string]: any }) => void
 }
 
 export class Storage {
+	private id: Id
+
 	private jwt?: string
 
 	/** Mapping of chainId:Tableland instance */
@@ -47,7 +50,8 @@ export class Storage {
 
 	private emitter: TypedEmitter<EmitterEvents>
 
-	public constructor(options: { jwt?: string }) {
+	public constructor(options: { id: Id; jwt?: string }) {
+		this.id = options.id
 		this.jwt = options.jwt
 		this.gun = Gun({
 			peers: ['http://localhost:3005/gun']
@@ -98,9 +102,6 @@ export class Storage {
 
 	/** Encrypt data using LIT protocol */
 	public async encrypt(options: {
-		/** The LIT protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig() */
-		authSig: JsonAuthSig
-
 		/** The chainId to encrypt on */
 		chainId: number
 
@@ -114,7 +115,8 @@ export class Storage {
 		 */
 		accessControlConditions: IPartialAccessControlCondition[]
 	}) {
-		const { authSig, data, accessControlConditions, chainId } = options
+		const { data, accessControlConditions, chainId } = options
+		const authSig = this.id.getLitAuthSig()
 
 		const strToEncrypt = JSON.stringify(data)
 
@@ -163,9 +165,6 @@ export class Storage {
 	}
 
 	public async fetchFromIPFSAndDecrypt(options: {
-		/** The LIT protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig() */
-		authSig: JsonAuthSig
-
 		/** The chainId to decrypt on */
 		chainId: number
 
@@ -197,9 +196,6 @@ export class Storage {
 
 	/** Decrypt data using LIT protocol */
 	public async decrypt(options: {
-		/** The LIT protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig() */
-		authSig: JsonAuthSig
-
 		/** The chainId to decrypt on */
 		chainId: number
 
@@ -212,8 +208,9 @@ export class Storage {
 		/** The lit encrypted symmetric key obtained from the saveEncryptionKey method */
 		encryptedSymmetricKey: string
 	}) {
-		const { accessControlConditions, chainId, authSig, encryptedSymmetricKey } =
-			options
+		const { accessControlConditions, chainId, encryptedSymmetricKey } = options
+
+		const authSig = this.id.getLitAuthSig()
 
 		let { strToDecrypt } = options
 
@@ -281,9 +278,14 @@ export class Storage {
 						encryptedSymmetricKey: parsedData.encryptedSymmetricKey
 					}
 
+					console.log({ parsedData, accessControlConditions, params })
+
 					const { data: decryptedData } = await this.decrypt(params)
 
 					decryptedItem.data = decryptedData
+					decryptedItem.accessControlConditions = accessControlConditions
+					decryptedItem.id = itemKey
+					decryptedItem.encryptedSymmetricKey = parsedData.encryptedSymmetricKey
 				} else if (typeof itemVal === 'object') {
 					// Recursively decrypt
 					decryptedItem[itemKey] = await this.decryptItem({
@@ -314,69 +316,61 @@ export class Storage {
 	}) {
 		const { path, cb, chainId, authSig } = options
 
-		this.emitter.addListener('data', cb)
+		// this.emitter.addListener('path', cb)
+		this.emitter.addListener(path, cb)
 
-		this.gun
-			.get(path)
-			// .map()
-			.open(async (data: any /*, key: string */) => {
-				try {
-					// console.log(`Fetching path ${path}`)
-					const keys = Object.keys(data)
-					const items: Record<string, any> = {}
-					// console.log({ keys })
-					for (let i = 0; i < keys.length; i++) {
-						const key = keys[i]
-						const item = data[key]
-
-						// console.log({ key, item })
-
-						const decryptedItem = await this.decryptItem({
-							item,
-							chainId,
-							authSig
-						})
-
-						// console.log({ decryptedItem })
-
-						items[key] = decryptedItem
+		this.gun.get(path).open(async (data: any /*, key: string */) => {
+			try {
+				const keys = Object.keys(data)
+				const items: Record<string, any> = {}
+				// const promises: Promise<any>[] = []
+				for (let i = 0; i < keys.length; i++) {
+					const key = keys[i]
+					let item = data[key]
+					if (/^#/.test(key)) {
+						item = {
+							[key]: item
+						}
 					}
 
-					this.emitter.emit('data', items)
+					const decryptedItem = await this.decryptItem({
+						item,
+						chainId,
+						authSig
+					})
+					items[key] = decryptedItem
 
-					// const parsedData = JSON.parse(data.item)
-					// if (parsedData.accessControlConditions) {
-					// 	const accessControlConditions = JSON.parse(
-					// 		parsedData.accessControlConditions
-					// 	)
-					// 	const params = {
-					// 		authSig,
+					// TODO: Batch decrypt items? Seems like maybe LIT is rate limiting? Sometimes it works, sometimes it throws a 400
+					// promises.push(
+					// 	this.decryptItem({
+					// 		item,
 					// 		chainId,
-					// 		strToDecrypt: this.base64URIToBlob(parsedData.data),
-					// 		accessControlConditions,
-					// 		encryptedSymmetricKey: parsedData.encryptedSymmetricKey
-					// 	}
-
-					// 	const { data: decryptedData } = await this.decrypt(params)
-
-					// 	this.emitter.emit('data', {
-					// 		key,
-					// 		chainId,
-					// 		item: {
-					// 			accessControlConditions,
-					// 			data: decryptedData
-					// 		}
+					// 		authSig
 					// 	})
-					// }
-				} catch (e) {
-					log.warn('Unable to parse data as JSON')
-					log.warn(e)
+					// )
 				}
-			})
+
+				// const result = await Promise.allSettled(promises)
+				// keys.forEach((k, i) => {
+				// 	const r = result[i]
+				// 	if (r.status === 'fulfilled') {
+				// 		// console.log({ k, i, resultI: result[i] })
+				// 		items[k] = r.value
+				// 	} else {
+				// 		log.warn(`Unable to parse data for key ${k}`)
+				// 	}
+				// })
+
+				this.emitter.emit(path, items)
+			} catch (e) {
+				log.warn('Unable to parse data as JSON')
+				log.warn(e)
+			}
+		})
 	}
 
 	public async off(path: string, cb: (data: any) => void) {
-		this.emitter.removeListener('data', cb)
+		this.emitter.removeListener(path, cb)
 	}
 
 	/** Encrypt the "data" field and then write to GunDB */
@@ -403,50 +397,30 @@ export class Storage {
 		 * For advanced customization options see: https://developer.litprotocol.com/SDK/Explanation/encryption
 		 */
 		accessControlConditions: IPartialAccessControlCondition[]
-
-		/**
-		 * The LIT protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig()
-		 *
-		 * If set will encrypt the "data" column before writing to tableland
-		 */
-		authSig: JsonAuthSig
 	}) {
 		const {
 			chainId,
 			path,
 			accessControlConditions: partialAccessControlConditions,
 			writeColumns,
-			data,
-			authSig
+			data
 		} = options
 
 		const { accessControlConditions, encryptedStr, encryptedSymmetricKey } =
 			await this.encrypt({
 				accessControlConditions: partialAccessControlConditions,
-				authSig,
 				chainId,
 				data
 			})
 
 		const base64EncryptedStr = await this.blobToBase64(encryptedStr)
 
-		// const { ipfsHash } = await this.saveToIPFS({
-		// 	data: base64EncryptedStr
-		// })
-
 		const newWriteColumns = {
 			...writeColumns,
 			accessControlConditions: JSON.stringify(accessControlConditions),
-			// data: `ipfs://${ipfsHash}`,
 			data: base64EncryptedStr,
 			encryptedSymmetricKey
 		}
-
-		// const result = await this.write({
-		// 	tableName,
-		// 	chainId,
-		// 	writeColumns: newWriteColumns
-		// })
 
 		const hash = await Gun.SEA.work(
 			JSON.stringify(newWriteColumns),
@@ -463,20 +437,13 @@ export class Storage {
 
 		const id = uuidv4()
 
-		// const result = this.gun
-		// 	.get('meem/items')
-		// 	.get(`#${hash}`)
-		// 	.put(JSON.stringify(newWriteColumns), ack => console.log({ ack }))
-
-		// console.log({ result })
-
-		// const item = this.gun.get('meem/items').get(`#${hash}`)
-
-		const r = this.gun
+		this.gun
 			.get(path)
+			// @ts-ignore
 			.get(id)
+			// @ts-ignore
 			.get(`#${hash}`)
-			.put(JSON.stringify(newWriteColumns), ack => console.log({ ack }))
+			.put(JSON.stringify(newWriteColumns), (ack: any) => log.debug({ ack }))
 
 		return { id, hash }
 	}
@@ -505,27 +472,18 @@ export class Storage {
 		 * For advanced customization options see: https://developer.litprotocol.com/SDK/Explanation/encryption
 		 */
 		accessControlConditions: IPartialAccessControlCondition[]
-
-		/**
-		 * The LIT protocol authSig. Can be obtained after login from sdk.id.getLitAuthSig()
-		 *
-		 * If set will encrypt the "data" column before writing to tableland
-		 */
-		authSig: JsonAuthSig
 	}) {
 		const {
 			chainId,
 			tableName,
 			accessControlConditions: partialAccessControlConditions,
 			writeColumns,
-			data,
-			authSig
+			data
 		} = options
 
 		const { accessControlConditions, encryptedStr, encryptedSymmetricKey } =
 			await this.encrypt({
 				accessControlConditions: partialAccessControlConditions,
-				authSig,
 				chainId,
 				data
 			})
@@ -816,7 +774,6 @@ export class Storage {
 					if (/^ipfs:\/\//.test(val)) {
 						promises.push(
 							this.fetchFromIPFSAndDecrypt({
-								authSig,
 								chainId,
 								ipfsURI: val,
 								accessControlConditions: row[accColumnIdx],
@@ -826,7 +783,6 @@ export class Storage {
 					} else {
 						promises.push(
 							this.decrypt({
-								authSig,
 								chainId,
 								strToDecrypt: this.base64URIToBlob(val),
 								accessControlConditions: row[accColumnIdx],
