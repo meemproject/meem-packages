@@ -100,8 +100,52 @@ export class Storage {
 		return client
 	}
 
-	/** Encrypt data using LIT protocol */
+	/** Generate an RSA public/private keypair */
+	public async generateKeyPair() {
+		const keyPair = await crypto.subtle.generateKey(
+			{
+				name: 'RSA-OAEP',
+				modulusLength: 4096,
+				publicExponent: new Uint8Array([1, 0, 1]),
+				hash: 'SHA-256'
+			},
+			true,
+			['encrypt', 'decrypt']
+		)
+
+		const [publicKey, privateKey] = await Promise.all([
+			crypto.subtle.exportKey('jwk', keyPair.publicKey),
+			crypto.subtle.exportKey('jwk', keyPair.privateKey)
+		])
+
+		return { publicKey, privateKey }
+	}
+
+	/** Encrypt data using a public key */
 	public async encrypt(options: {
+		data: Record<string, any>
+		publicKey: JsonWebKey
+	}) {
+		const { data, publicKey } = options
+		const cryptoKey = await crypto.subtle.importKey(
+			'jwk',
+			publicKey,
+			{ name: 'RSA-OAEP', hash: { name: 'SHA-256' } },
+			false,
+			['encrypt']
+		)
+
+		const encrypted = await crypto.subtle.encrypt(
+			{ name: 'RSA-OAEP' },
+			cryptoKey,
+			Buffer.from(JSON.stringify(data))
+		)
+
+		return Buffer.from(encrypted).toString('base64')
+	}
+
+	/** Encrypt data using LIT protocol */
+	public async encryptWithLit(options: {
 		/** The chainId to encrypt on */
 		chainId: number
 
@@ -164,6 +208,7 @@ export class Storage {
 		}
 	}
 
+	/** Fetches a file from IPFS and decrypts it using LIT */
 	public async fetchFromIPFSAndDecrypt(options: {
 		/** The chainId to decrypt on */
 		chainId: number
@@ -188,14 +233,50 @@ export class Storage {
 
 		const response = await request.get(`${gateway}${ipfsHash}`)
 
-		return this.decrypt({
+		return this.decryptWithLit({
 			...rest,
 			strToDecrypt: this.base64URIToBlob(response.text)
 		})
 	}
 
-	/** Decrypt data using LIT protocol */
+	/** Decrypt data using a private key */
 	public async decrypt(options: {
+		/** The string to decrypt */
+		strToDecrypt: string
+
+		privateKey: JsonWebKey
+	}) {
+		const { strToDecrypt, privateKey } = options
+
+		const cryptoKey = await crypto.subtle.importKey(
+			'jwk',
+			privateKey,
+			{ name: 'RSA-OAEP', hash: { name: 'SHA-256' } },
+			false,
+			['decrypt']
+		)
+
+		const decryptedString = await crypto.subtle.decrypt(
+			{ name: 'RSA-OAEP' },
+			cryptoKey,
+			Buffer.from(strToDecrypt, 'base64')
+		)
+
+		let data: Record<string, any> = {}
+		if (decryptedString) {
+			try {
+				data = JSON.parse(Buffer.from(decryptedString).toString())
+			} catch (e) {
+				log.warn('Error parsing decrypted string as JSON')
+				log.warn(e)
+			}
+		}
+
+		return { decryptedString, data }
+	}
+
+	/** Decrypt data using LIT protocol */
+	public async decryptWithLit(options: {
 		/** The chainId to decrypt on */
 		chainId: number
 
@@ -248,17 +329,66 @@ export class Storage {
 		return { decryptedString, data }
 	}
 
+	/** Decrypt an item stored in GunDB using a private key */
 	public async decryptItem(options: {
 		item: Record<string, any>
-		chainId: number
-		authSig: JsonAuthSig
+		privateKey: JsonWebKey
 	}) {
-		const { item, chainId, authSig } = options
+		const { item, privateKey } = options
 
 		try {
 			const itemKeys = Object.keys(item)
 
-			const decryptedItem: Record<string, any> = {}
+			let decryptedItem: Record<string, any> = {}
+
+			for (let i = 0; i < itemKeys.length; i++) {
+				const itemKey = itemKeys[i]
+				const itemVal = item[itemKey]
+
+				if (/^#/.test(itemKey)) {
+					const parsedData = JSON.parse(itemVal)
+					// decrypt
+					const { data: decryptedData } = await this.decrypt({
+						strToDecrypt: parsedData.data,
+						privateKey
+					})
+					decryptedItem = { ...parsedData }
+					decryptedItem.data = decryptedData
+					decryptedItem.id = itemKey
+					decryptedItem.encryptedSymmetricKey = parsedData.encryptedSymmetricKey
+				} else if (typeof itemVal === 'object') {
+					// Recursively decrypt
+					decryptedItem[itemKey] = await this.decryptItem({
+						item: itemVal,
+						privateKey
+					})
+				} else {
+					// Leave it
+					decryptedItem[itemKey] = itemVal
+				}
+			}
+
+			return decryptedItem
+		} catch (e) {
+			log.warn('Unable to decrypt item', { item })
+			log.warn(e)
+		}
+
+		return item
+	}
+
+	/** Decrypt an item stored in GunDB using LIT */
+	public async decryptItemWithLit(options: {
+		item: Record<string, any>
+		chainId: number
+	}) {
+		const { item, chainId } = options
+
+		try {
+			const authSig = this.id.getLitAuthSig()
+			const itemKeys = Object.keys(item)
+
+			let decryptedItem: Record<string, any> = {}
 
 			for (let i = 0; i < itemKeys.length; i++) {
 				const itemKey = itemKeys[i]
@@ -278,19 +408,16 @@ export class Storage {
 						encryptedSymmetricKey: parsedData.encryptedSymmetricKey
 					}
 
-					console.log({ parsedData, accessControlConditions, params })
-
-					const { data: decryptedData } = await this.decrypt(params)
-
+					const { data: decryptedData } = await this.decryptWithLit(params)
+					decryptedItem = { ...parsedData }
 					decryptedItem.data = decryptedData
 					decryptedItem.accessControlConditions = accessControlConditions
 					decryptedItem.id = itemKey
 					decryptedItem.encryptedSymmetricKey = parsedData.encryptedSymmetricKey
 				} else if (typeof itemVal === 'object') {
 					// Recursively decrypt
-					decryptedItem[itemKey] = await this.decryptItem({
+					decryptedItem[itemKey] = await this.decryptItemWithLit({
 						chainId,
-						authSig,
 						item: decryptedItem[itemKey]
 					})
 				} else {
@@ -308,22 +435,29 @@ export class Storage {
 		return item
 	}
 
+	/** Subscribe to data changes on a path */
 	public async on(options: {
+		/** The path to listen for */
 		path: string
-		cb: (data: any) => void
-		chainId: number
-		authSig: JsonAuthSig
-	}) {
-		const { path, cb, chainId, authSig } = options
 
-		// this.emitter.addListener('path', cb)
+		/** The callback invoked when data changes */
+		cb: (data: any) => void
+
+		/** The chain id */
+		chainId?: number
+
+		/** Will decrypt the data using the JSON web key. If omitted, will decrypt using LIT */
+		privateKey?: JsonWebKey
+	}) {
+		const { path, cb, chainId, privateKey } = options
+
 		this.emitter.addListener(path, cb)
 
 		this.gun.get(path).open(async (data: any /*, key: string */) => {
 			try {
 				const keys = Object.keys(data)
 				const items: Record<string, any> = {}
-				// const promises: Promise<any>[] = []
+				const promises: Promise<any>[] = []
 				for (let i = 0; i < keys.length; i++) {
 					const key = keys[i]
 					let item = data[key]
@@ -333,33 +467,32 @@ export class Storage {
 						}
 					}
 
-					const decryptedItem = await this.decryptItem({
-						item,
-						chainId,
-						authSig
-					})
-					items[key] = decryptedItem
-
-					// TODO: Batch decrypt items? Seems like maybe LIT is rate limiting? Sometimes it works, sometimes it throws a 400
-					// promises.push(
-					// 	this.decryptItem({
-					// 		item,
-					// 		chainId,
-					// 		authSig
-					// 	})
-					// )
+					if (privateKey) {
+						promises.push(
+							this.decryptItem({
+								item,
+								privateKey
+							})
+						)
+					} else if (chainId) {
+						promises.push(
+							this.decryptItemWithLit({
+								item,
+								chainId
+							})
+						)
+					}
 				}
 
-				// const result = await Promise.allSettled(promises)
-				// keys.forEach((k, i) => {
-				// 	const r = result[i]
-				// 	if (r.status === 'fulfilled') {
-				// 		// console.log({ k, i, resultI: result[i] })
-				// 		items[k] = r.value
-				// 	} else {
-				// 		log.warn(`Unable to parse data for key ${k}`)
-				// 	}
-				// })
+				const result = await Promise.allSettled(promises)
+				keys.forEach((k, i) => {
+					const r = result[i]
+					if (r.status === 'fulfilled') {
+						items[k] = r.value
+					} else {
+						log.warn(`Unable to parse data for key ${k}`)
+					}
+				})
 
 				this.emitter.emit(path, items)
 			} catch (e) {
@@ -369,12 +502,71 @@ export class Storage {
 		})
 	}
 
+	/** Unsubscribe to events */
 	public async off(path: string, cb: (data: any) => void) {
 		this.emitter.removeListener(path, cb)
 	}
 
 	/** Encrypt the "data" field and then write to GunDB */
 	public async encryptAndWrite(options: {
+		/** The path to write the data */
+		path: string
+
+		/** The values to be written to the db in the form of columnName:value */
+		writeColumns?: {
+			[columnName: string]: any
+		}
+
+		/** The values to be encrypted and written to the db "data" column in the form of columnName:value */
+		data: {
+			[columnName: string]: any
+		}
+
+		/**
+		 * The private or public key that will be used to encrypt the data
+		 */
+		publicKey: JsonWebKey
+	}) {
+		const { path, publicKey, writeColumns, data } = options
+
+		const encryptedStr = await this.encrypt({
+			data,
+			publicKey
+		})
+
+		const newWriteColumns = {
+			...writeColumns,
+			data: encryptedStr
+		}
+
+		const hash = await Gun.SEA.work(
+			JSON.stringify(newWriteColumns),
+			null,
+			null,
+			{
+				name: 'SHA-256'
+			}
+		)
+
+		if (!hash) {
+			throw new Error('SEA_WORK_FAILED')
+		}
+
+		const id = uuidv4()
+
+		const item = this.gun
+			.get(path)
+			// @ts-ignore
+			.get(id)
+			// @ts-ignore
+			.get(`#${hash}`)
+			.put(JSON.stringify(newWriteColumns), (ack: any) => log.debug({ ack }))
+
+		return { id, hash, item }
+	}
+
+	/** Encrypt the "data" field and then write to GunDB */
+	public async encryptWithLitAndWrite(options: {
 		/** The chain */
 		chainId: number
 
@@ -407,7 +599,7 @@ export class Storage {
 		} = options
 
 		const { accessControlConditions, encryptedStr, encryptedSymmetricKey } =
-			await this.encrypt({
+			await this.encryptWithLit({
 				accessControlConditions: partialAccessControlConditions,
 				chainId,
 				data
@@ -482,7 +674,7 @@ export class Storage {
 		} = options
 
 		const { accessControlConditions, encryptedStr, encryptedSymmetricKey } =
-			await this.encrypt({
+			await this.encryptWithLit({
 				accessControlConditions: partialAccessControlConditions,
 				chainId,
 				data
@@ -595,84 +787,6 @@ export class Storage {
 		return count
 	}
 
-	/** Subscribe to data at the "path" */
-	// public async on(options: {
-	// 	/** The data path */
-	// 	path: string
-
-	// 	/**
-	// 	 * If set will attempt to decrypt the rows "data" column using LIT protocol and
-	// 	 * filter out any rows that fail decryption
-	// 	 */
-	// 	authSig?: JsonAuthSig
-	// }) {
-	// 	const { path, authSig } = options
-
-	// 	const gun = await this.getGunInstance()
-
-	// 	gun.get(path).map(async (item: Record<string, any>) => {
-	// 		console.log({ item })
-	// 	})
-
-	// 	// const rows = data.rows.map((row: any[]) => {
-	// 	// 	const builtRow: Record<string, any> = {}
-	// 	// 	row.forEach((val, i) => {
-	// 	// 		const columnName = data.columns[i].name
-	// 	// 		if (
-	// 	// 			columnName === 'data' &&
-	// 	// 			authSig &&
-	// 	// 			accColumnIdx > -1 &&
-	// 	// 			escColumnIdx > -1
-	// 	// 		) {
-	// 	// 			if (/^ipfs:\/\//.test(val)) {
-	// 	// 				promises.push(
-	// 	// 					this.fetchFromIPFSAndDecrypt({
-	// 	// 						authSig,
-	// 	// 						chainId,
-	// 	// 						ipfsURI: val,
-	// 	// 						accessControlConditions: row[accColumnIdx],
-	// 	// 						encryptedSymmetricKey: row[escColumnIdx]
-	// 	// 					})
-	// 	// 				)
-	// 	// 			} else {
-	// 	// 				promises.push(
-	// 	// 					this.decrypt({
-	// 	// 						authSig,
-	// 	// 						chainId,
-	// 	// 						strToDecrypt: this.base64URIToBlob(val),
-	// 	// 						accessControlConditions: row[accColumnIdx],
-	// 	// 						encryptedSymmetricKey: row[escColumnIdx]
-	// 	// 					})
-	// 	// 				)
-	// 	// 			}
-	// 	// 		}
-	// 	// 		builtRow[data.columns[i].name] = val
-	// 	// 	})
-
-	// 	// 	return builtRow
-	// 	// })
-
-	// 	// if (promises.length > 0) {
-	// 	// 	const results = await Promise.allSettled(promises)
-	// 	// 	results.forEach((result, i) => {
-	// 	// 		if (result.status === 'fulfilled') {
-	// 	// 			rows[i].data = result.value.data
-	// 	// 		} else {
-	// 	// 			log.debug(result.status, result.reason)
-	// 	// 		}
-	// 	// 	})
-	// 	// }
-
-	// 	// log.debug('Retrieved Tableland Rows', { rows })
-
-	// 	// if (authSig) {
-	// 	// 	log.debug('Found "authSig". Filtering out rows that failed decryption')
-	// 	// 	return rows.filter(r => typeof r.data === 'object')
-	// 	// }
-
-	// 	// return rows
-	// }
-
 	/** Fetch data from a Tableland table */
 	public async read(options: {
 		/** The chain */
@@ -782,7 +896,7 @@ export class Storage {
 						)
 					} else {
 						promises.push(
-							this.decrypt({
+							this.decryptWithLit({
 								chainId,
 								strToDecrypt: this.base64URIToBlob(val),
 								accessControlConditions: row[accColumnIdx],
