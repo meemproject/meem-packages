@@ -50,11 +50,21 @@ export class Storage {
 
 	private emitter: TypedEmitter<EmitterEvents>
 
-	public constructor(options: { id: Id; jwt?: string }) {
+	public constructor(options: { id: Id; jwt?: string; peers?: string[] }) {
+		let peers = options.peers
+
+		if (!peers && process.env.NEXT_PUBLIC_GUN_DB_PEERS) {
+			peers = process.env.NEXT_PUBLIC_GUN_DB_PEERS.split(',').map(p => p.trim())
+		}
+
+		if (!peers) {
+			peers = ['https://api-indexer.meem.wtf/gun']
+		}
+
 		this.id = options.id
 		this.jwt = options.jwt
 		this.gun = Gun({
-			peers: ['http://localhost:3005/gun']
+			peers
 		})
 		this.emitter = new EventEmitter() as TypedEmitter<EmitterEvents>
 	}
