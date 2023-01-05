@@ -20,11 +20,6 @@ import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
 import { Id } from './id'
 
-if (typeof window !== 'undefined') {
-	require('gun/sea')
-	require('gun/lib/open')
-}
-
 export interface IPartialAccessControlCondition
 	extends Partial<AccsDefaultParams> {
 	returnValueTest?: {
@@ -70,6 +65,16 @@ export class Storage {
 			peers
 		})
 		this.emitter = new EventEmitter() as TypedEmitter<EmitterEvents>
+		import('gun/sea')
+			.then(() => {
+				console.log('Imported gun/sea')
+			})
+			.catch(e => console.log(e))
+		import('gun/lib/open')
+			.then(() => {
+				console.log('Imported gun/lib/open')
+			})
+			.catch(e => console.log(e))
 	}
 
 	/** Sets the JWT used in api calls */
