@@ -97,20 +97,18 @@ export class Storage {
 	}
 
 	/** Get a LIT protocol client */
-	public async getLitInstance(options: {
-		alertWhenUnauthorized: boolean
-		debug: boolean
+	public async getLitInstance(options?: {
+		alertWhenUnauthorized?: boolean
+		debug?: boolean
 	}) {
-		// eslint-disable-next-line @typescript-eslint/naming-convention
-		const { debug, alertWhenUnauthorized } = options
-
 		if (this.lit) {
 			return this.lit
 		}
 
 		const client = new Lit.LitNodeClient()
-		client.config.debug = debug ?? false
-		client.config.alertWhenUnauthorized = alertWhenUnauthorized ?? false
+		client.config.debug = options?.debug ?? false
+		client.config.alertWhenUnauthorized =
+			options?.alertWhenUnauthorized ?? false
 		await client.connect()
 
 		this.lit = client
