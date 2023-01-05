@@ -65,16 +65,7 @@ export class Storage {
 			peers
 		})
 		this.emitter = new EventEmitter() as TypedEmitter<EmitterEvents>
-		import('gun/sea')
-			.then(() => {
-				console.log('Imported gun/sea')
-			})
-			.catch(e => console.log(e))
-		import('gun/lib/open')
-			.then(() => {
-				console.log('Imported gun/lib/open')
-			})
-			.catch(e => console.log(e))
+		this.importGunExtensions()
 	}
 
 	/** Sets the JWT used in api calls */
@@ -1055,6 +1046,22 @@ export class Storage {
 			return new Blob([ab], { type: 'image/jpeg' })
 		} catch (e) {
 			return new Blob()
+		}
+	}
+
+	private async importGunExtensions() {
+		try {
+			await import('gun/sea')
+			console.log('Imported gun/sea')
+		} catch (e) {
+			console.log('Failed to import gun/sea', e)
+		}
+
+		try {
+			await import('gun/lib/open')
+			console.log('Imported gun/lib/open')
+		} catch (e) {
+			console.log('Failed to import gun/lib/open', e)
 		}
 	}
 }
