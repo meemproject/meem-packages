@@ -1052,16 +1052,16 @@ export class Storage {
 	private async importGunExtensions() {
 		try {
 			await import('gun/sea')
-			console.log('Imported gun/sea')
+			log.trace('Imported gun/sea')
 		} catch (e) {
-			console.log('Failed to import gun/sea', e)
+			log.debug('Failed to import gun/sea', e)
 		}
 
 		try {
 			await import('gun/lib/open')
-			console.log('Imported gun/lib/open')
+			log.trace('Imported gun/lib/open')
 		} catch (e) {
-			console.log('Failed to import gun/lib/open', e)
+			log.debug('Failed to import gun/lib/open', e)
 		}
 	}
 }
