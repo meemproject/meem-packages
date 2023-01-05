@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.14.0](https://github.com/meemproject/meem-packages/compare/v0.13.5...v0.14.0) (2023-01-05)
+
+
+### Bug Fixes
+
+* epm upload path ([ed099a8](https://github.com/meemproject/meem-packages/commit/ed099a8))
+
+
+### Features
+
+* encryption, decryption, gundb ([9b53cca](https://github.com/meemproject/meem-packages/commit/9b53cca))
+* switch to aes encryption instead of rsa which has a max size limit ([4b3c545](https://github.com/meemproject/meem-packages/commit/4b3c545))
+
+
+
+
+
 ## [0.13.5](https://github.com/meemproject/meem-packages/compare/v0.13.4...v0.13.5) (2023-01-04)
 
 **Note:** Version bump only for package meem-packages
