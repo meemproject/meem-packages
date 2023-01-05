@@ -527,6 +527,7 @@ export class Storage {
 
 		this.emitter.addListener(path, cb)
 
+		// @ts-ignore
 		this.gun.get(path).open(async (data: any /*, key: string */) => {
 			try {
 				const keys = Object.keys(data)
