@@ -131,22 +131,57 @@ export class Storage {
 		return { publicKey, privateKey }
 	}
 
+	public async generateAESKey() {
+		const key = await crypto.subtle.generateKey(
+			{
+				name: 'AES-CTR',
+				length: 256 //can be  128, 192, or 256
+			},
+			true, //whether the key is extractable (i.e. can be used in exportKey)
+			['encrypt', 'decrypt'] //can "encrypt", "decrypt", "wrapKey", or "unwrapKey"
+		)
+
+		const privateKey = await crypto.subtle.exportKey('jwk', key)
+
+		return privateKey
+	}
+
 	/** Encrypt data using a public key */
 	public async encrypt(options: {
 		data: Record<string, any>
-		publicKey: JsonWebKey
+		key: JsonWebKey
+
+		algorithm?:
+			| AlgorithmIdentifier
+			| RsaHashedImportParams
+			| EcKeyImportParams
+			| HmacImportParams
+			| AesKeyAlgorithm
+
+		/** The algorithm params to pass to crypto.subtle.decrypt(...). Default AES-CTR length 128 */
+		algorithmParams?:
+			| AlgorithmIdentifier
+			| RsaOaepParams
+			| AesCtrParams
+			| AesCbcParams
+			| AesGcmParams
 	}) {
-		const { data, publicKey } = options
+		const { data, key, algorithm, algorithmParams } = options
+
 		const cryptoKey = await crypto.subtle.importKey(
 			'jwk',
-			publicKey,
-			{ name: 'RSA-OAEP', hash: { name: 'SHA-256' } },
+			key,
+			algorithm ?? { name: 'AES-CTR' },
 			false,
 			['encrypt']
 		)
 
 		const encrypted = await crypto.subtle.encrypt(
-			{ name: 'RSA-OAEP' },
+			algorithmParams ?? {
+				name: 'AES-CTR',
+				counter: new Uint8Array(16),
+				length: 128
+			},
 			cryptoKey,
 			Buffer.from(JSON.stringify(data))
 		)
@@ -255,19 +290,39 @@ export class Storage {
 		strToDecrypt: string
 
 		privateKey: JsonWebKey
+
+		/** The algorithm used to generate the privateKey. Default AES-CTR */
+		algorithm?:
+			| AlgorithmIdentifier
+			| RsaHashedImportParams
+			| EcKeyImportParams
+			| HmacImportParams
+			| AesKeyAlgorithm
+
+		/** The algorithm params to pass to crypto.subtle.decrypt(...). Default AES-CTR length 128 */
+		algorithmParams?:
+			| AlgorithmIdentifier
+			| RsaOaepParams
+			| AesCtrParams
+			| AesCbcParams
+			| AesGcmParams
 	}) {
-		const { strToDecrypt, privateKey } = options
+		const { strToDecrypt, privateKey, algorithm, algorithmParams } = options
 
 		const cryptoKey = await crypto.subtle.importKey(
 			'jwk',
 			privateKey,
-			{ name: 'RSA-OAEP', hash: { name: 'SHA-256' } },
+			algorithm ?? { name: 'AES-CTR', hash: { name: 'SHA-256' } },
 			false,
 			['decrypt']
 		)
 
 		const decryptedString = await crypto.subtle.decrypt(
-			{ name: 'RSA-OAEP' },
+			algorithmParams ?? {
+				name: 'AES-CTR',
+				counter: new Uint8Array(16),
+				length: 128
+			},
 			cryptoKey,
 			Buffer.from(strToDecrypt, 'base64')
 		)
@@ -533,15 +588,15 @@ export class Storage {
 		}
 
 		/**
-		 * The private or public key that will be used to encrypt the data
+		 * The key that will be used to encrypt the data
 		 */
-		publicKey: JsonWebKey
+		key: JsonWebKey
 	}) {
-		const { path, publicKey, writeColumns, data } = options
+		const { path, key, writeColumns, data } = options
 
 		const encryptedStr = await this.encrypt({
 			data,
-			publicKey
+			key
 		})
 
 		const newWriteColumns = {
