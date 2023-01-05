@@ -64,6 +64,7 @@
 		"@lit-protocol/lit-node-client": "^2.0.35",
 		"@meemproject/meem-contracts": "^0.14.2",
 		"@meemproject/utils": "^0.14.2",
+		"@peculiar/webcrypto": "^1.4.1",
 		"@tableland/sdk": "^3.1.5",
 		"@typechain/ethers-v5": "^10.0.0",
 		"@types/js-cookie": "^3.0.1",
