@@ -4,42 +4,52 @@ import { createStyles } from '@mantine/core'
 
 // Primary Palette
 export const colorBlack = '#000000'
+export const colorDarkerGrey = '#222222'
 export const colorDarkGrey = '#444444'
 export const colorGrey = '#E1E1E1'
 export const colorLightGrey = '#F2F2F2'
 export const colorLightestGrey = '#FAFAFA'
 export const colorWhite = '#FFFFFF'
-export const colorPink = '#FF6651'
-export const colorLightPink = '#FFF0EE'
+export const colorBlue = '#9ED3FD'
+export const colorLightBlue = '#f3faff'
+export const colorDarkBlue = '#6895f7'
+export const colorYellow = '#F9FF15'
 
 // Utility colors
 export const colorGreen = '#1DAD4E'
 export const colorVerified = 'rgba(62, 162, 255, 1)'
+export const colorSiteDarkModeBg = '#1A1C1E'
 
-export const useClubsTheme = createStyles(theme => ({
+export const useMeemTheme = createStyles(theme => ({
 	// Buttons
 	buttonBlack: {
-		backgroundColor: colorBlack,
+		backgroundColor: theme.colorScheme === 'dark' ? colorDarkGrey : colorBlack,
 		'&:hover': {
 			backgroundColor: colorDarkGrey
 		},
 		borderRadius: 24
 	},
 	buttonGrey: {
-		marginLeft: 8,
-		backgroundColor: colorGrey,
+		backgroundColor: theme.colorScheme === 'dark' ? colorDarkGrey : colorGrey,
 		'&:hover': {
 			backgroundColor: colorLightGrey
 		},
-		color: colorBlack,
+		color: theme.colorScheme === 'dark' ? colorWhite : colorBlack,
 		borderRadius: 24
 	},
-	buttonRed: {
-		color: colorWhite,
-		marginLeft: 8,
-		backgroundColor: colorPink,
+	buttonDarkGrey: {
+		backgroundColor: colorDarkGrey,
 		'&:hover': {
-			backgroundColor: colorLightPink
+			backgroundColor: colorDarkerGrey
+		},
+		color: colorWhite,
+		borderRadius: 24
+	},
+	buttonBlue: {
+		color: colorBlack,
+		backgroundColor: colorBlue,
+		'&:hover': {
+			backgroundColor: colorDarkBlue
 		},
 		borderRadius: 24
 	},
@@ -49,24 +59,37 @@ export const useClubsTheme = createStyles(theme => ({
 		borderColor: colorBlack,
 		backgroundColor: colorWhite,
 		'&:hover': {
-			backgroundColor: colorLightestGrey
+			backgroundColor: colorLightGrey
 		}
 	},
 
 	// Form Fields
 	fRadio: { fontWeight: 600, fontFamily: 'Inter' },
 	fTextField: {
-		backgroundColor: colorLightestGrey,
 		border: '0px',
-		height: 60
+		height: 60,
+		backgroundColor: theme.colorScheme === 'dark' ? '' : colorLightestGrey
 	},
-	fOrangeSelectableSpan: {
+	fBlueSelectableSpan: {
 		padding: 4,
 		borderRadius: 8,
 		fontWeight: 'bold',
-		backgroundColor: colorLightPink,
-		color: colorPink,
+		backgroundColor:
+			theme.colorScheme === 'dark' ? 'rgba(255, 102, 81, 0.3)' : colorLightBlue,
+		color: colorDarkBlue,
 		cursor: 'pointer'
+	},
+	fRichTextEditorContainer: {
+		border: `1px solid ${
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorGrey
+		}`,
+		lineHeight: 1.4,
+		borderRadius: 16
+	},
+	fRichTextEditorToolbar: {
+		border: 'none',
+		borderRadius: 24,
+		marginBottom: 10
 	},
 
 	// Layout
@@ -129,14 +152,20 @@ export const useClubsTheme = createStyles(theme => ({
 		fontSize: 16,
 		fontWeight: 600,
 		cursor: 'pointer',
-		border: `1px solid ${colorGrey}`,
-		backgroundColor: colorLightestGrey,
+		border: `1px solid ${
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorGrey
+		}`,
+		backgroundColor:
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorLightestGrey,
 		borderRadius: 16,
 		padding: 16
 	},
 	gridItemCentered: {
-		border: `1px solid ${colorGrey}`,
-		backgroundColor: colorLightestGrey,
+		border: `1px solid ${
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorGrey
+		}`,
+		backgroundColor:
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorLightestGrey,
 		fontWeight: 600,
 		borderRadius: 16,
 		padding: 16,
@@ -144,22 +173,34 @@ export const useClubsTheme = createStyles(theme => ({
 		display: 'flex',
 		alignItems: 'center'
 	},
+	greyContentBox: {
+		backgroundColor:
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorLightGrey,
+		borderRadius: 16,
+		padding: 16
+	},
 	connectMethodGridItem: {
-		backgroundColor: colorLightestGrey,
+		backgroundColor:
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorLightestGrey,
 		width: 200,
 		height: 200,
 		borderRadius: 20,
-		border: `1px solid ${colorGrey}`,
+		border: `1px solid ${
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorGrey
+		}`,
 		cursor: 'pointer',
 		position: 'relative'
 	},
 	connectMethodGridItemMobile: {
-		backgroundColor: colorLightestGrey,
+		backgroundColor:
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorLightestGrey,
 		display: 'flex',
 		flexDirection: 'row',
 		borderRadius: 32,
 		padding: 8,
-		border: `1px solid ${colorGrey}`,
+		border: `1px solid ${
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorGrey
+		}`,
 		cursor: 'pointer',
 		alignItems: 'center'
 	},
@@ -168,7 +209,7 @@ export const useClubsTheme = createStyles(theme => ({
 		alignItems: 'center',
 		textAlign: 'center'
 	},
-	integrationGridItem: {
+	extensionGridItem: {
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'start',
@@ -176,24 +217,30 @@ export const useClubsTheme = createStyles(theme => ({
 		minHeight: 110,
 		marginBottom: 12,
 		cursor: 'pointer',
-		border: `1px solid ${colorGrey}`,
-		backgroundColor: colorLightestGrey,
+		border: `1px solid ${
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorGrey
+		}`,
+		backgroundColor:
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorLightestGrey,
 		borderRadius: 16,
 		padding: 16
 	},
-	integrationGridItemEnabled: {
+	extensionGridItemEnabled: {
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center',
 		marginBottom: 12,
-		border: `1px solid ${colorGrey}`,
-		backgroundColor: colorLightestGrey,
+		border: `1px solid ${
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorGrey
+		}`,
+		backgroundColor:
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorLightestGrey,
 		borderRadius: 16,
 		paddingTop: 16,
 		position: 'relative'
 	},
-	integrationGridItemEnabledHeaderBackground: {
-		backgroundColor: colorWhite,
+	extensionGridItemEnabledHeaderBackground: {
+		backgroundColor: theme.colorScheme === 'dark' ? colorDarkGrey : colorWhite,
 		position: 'absolute',
 		top: 0,
 		left: 0,
@@ -202,18 +249,18 @@ export const useClubsTheme = createStyles(theme => ({
 		borderTopLeftRadius: 16,
 		borderTopRightRadius: 16
 	},
-	integrationGridItemActions: {
+	extensionGridItemActions: {
 		display: 'flex',
 		flexDirection: 'row',
 		height: 46
 	},
-	integrationGridItemAction: {
+	extensionGridItemAction: {
 		cursor: 'pointer',
 		display: 'flex',
 		flexDirection: 'row',
 		padding: 12
 	},
-	integrationGridItemHeader: {
+	extensionGridItemHeader: {
 		fontWeight: 600,
 		display: 'flex',
 		alignItems: 'center',
@@ -224,12 +271,13 @@ export const useClubsTheme = createStyles(theme => ({
 	pageHeader: {
 		marginBottom: 32,
 		display: 'flex',
-		backgroundColor: colorLightestGrey,
+		backgroundColor:
+			theme.colorScheme === 'dark' ? colorBlack : colorLightestGrey,
 		alignItems: 'center',
 		justifyContent: 'space-between',
 		flexDirection: 'row',
 		paddingTop: 32,
-		borderBottomColor: colorGrey,
+		borderBottomColor: theme.colorScheme === 'dark' ? colorDarkGrey : colorGrey,
 		borderBottomWidth: '1px',
 		borderBottomStyle: 'solid',
 		paddingBottom: 32,
@@ -265,10 +313,15 @@ export const useClubsTheme = createStyles(theme => ({
 		right: 0
 	},
 	pageFooterBackground: {
-		backgroundColor: colorWhite,
+		backgroundColor: theme.colorScheme === 'dark' ? colorBlack : colorWhite,
 		width: '100%',
 		height: 48,
 		paddingTop: 8
+	},
+	pageZeroPaddingMobileContainer: {
+		[`@media (max-width: ${theme.breakpoints.md}px)`]: {
+			padding: 0
+		}
 	},
 
 	// Modal
@@ -283,9 +336,36 @@ export const useClubsTheme = createStyles(theme => ({
 		position: 'relative'
 	},
 	modalStepsContainer: {
-		border: `1px solid ${colorLightGrey}`,
+		border: `1px solid ${
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorLightGrey
+		}`,
 		borderRadius: 16,
 		padding: 16
+	},
+
+	// Agreements Home Columns Layout
+	pageResponsiveContainer: {
+		display: 'flex',
+		flexDirection: 'row',
+		marginTop: 64,
+		[`@media (max-width: ${theme.breakpoints.md}px)`]: {
+			flexDirection: 'column',
+			marginTop: 0
+		}
+	},
+	pageLeftColumn: {
+		width: 350,
+		paddingRight: 32,
+		[`@media (max-width: ${theme.breakpoints.md}px)`]: {
+			width: '100%',
+			paddingRight: 0
+		}
+	},
+	pageRightColumn: {
+		width: 650,
+		[`@media (max-width: ${theme.breakpoints.md}px)`]: {
+			width: '100%'
+		}
 	},
 
 	// Page Panel Layout
@@ -320,19 +400,21 @@ export const useClubsTheme = createStyles(theme => ({
 
 	// Site header bar
 	siteHeader: {
-		marginTop: 0,
-		paddingTop: 8,
-		paddingBottom: '-8px',
-		borderBottom: `1px solid ${colorGrey}`
+		backgroundColor: theme.colorScheme === 'dark' ? colorBlack : colorWhite,
+		borderBottom: `1px solid ${
+			theme.colorScheme === 'dark' ? colorDarkGrey : colorGrey
+		}`
 	},
 	siteHeaderLeftItems: {
-		marginLeft: 4,
+		marginLeft: 16,
+		paddingTop: 2,
 		display: 'flex',
 		flexDirection: 'row',
 		alignItems: 'center'
 	},
 
 	siteHeaderRightItems: {
+		paddingTop: 10,
 		marginBottom: 4,
 		marginRight: 0,
 		display: 'flex',
@@ -347,6 +429,7 @@ export const useClubsTheme = createStyles(theme => ({
 		marginLeft: 16,
 		marginRight: 8,
 		paddingBottom: 6,
+		color: theme.colorScheme === 'dark' ? colorWhite : colorBlack,
 		cursor: 'pointer'
 	},
 	siteHeaderInner: {
@@ -358,7 +441,7 @@ export const useClubsTheme = createStyles(theme => ({
 	},
 	siteHeaderUser: {
 		marginBottom: '5px',
-		color: theme.colorScheme === 'dark' ? colorDarkGrey : colorBlack,
+		color: theme.colorScheme === 'dark' ? colorLightGrey : colorBlack,
 		padding: `${theme.spacing.xs}px ${theme.spacing.sm}px`,
 		borderRadius: theme.radius.sm,
 		transition: 'background-color 100ms ease'
@@ -373,6 +456,59 @@ export const useClubsTheme = createStyles(theme => ({
 		},
 		marginRight: 24,
 		marginLeft: 24
+	},
+
+	// Widgets
+	widgetDark: {
+		backgroundColor: colorBlack,
+		color: 'white',
+		position: 'relative',
+		padding: 24,
+		width: '100%',
+		borderRadius: 16,
+		boxShadow:
+			theme.colorScheme === 'dark' ? '' : '0px 4px 30px rgba(0, 0, 0, 0.1)',
+		marginBottom: 48,
+		[`@media (max-width: ${theme.breakpoints.md}px)`]: {
+			borderRadius: 0,
+			boxShadow: '',
+			marginBottom: 0
+		}
+	},
+	widgetLight: {
+		boxShadow:
+			theme.colorScheme === 'dark' ? '' : '5px 5px 30px rgba(0, 0, 0, 0.1)',
+		borderRadius: 16,
+		width: '100%',
+		backgroundColor: theme.colorScheme === 'dark' ? colorBlack : colorWhite,
+		padding: 24,
+		marginBottom: 48,
+		[`@media (max-width: ${theme.breakpoints.md}px)`]: {
+			borderRadius: 0,
+			boxShadow: 'none',
+			marginBottom: 0,
+			borderBottom: `8px solid ${
+				theme.colorScheme === 'dark' ? colorDarkerGrey : colorLightGrey
+			}`
+		}
+	},
+	widgetMeem: {
+		boxShadow:
+			theme.colorScheme === 'dark' ? '' : '5px 5px 30px rgba(0, 0, 0, 0.1)',
+		borderRadius: 16,
+		width: '100%',
+		background:
+			'linear-gradient(117deg, rgba(227,255,191,1) 0%, rgba(229,255,183,0.8477984943977591) 3%, rgba(247,254,113,0.8534007352941176) 31%, rgba(177,220,255,0.8505996148459384) 66%, rgba(133,139,33,0.4724483543417367) 100%)',
+		padding: 24,
+		marginBottom: 48,
+		[`@media (max-width: ${theme.breakpoints.md}px)`]: {
+			borderRadius: 0,
+			boxShadow: 'none',
+			marginBottom: 0,
+			borderBottom: `8px solid ${
+				theme.colorScheme === 'dark' ? colorDarkerGrey : colorLightGrey
+			}`
+		}
 	},
 
 	// Images
@@ -398,10 +534,11 @@ export const useClubsTheme = createStyles(theme => ({
 		height: 256,
 		marginTop: -12,
 		marginBottom: -12,
-		backgroundColor: colorWhite,
+		backgroundColor:
+			theme.colorScheme === 'dark' ? colorSiteDarkModeBg : colorWhite,
 		zIndex: -1
 	},
-	imageClubLogo: {
+	imageAgreementLogo: {
 		imageRendering: 'pixelated',
 		width: 80,
 		height: 80,
@@ -412,17 +549,20 @@ export const useClubsTheme = createStyles(theme => ({
 			minWidth: 40
 		}
 	},
-	imageClubLogoContainer: {
+	imageAgreementLogoContainer: {
 		marginTop: 32,
 		width: 108,
 		height: 100,
 		position: 'relative'
 	},
-	imageClubLogoDeleteButton: {
+	imageAgreementLogoDeleteButton: {
 		position: 'absolute',
 		top: '-12px',
 		right: '-105px',
 		cursor: 'pointer'
+	},
+	imagePixelated: {
+		imageRendering: 'pixelated'
 	},
 
 	// Misc
@@ -436,6 +576,12 @@ export const useClubsTheme = createStyles(theme => ({
 	badge: {
 		paddingLeft: 8,
 		paddingRight: 8
+	},
+	iconDarkThemeToggle: {
+		marginTop: -4,
+		[`@media (max-width: ${theme.breakpoints.md}px)`]: {
+			marginRight: 20
+		}
 	},
 	paragraphIntTextInput: {
 		paddingLeft: 142
@@ -504,13 +650,22 @@ export const useClubsTheme = createStyles(theme => ({
 	tExtraExtraSmall: { fontWeight: 500, fontSize: '12px', lineHeight: 1.4 },
 
 	// Text variants
-	tBadgeText: { fontWeight: 600, fontSize: '12px', color: colorBlack },
+	tBadgeText: {
+		fontWeight: 600,
+		fontSize: '12px',
+		color: theme.colorScheme === 'dark' ? colorWhite : colorBlack
+	},
+	tBadgeTextSmall: {
+		fontWeight: 600,
+		fontSize: '10px',
+		color: theme.colorScheme === 'dark' ? colorWhite : colorBlack
+	},
 	tBadgeTextWhite: { fontWeight: 600, fontSize: '12px', color: colorWhite },
 
 	tLink: {
 		textDecoration: 'underline',
 		cursor: 'pointer',
-		color: colorPink,
+		color: colorBlue,
 		fontWeight: 600
 	},
 
