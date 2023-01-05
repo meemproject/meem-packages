@@ -19,11 +19,8 @@ import { MeemAPI } from '../generated/api.generated'
 import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
 import { Id } from './id'
-
-if (typeof window !== 'undefined') {
-	require('gun/sea')
-	require('gun/lib/open')
-}
+import 'gun/sea'
+import 'gun/lib/open'
 
 export interface IPartialAccessControlCondition
 	extends Partial<AccsDefaultParams> {
@@ -527,7 +524,6 @@ export class Storage {
 
 		this.emitter.addListener(path, cb)
 
-		// @ts-ignore
 		this.gun.get(path).open(async (data: any /*, key: string */) => {
 			try {
 				const keys = Object.keys(data)
