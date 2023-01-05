@@ -18,9 +18,9 @@ import { v4 as uuidv4 } from 'uuid'
 import { MeemAPI } from '../generated/api.generated'
 import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
+import { Id } from './id'
 import 'gun/sea'
 import 'gun/lib/open'
-import { Id } from './id'
 
 export interface IPartialAccessControlCondition
 	extends Partial<AccsDefaultParams> {
