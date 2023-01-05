@@ -807,14 +807,14 @@ export class Agreement {
 			/** The link label */
 			label?: string
 			/** Visibility of the link extension */
-			visibility?: MeemAPI.IAgreementExtensionVisibility
+			visibility?: MeemAPI.AgreementExtensionVisibility
 		}
 		/** Optional widget data associated with this extension */
 		widget?: {
 			/** Metadata associated with the extension widget */
 			metadata?: MeemAPI.IMeemMetadataLike
 			/** Visibility of the extension widget */
-			visibility?: MeemAPI.IAgreementExtensionVisibility
+			visibility?: MeemAPI.AgreementExtensionVisibility
 		}
 	}) {
 		const { agreementId, extensionId, metadata, externalLink, widget } = options
@@ -852,7 +852,7 @@ export class Agreement {
 			/** The link label */
 			label?: string
 			/** Visibility of the link extension */
-			visibility?: MeemAPI.IAgreementExtensionVisibility
+			visibility?: MeemAPI.AgreementExtensionVisibility
 		}
 		/** Optional widget data associated with this extension */
 		widget?: {

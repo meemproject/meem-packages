@@ -1190,6 +1190,7 @@ export type AgreementExtensions = {
   ExtensionId?: Maybe<Scalars['uuid']>;
   createdAt: Scalars['timestamptz'];
   id: Scalars['uuid'];
+  isInitialized?: Maybe<Scalars['Boolean']>;
   metadata?: Maybe<Scalars['jsonb']>;
   updatedAt: Scalars['timestamptz'];
 };
@@ -1288,7 +1289,23 @@ export type AgreementExtensions_Aggregate = {
 };
 
 export type AgreementExtensions_Aggregate_Bool_Exp = {
+  bool_and?: InputMaybe<AgreementExtensions_Aggregate_Bool_Exp_Bool_And>;
+  bool_or?: InputMaybe<AgreementExtensions_Aggregate_Bool_Exp_Bool_Or>;
   count?: InputMaybe<AgreementExtensions_Aggregate_Bool_Exp_Count>;
+};
+
+export type AgreementExtensions_Aggregate_Bool_Exp_Bool_And = {
+  arguments: AgreementExtensions_Select_Column_AgreementExtensions_Aggregate_Bool_Exp_Bool_And_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<AgreementExtensions_Bool_Exp>;
+  predicate: Boolean_Comparison_Exp;
+};
+
+export type AgreementExtensions_Aggregate_Bool_Exp_Bool_Or = {
+  arguments: AgreementExtensions_Select_Column_AgreementExtensions_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<AgreementExtensions_Bool_Exp>;
+  predicate: Boolean_Comparison_Exp;
 };
 
 export type AgreementExtensions_Aggregate_Bool_Exp_Count = {
@@ -1353,6 +1370,7 @@ export type AgreementExtensions_Bool_Exp = {
   _or?: InputMaybe<Array<AgreementExtensions_Bool_Exp>>;
   createdAt?: InputMaybe<Timestamptz_Comparison_Exp>;
   id?: InputMaybe<Uuid_Comparison_Exp>;
+  isInitialized?: InputMaybe<Boolean_Comparison_Exp>;
   metadata?: InputMaybe<Jsonb_Comparison_Exp>;
   updatedAt?: InputMaybe<Timestamptz_Comparison_Exp>;
 };
@@ -1396,6 +1414,7 @@ export type AgreementExtensions_Insert_Input = {
   ExtensionId?: InputMaybe<Scalars['uuid']>;
   createdAt?: InputMaybe<Scalars['timestamptz']>;
   id?: InputMaybe<Scalars['uuid']>;
+  isInitialized?: InputMaybe<Scalars['Boolean']>;
   metadata?: InputMaybe<Scalars['jsonb']>;
   updatedAt?: InputMaybe<Scalars['timestamptz']>;
 };
@@ -1479,6 +1498,7 @@ export type AgreementExtensions_Order_By = {
   ExtensionId?: InputMaybe<Order_By>;
   createdAt?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
+  isInitialized?: InputMaybe<Order_By>;
   metadata?: InputMaybe<Order_By>;
   updatedAt?: InputMaybe<Order_By>;
 };
@@ -1506,9 +1526,23 @@ export enum AgreementExtensions_Select_Column {
   /** column name */
   Id = 'id',
   /** column name */
+  IsInitialized = 'isInitialized',
+  /** column name */
   Metadata = 'metadata',
   /** column name */
   UpdatedAt = 'updatedAt'
+}
+
+/** select "AgreementExtensions_aggregate_bool_exp_bool_and_arguments_columns" columns of table "AgreementExtensions" */
+export enum AgreementExtensions_Select_Column_AgreementExtensions_Aggregate_Bool_Exp_Bool_And_Arguments_Columns {
+  /** column name */
+  IsInitialized = 'isInitialized'
+}
+
+/** select "AgreementExtensions_aggregate_bool_exp_bool_or_arguments_columns" columns of table "AgreementExtensions" */
+export enum AgreementExtensions_Select_Column_AgreementExtensions_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns {
+  /** column name */
+  IsInitialized = 'isInitialized'
 }
 
 /** input type for updating data in table "AgreementExtensions" */
@@ -1518,6 +1552,7 @@ export type AgreementExtensions_Set_Input = {
   ExtensionId?: InputMaybe<Scalars['uuid']>;
   createdAt?: InputMaybe<Scalars['timestamptz']>;
   id?: InputMaybe<Scalars['uuid']>;
+  isInitialized?: InputMaybe<Scalars['Boolean']>;
   metadata?: InputMaybe<Scalars['jsonb']>;
   updatedAt?: InputMaybe<Scalars['timestamptz']>;
 };
@@ -1537,6 +1572,7 @@ export type AgreementExtensions_Stream_Cursor_Value_Input = {
   ExtensionId?: InputMaybe<Scalars['uuid']>;
   createdAt?: InputMaybe<Scalars['timestamptz']>;
   id?: InputMaybe<Scalars['uuid']>;
+  isInitialized?: InputMaybe<Scalars['Boolean']>;
   metadata?: InputMaybe<Scalars['jsonb']>;
   updatedAt?: InputMaybe<Scalars['timestamptz']>;
 };
@@ -1553,6 +1589,8 @@ export enum AgreementExtensions_Update_Column {
   CreatedAt = 'createdAt',
   /** column name */
   Id = 'id',
+  /** column name */
+  IsInitialized = 'isInitialized',
   /** column name */
   Metadata = 'metadata',
   /** column name */
@@ -5994,6 +6032,10 @@ export enum ChainNonces_Constraint {
   ChainNoncesChainIdKey16 = 'ChainNonces_chainId_key16',
   /** unique or primary key constraint on columns "chainId" */
   ChainNoncesChainIdKey17 = 'ChainNonces_chainId_key17',
+  /** unique or primary key constraint on columns "chainId" */
+  ChainNoncesChainIdKey18 = 'ChainNonces_chainId_key18',
+  /** unique or primary key constraint on columns "chainId" */
+  ChainNoncesChainIdKey19 = 'ChainNonces_chainId_key19',
   /** unique or primary key constraint on columns "id" */
   ChainNoncesPkey = 'ChainNonces_pkey'
 }
@@ -9004,6 +9046,10 @@ export enum UserIdentities_Constraint {
   UserIdentitiesExternalIdKey1 = 'UserIdentities_externalId_key1',
   /** unique or primary key constraint on columns "externalId" */
   UserIdentitiesExternalIdKey2 = 'UserIdentities_externalId_key2',
+  /** unique or primary key constraint on columns "externalId" */
+  UserIdentitiesExternalIdKey3 = 'UserIdentities_externalId_key3',
+  /** unique or primary key constraint on columns "externalId" */
+  UserIdentitiesExternalIdKey4 = 'UserIdentities_externalId_key4',
   /** unique or primary key constraint on columns "id" */
   UserIdentitiesPkey = 'UserIdentities_pkey'
 }
