@@ -1,5 +1,5 @@
 import log from '@kengoldfarb/log'
-import { MeemAPI } from '@meemproject/api'
+import { MeemAPI } from '@meemproject/sdk'
 import { isEqual, remove } from 'lodash'
 import React, { useContext, createContext, useState, ReactNode } from 'react'
 import { MatchMutate, useMatchMutate } from '../lib/useMatchMutate'
@@ -15,7 +15,7 @@ export interface ISockets {
 	): void
 }
 
-interface ISocketContextState {
+export interface ISocketContextState {
 	connect: () => void
 	websocket?: WebSocket
 	sockets?: ISockets

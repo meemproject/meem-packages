@@ -1,17 +1,18 @@
-import { Meem_Contract_20220718 } from './Meem/20220718/Contract'
-import { Meem_Token_20220718 } from './Meem/20220718/Token'
-import { MeemClub_Contract_20220718 } from './MeemClub/20220718/Contract'
-import { MeemClub_Token_20220718 } from './MeemClub/20220718/Token'
+import { Meem_Contract_20221116 } from './Meem/20221116/Contract'
+import { Meem_Token_20221116 } from './Meem/20221116/Token'
+import { Meem_AgreementContract_20221116 } from './Meem/20221116/AgreementContract'
+import { Meem_AgreementToken_20221116 } from './Meem/20221116/AgreementToken'
+import { Meem_AgreementRoleContract_20221116 } from './Meem/20221116/AgreementRoleContract'
+import { Meem_AgreementRoleToken_20221116 } from './Meem/20221116/AgreementRoleToken'
+import { Meem_AgreementExtension_20221116 } from './Meem/20221116/AgreementExtension'
 
-export { Meem_Contract_20220718, Meem_Token_20220718 }
-export { MeemClub_Contract_20220718, MeemClub_Token_20220718 }
+export { Meem_Contract_20221116, Meem_Token_20221116 }
+export { Meem_AgreementContract_20221116, Meem_AgreementToken_20221116 }
+export { Meem_AgreementRoleContract_20221116, Meem_AgreementRoleToken_20221116 }
+export { Meem_AgreementExtension_20221116 }
 
-export type MeemContractMetadataLike =
-	| Meem_Contract_20220718
-	| MeemClub_Contract_20220718
-
-export type MeemTokenMetadataLike =
-	| Meem_Token_20220718
-	| MeemClub_Token_20220718
-
-export type MeemMetadataLike = MeemContractMetadataLike | MeemTokenMetadataLike
+export type MeemMetadataLike = {
+	meem_metadata_type: string
+	meem_metadata_version: string
+	[key: string]: any
+}

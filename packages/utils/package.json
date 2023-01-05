@@ -1,6 +1,6 @@
 {
 	"name": "@meemproject/utils",
-	"version": "0.9.4",
+	"version": "0.14.0",
 	"main": "build/index.js",
 	"license": "MIT",
 	"files": [
@@ -25,7 +25,7 @@
 		"@types/superagent": "^4.1.15",
 		"chokidar-cli": "^3.0.0",
 		"eslint": "^8.13.0",
-		"eslint-config-kengoldfarb": "^1.4.2",
+		"eslint-config-kengoldfarb": "^1.4.5",
 		"fs-extra": "^10.0.1",
 		"superagent": "^7.1.2",
 		"ts-node": "^10.7.0",
@@ -34,7 +34,7 @@
 	},
 	"dependencies": {
 		"@kengoldfarb/log": "^1.0.5",
-		"@meemproject/meem-contracts": "^0.9.4",
+		"@meemproject/meem-contracts": "^0.14.0",
 		"ethers": "^5.6.4"
 	},
 	"publishConfig": {

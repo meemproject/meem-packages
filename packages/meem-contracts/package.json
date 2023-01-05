@@ -1,6 +1,6 @@
 {
 	"name": "@meemproject/meem-contracts",
-	"version": "0.9.4",
+	"version": "0.14.0",
 	"description": "Meems are pieces of digital content wrapped in more advanced dynamic property rights. They are ideas, stories, images -- existing independently from any social platform -- whose creators have set the terms by which others can access, remix, and share in their value.",
 	"author": "Meem Project",
 	"homepage": "https://meem.wtf",
@@ -78,7 +78,7 @@
 		"concurrently": "^6.2.1",
 		"dotenv": "^10.0.0",
 		"eslint": "^8.13.0",
-		"eslint-config-kengoldfarb": "^1.4.2",
+		"eslint-config-kengoldfarb": "^1.4.5",
 		"ethereum-waffle": "^3.3.0",
 		"fs-extra": "^10.0.0",
 		"hardhat": "^2.10.2",

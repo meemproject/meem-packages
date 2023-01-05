@@ -2,15 +2,6 @@
 # yarn lockfile v1
 
 
-"@apidevtools/json-schema-ref-parser@https://github.com/bcherny/json-schema-ref-parser.git#984282d34a2993e5243aa35100fe32a63699164d":
-  version "0.0.0-dev"
-  resolved "https://github.com/bcherny/json-schema-ref-parser.git#984282d34a2993e5243aa35100fe32a63699164d"
-  dependencies:
-    "@jsdevtools/ono" "^7.1.3"
-    "@types/json-schema" "^7.0.6"
-    call-me-maybe "^1.0.1"
-    js-yaml "^4.1.0"
-
 "@babel/code-frame@^7.0.0":
   version "7.18.6"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.18.6.tgz#3b25d38c89600baa2dcc219edfa88a74eb2c427a"
@@ -46,6 +37,16 @@
   integrity sha512-lkqXDcvlFT5rvEjiu6+QYO+1GXrEHRo2LOtS7E4GtX5ESIZOgepqsZBVIj6Pv+a6zqsya9VCgiK1KAK4BvJDAw==
   dependencies:
     regenerator-runtime "^0.13.4"
+
+"@bcherny/json-schema-ref-parser@9.0.9":
+  version "9.0.9"
+  resolved "https://registry.yarnpkg.com/@bcherny/json-schema-ref-parser/-/json-schema-ref-parser-9.0.9.tgz#09899d405bc708c0acac0066ae8db5b94d465ca4"
+  integrity sha512-vmEmnJCfpkLdas++9OYg6riIezTYqTHpqUTODJzHLzs5UnXujbOJW9VwcVCnyo1mVRt32FRr23iXBx/sX8YbeQ==
+  dependencies:
+    "@jsdevtools/ono" "^7.1.3"
+    "@types/json-schema" "^7.0.6"
+    call-me-maybe "^1.0.1"
+    js-yaml "^4.1.0"
 
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
@@ -1049,10 +1050,10 @@ eslint-config-airbnb-typescript@^17.0.0:
   dependencies:
     eslint-config-airbnb-base "^15.0.0"
 
-eslint-config-kengoldfarb@^1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/eslint-config-kengoldfarb/-/eslint-config-kengoldfarb-1.4.2.tgz#1da52d05c5844933cedba5b78608bbd7edf48132"
-  integrity sha512-Sa8QNs/qceGbTKnCbHt1M5GsiSOeCAU0yc7s3sGVGh9zTrxhM+ujpCRJ7Ja61UKrZmrNxSPSu4V8QL2yGQAy+g==
+eslint-config-kengoldfarb@^1.4.5:
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/eslint-config-kengoldfarb/-/eslint-config-kengoldfarb-1.4.5.tgz#e431538e3acc449f6213f620cc1ab95f314f4d50"
+  integrity sha512-xozYWjKrOXk8kPzH38vioeLQX+QrZA7mW1bKPt7At5u0vnr12F9Y9Ug+5JkXW70CZsh9wU0HoeKowCod/PmPiQ==
   dependencies:
     "@typescript-eslint/eslint-plugin" "^5.19.0"
     "@typescript-eslint/parser" "^5.19.0"
@@ -1060,7 +1061,7 @@ eslint-config-kengoldfarb@^1.4.2:
     eslint-config-prettier "^8.5.0"
     eslint-plugin-import "^2.26.0"
     eslint-plugin-jsx-a11y "^6.3.1"
-    eslint-plugin-kengoldfarb "^1.4.2"
+    eslint-plugin-kengoldfarb "^1.4.5"
     eslint-plugin-prettier "^4.0.0"
     eslint-plugin-react "^7.29.4"
     eslint-plugin-react-hooks "^4.4.0"
@@ -1125,10 +1126,10 @@ eslint-plugin-jsx-a11y@^6.3.1:
     minimatch "^3.1.2"
     semver "^6.3.0"
 
-eslint-plugin-kengoldfarb@^1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-kengoldfarb/-/eslint-plugin-kengoldfarb-1.4.2.tgz#17fb4450e97ecf72273b51d7d515cde2ad1c3d19"
-  integrity sha512-1tsn+etNKJ1W8N90KSnb7GiZt/PHBnNkuOd0Lh2F+m/MdRNKrMzeZO89lpyOop1l4VjQEXz7noqjubALW/Hmwg==
+eslint-plugin-kengoldfarb@^1.4.5:
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-kengoldfarb/-/eslint-plugin-kengoldfarb-1.4.5.tgz#89bf1380ed693bdb10ce5be38a3e46279581e4b7"
+  integrity sha512-P0Yt7ow9eyi6r9+Jbw3D9OfDWlR7ESyS1gWxk5C2+oslPUrguGcszgUTfuBSP2iZkUVF2qeFe8zbegAIt/6nPQ==
   dependencies:
     pascal-case "^3"
 
@@ -1850,12 +1851,12 @@ json-parse-even-better-errors@^2.3.0:
   resolved "https://registry.yarnpkg.com/json-parse-even-better-errors/-/json-parse-even-better-errors-2.3.1.tgz#7c47805a94319928e05777405dc12e1f7a4ee02d"
   integrity sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w==
 
-json-schema-to-typescript@^11.0.1:
-  version "11.0.1"
-  resolved "https://registry.yarnpkg.com/json-schema-to-typescript/-/json-schema-to-typescript-11.0.1.tgz#9203036817ca797f1116cbfe9163e8a4ec948bc3"
-  integrity sha512-iQFEErdr9PWQUN3kLvaFFdgWAfwBeqH3PMzxza4NpSU/8uadwHKKi66Hgu5Rb3NeVSk85xkwTYIeuah+R0ASeA==
+json-schema-to-typescript@^11.0.2:
+  version "11.0.2"
+  resolved "https://registry.yarnpkg.com/json-schema-to-typescript/-/json-schema-to-typescript-11.0.2.tgz#80348391abb4ffb75daf312380c2f01c552ffba8"
+  integrity sha512-XRyeXBJeo/IH4eTP5D1ptX78vCvH86nMDt2k3AxO28C3uYWEDmy4mgPyMpb8bLJ/pJMElOGuQbnKR5Y6NSh3QQ==
   dependencies:
-    "@apidevtools/json-schema-ref-parser" "https://github.com/bcherny/json-schema-ref-parser.git#984282d34a2993e5243aa35100fe32a63699164d"
+    "@bcherny/json-schema-ref-parser" "9.0.9"
     "@types/json-schema" "^7.0.11"
     "@types/lodash" "^4.14.182"
     "@types/prettier" "^2.6.1"

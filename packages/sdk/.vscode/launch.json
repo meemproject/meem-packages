@@ -1,0 +1,27 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Test file (hardhat)",
+			"type": "node",
+			"request": "launch",
+			"runtimeArgs": [
+				"${workspaceFolder}/../meem-contracts/node_modules/.bin/hardhat",
+				"test",
+				"--network",
+				"hardhat",
+				// "--verbose",
+				"${relativeFile}"
+			],
+			"runtimeExecutable": "${env:NVM_BIN}/node",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"port": 9229,
+			"cwd": "${workspaceRoot}",
+			"env": {
+				"TS_NODE_TRANSPILE_ONLY": "1",
+				// "DEBUG": "@meemproject/*",
+			}
+		}
+	]
+}

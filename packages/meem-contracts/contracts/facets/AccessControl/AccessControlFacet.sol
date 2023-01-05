@@ -32,6 +32,10 @@ contract AccessControlFacet {
 	/// @param user The user that was revoked
 	event MeemRoleRevoked(bytes32 indexed role, address indexed user);
 
+	/// @notice Emitted when the admin contract address is set
+	/// @param adminContract The address of the new admin contract
+	event MeemAdminContractSet(address indexed adminContract);
+
 	/// @notice An admin of the contract.
 	/// @return Hashed value that represents this role.
 	function ADMIN_ROLE() public pure returns (bytes32) {
@@ -166,5 +170,7 @@ contract AccessControlFacet {
 		ac.requireRole(AccessControlStorage.ADMIN_ROLE, msg.sender);
 
 		AccessControlStorage.dataStore().adminContract = newAdminContract;
+
+		emit MeemAdminContractSet(newAdminContract);
 	}
 }

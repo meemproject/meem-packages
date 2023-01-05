@@ -1,0 +1,10 @@
+{
+    "description": "This schema describes version 20221116 of the Meem Agreement Token metadata standard.",
+    "title": "Meem_AgreementToken_20221116",
+    "type": "object",
+    "allOf": [
+        {
+            "$ref": "Meem/20221116/Token.json"
+        }
+    ]
+}
