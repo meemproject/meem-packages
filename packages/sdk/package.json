@@ -1,6 +1,6 @@
 {
 	"name": "@meemproject/sdk",
-	"version": "0.14.0",
+	"version": "0.14.2",
 	"main": "build/index.js",
 	"license": "MIT",
 	"files": [
@@ -62,8 +62,8 @@
 		"@kengoldfarb/log": "^1.0.5",
 		"@lit-protocol/constants": "^2.0.35",
 		"@lit-protocol/lit-node-client": "^2.0.35",
-		"@meemproject/meem-contracts": "^0.14.0",
-		"@meemproject/utils": "^0.14.0",
+		"@meemproject/meem-contracts": "^0.14.2",
+		"@meemproject/utils": "^0.14.2",
 		"@peculiar/webcrypto": "^1.4.1",
 		"@tableland/sdk": "^3.1.5",
 		"@typechain/ethers-v5": "^10.0.0",
