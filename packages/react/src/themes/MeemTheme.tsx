@@ -141,6 +141,18 @@ export const useMeemTheme = createStyles(theme => ({
 	},
 	invisibleContainer: { display: 'none' },
 	visibleContainer: { display: 'block' },
+	visibleDesktopOnly: {
+		display: 'block',
+		[`@media (max-width: ${theme.breakpoints.md}px)`]: {
+			display: 'none'
+		}
+	},
+	visibleMobileOnly: {
+		display: 'none',
+		[`@media (max-width: ${theme.breakpoints.md}px)`]: {
+			display: 'block'
+		}
+	},
 
 	// Grids and items
 	boxBorderedRounded: {
@@ -182,12 +194,11 @@ export const useMeemTheme = createStyles(theme => ({
 	connectMethodGridItem: {
 		backgroundColor:
 			theme.colorScheme === 'dark' ? colorDarkGrey : colorLightestGrey,
-		width: 200,
-		height: 200,
-		borderRadius: 20,
-		border: `1px solid ${
-			theme.colorScheme === 'dark' ? colorDarkGrey : colorGrey
-		}`,
+		width: 150,
+		height: 100,
+		borderRadius: 16,
+		boxShadow:
+			theme.colorScheme === 'dark' ? '' : '5px 5px 30px rgba(0, 0, 0, 0.1)',
 		cursor: 'pointer',
 		position: 'relative'
 	},
@@ -205,7 +216,7 @@ export const useMeemTheme = createStyles(theme => ({
 		alignItems: 'center'
 	},
 	connectMethodGridItemContent: {
-		marginTop: 55,
+		paddingTop: 20,
 		alignItems: 'center',
 		textAlign: 'center'
 	},
