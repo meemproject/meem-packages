@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.15.0](https://github.com/meemproject/meem-packages/compare/v0.14.6...v0.15.0) (2023-01-09)
+
+
+### Features
+
+* improved sign in design ([fa6d41f](https://github.com/meemproject/meem-packages/commit/fa6d41f))
+
+
+
+
+
 ## [0.14.6](https://github.com/meemproject/meem-packages/compare/v0.14.5...v0.14.6) (2023-01-06)
 
 **Note:** Version bump only for package @meemproject/react
