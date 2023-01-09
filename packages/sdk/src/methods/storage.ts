@@ -19,8 +19,6 @@ import { MeemAPI } from '../generated/api.generated'
 import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
 import { Id } from './id'
-import 'gun/sea'
-import 'gun/lib/open'
 
 export interface IPartialAccessControlCondition
 	extends Partial<AccsDefaultParams> {
@@ -67,6 +65,7 @@ export class Storage {
 			peers
 		})
 		this.emitter = new EventEmitter() as TypedEmitter<EmitterEvents>
+		this.importGunExtensions()
 	}
 
 	/** Sets the JWT used in api calls */
@@ -524,6 +523,7 @@ export class Storage {
 
 		this.emitter.addListener(path, cb)
 
+		// @ts-ignore
 		this.gun.get(path).open(async (data: any /*, key: string */) => {
 			try {
 				const keys = Object.keys(data)
@@ -1046,6 +1046,22 @@ export class Storage {
 			return new Blob([ab], { type: 'image/jpeg' })
 		} catch (e) {
 			return new Blob()
+		}
+	}
+
+	private async importGunExtensions() {
+		try {
+			await import('gun/sea')
+			log.trace('Imported gun/sea')
+		} catch (e) {
+			log.debug('Failed to import gun/sea', e)
+		}
+
+		try {
+			await import('gun/lib/open')
+			log.trace('Imported gun/lib/open')
+		} catch (e) {
+			log.debug('Failed to import gun/lib/open', e)
 		}
 	}
 }

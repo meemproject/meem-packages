@@ -33,7 +33,7 @@ export class AgreementExtension {
 	public async createAgreementExtension(
 		options: ICreateAgreementExtensionOptions
 	) {
-		const { extensionId, metadata, agreementId } = options
+		const { agreementId } = options
 
 		log.debug('Creating agreement Extension', options)
 
@@ -46,8 +46,7 @@ export class AgreementExtension {
 					jwt: this.jwt,
 					method: MeemAPI.v1.CreateAgreement.method,
 					body: {
-						extensionId,
-						metadata
+						...options
 					}
 				}
 			)
@@ -59,7 +58,7 @@ export class AgreementExtension {
 	public async updateAgreementExtension(
 		options: IUpdateAgreementExtensionOptions
 	) {
-		const { agreementExtensionId, metadata, agreementId } = options
+		const { agreementExtensionId, agreementId } = options
 
 		log.debug('Creating agreement Extension', options)
 
@@ -73,7 +72,7 @@ export class AgreementExtension {
 					jwt: this.jwt,
 					method: MeemAPI.v1.UpdateAgreementExtension.method,
 					body: {
-						metadata
+						...options
 					}
 				}
 			)
