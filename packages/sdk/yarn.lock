@@ -2591,10 +2591,10 @@
   resolved "https://registry.yarnpkg.com/@lit-protocol/uint8arrays/-/uint8arrays-2.0.35.tgz#d9174956daa25bd729ba404fb6cd2e0a924becd3"
   integrity sha512-8pb4TJpZiUrlIJhTifkz7JdqaZQPgWWXFrR+y0RPjOdntKqDxnL6KV836cscrRLNseovRnd96EA+vYKpYhAjiQ==
 
-"@meemproject/meem-contracts@^0.14.0":
-  version "0.14.0"
-  resolved "https://registry.yarnpkg.com/@meemproject/meem-contracts/-/meem-contracts-0.14.0.tgz#46a7d34b22a8ca8541e584f0904deb71dd330af1"
-  integrity sha512-gQIsABETCyHm4SM4HN9kL7mENQMB/e6jt5uRM9yc0Vfe2kbuHvgmn8aD+Jb59cCCOYoa3Nq1eie5p3cKV05Utg==
+"@meemproject/meem-contracts@^0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@meemproject/meem-contracts/-/meem-contracts-0.15.0.tgz#318cd86a350ef83e53c970f9b6703991b0a0812e"
+  integrity sha512-+YB6hATKLV2/e/jNTkR7DckLTU0/RLQCJetQ7T93qfAZ+Tp/G5BML3oGb57KqjperrFu3RdyY9iNLwDPRDBrww==
   dependencies:
     "@kengoldfarb/log" "^1.0.5"
     "@openzeppelin/contracts" "^4.7.3"
@@ -2603,13 +2603,13 @@
     merkletreejs "^0.2.32"
     superagent "^8.0.0"
 
-"@meemproject/utils@^0.14.0":
-  version "0.14.0"
-  resolved "https://registry.yarnpkg.com/@meemproject/utils/-/utils-0.14.0.tgz#fd2a9338751e37eb38f9946c93eed8f1b6e78d14"
-  integrity sha512-LWXmn/LlJ5mISsCMSTHWbEIXUqQSrQ1W/hc0Bol0mPxARAAGDoD8kYJn6s0Q3IGI/nndSJQzq7HcTi0WSN0eWw==
+"@meemproject/utils@^0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@meemproject/utils/-/utils-0.15.0.tgz#1d4d8e4cdec5bdf0134e839d8b2429545baccb02"
+  integrity sha512-LHVFNrwPaoz4QOUIkderTh6PP59IyWH4i33OhzcIWRBvgcKs7alDmK94comIlR7wio3I+Buh8FafovgD0Qdjgw==
   dependencies:
     "@kengoldfarb/log" "^1.0.5"
-    "@meemproject/meem-contracts" "^0.14.0"
+    "@meemproject/meem-contracts" "^0.15.0"
     ethers "^5.6.4"
 
 "@metamask/eth-sig-util@^4.0.0":
