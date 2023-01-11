@@ -394,22 +394,23 @@ export class Agreement {
 	}
 
 	/** Update off-chain agreement data */
-	public async updateAgreement(options: MeemAPI.v1.UpdateAgreement.IRequestBody & {
-		/** The agreement */
-		agreementId: string
-	}) {
+	public async updateAgreement(
+		options: MeemAPI.v1.UpdateAgreement.IRequestBody & {
+			/** The agreement */
+			agreementId: string
+		}
+	) {
 		const { agreementId, ...updateProperties } = options
-		const result =
-			await makeRequest<MeemAPI.v1.UpdateAgreement.IDefinition>(
-				MeemAPI.v1.UpdateAgreement.path({ agreementId }),
-				{
-					jwt: this.jwt,
-					method: MeemAPI.v1.UpdateAgreement.method,
-					body: {
-						...updateProperties
-					}
+		const result = await makeRequest<MeemAPI.v1.UpdateAgreement.IDefinition>(
+			MeemAPI.v1.UpdateAgreement.path({ agreementId }),
+			{
+				jwt: this.jwt,
+				method: MeemAPI.v1.UpdateAgreement.method,
+				body: {
+					...updateProperties
 				}
-			)
+			}
+		)
 
 		return result
 	}
