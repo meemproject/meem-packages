@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.16.0](https://github.com/meemproject/meem-packages/compare/v0.15.2...v0.16.0) (2023-01-12)
+
+
+### Features
+
+* support for magic link ([d8ab827](https://github.com/meemproject/meem-packages/commit/d8ab827))
+
+
+
+
+
 ## [0.15.2](https://github.com/meemproject/meem-packages/compare/v0.15.1...v0.15.2) (2023-01-11)
 
 **Note:** Version bump only for package meem-packages
