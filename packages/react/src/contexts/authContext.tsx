@@ -1,10 +1,12 @@
 import { ApolloError } from '@apollo/client'
+import { ConnectExtension } from '@magic-ext/connect'
 import { MeemAPI, makeFetcher } from '@meemproject/sdk'
-import WalletConnectProvider from '@walletconnect/web3-provider'
+// import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers, ethers } from 'ethers'
 import Cookies from 'js-cookie'
 import JWT from 'jsonwebtoken'
 import { DateTime } from 'luxon'
+import { Magic } from 'magic-sdk'
 import React, {
 	createContext,
 	useMemo,
@@ -15,7 +17,7 @@ import React, {
 	ReactNode
 } from 'react'
 import useSWR from 'swr'
-import Web3Modal from 'web3modal'
+// import Web3Modal from 'web3modal'
 import { chains } from '../lib/chains'
 import log from '../lib/log'
 
@@ -107,6 +109,12 @@ export interface IAuthContextState {
 
 	/** The current user */
 	me?: MeemAPI.v1.GetMe.IResponseBody
+
+	/** The type of wallet that is connected */
+	walletType?: WalletType
+
+	/** An instance of the Magic.link sdk instance */
+	magic?: Magic<ConnectExtension[]>
 }
 
 const AuthContext = createContext({} as IAuthContextState)
@@ -114,6 +122,10 @@ AuthContext.displayName = 'AuthContext'
 
 export interface IAuthContextProps {
 	children?: ReactNode
+
+	chainId: number
+
+	magicApiKey: string
 
 	/** Use custom RPC endpoints for a chain */
 	rpcs?: {
@@ -128,16 +140,26 @@ export interface IAuthContextProps {
 	}
 }
 
+export type WalletType =
+	| 'magic'
+	| 'metamask'
+	| 'coinbase_wallet'
+	| 'wallet_connect'
+	| undefined
+
 export const AuthProvider: React.FC<IAuthContextProps> = ({
 	rpcs,
+	chainId: initialChainId,
+	magicApiKey,
 	...props
 }: IAuthContextProps) => {
 	const [accounts, setAccounts] = useState<string[]>([])
 	const [jwt, setJwt] = useState<string>()
-	const [chainId, setChainId] = useState<number>()
+	const [magic, setMagic] = useState<Magic<ConnectExtension[]>>()
+	const [walletType, setWalletType] = useState<WalletType>()
+	const [chainId, setChainId] = useState<number>(initialChainId)
 	const [loginState, setLoginState] = useState<LoginState>(LoginState.Unknown)
 	const [isConnected, setIsConnected] = useState<boolean>(false)
-	const [web3Modal, setWeb3Modal] = useState<Web3Modal | undefined>(undefined)
 	const [provider, setProvider] = useState<any | undefined>(undefined)
 	const [web3Provider, setWeb3Provider] = useState<
 		providers.Web3Provider | undefined
@@ -215,70 +237,66 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 		setJwt(undefined)
 	}, [])
 
-	const connectWallet = useCallback(
-		async (to?: string) => {
-			let p: any
+	const connectWallet = useCallback(async () => {
+		let p: any
 
-			try {
-				// This is the initial `provider` that is returned when
-				// using web3Modal to connect. Can be MetaMask or WalletConnect.
-				p = to ? await web3Modal?.connectTo(to) : await web3Modal?.connect()
-				log.debug('Connected')
-			} catch (e) {
-				log.warn(e)
-				log.warn(
-					'Error: unable to connect with web3modal. Did the user close the modal?'
-				)
-				return
+		try {
+			const customNodeOptions = {
+				rpcUrl:
+					chainId && rpcUrls[chainId] ? (rpcUrls[chainId][0] as string) : '',
+				chainId
 			}
 
-			// We plug the initial `provider` into ethers.js and get back
-			// a Web3Provider. This will add on methods from ethers.js and
-			// event listeners such as `.on()` will be different.
-			const w3p = new providers.Web3Provider(p, 'any')
+			const m = new Magic(magicApiKey, {
+				network: customNodeOptions,
+				extensions: [new ConnectExtension()]
+			})
 
-			const s = w3p.getSigner()
+			setMagic(m)
 
-			const address = await s.getAddress()
+			// @ts-ignore
+			p = new ethers.providers.Web3Provider(m.rpcProvider)
 
-			const n = await w3p.getNetwork()
+			log.debug('Connected')
+		} catch (e) {
+			log.warn(e)
+			log.warn(
+				'Error: unable to connect with web3modal. Did the user close the modal?'
+			)
+			return
+		}
 
-			setNetwork(n)
-			setChainId(n.chainId)
-			setProvider(p)
+		const s = p.getSigner()
 
-			setSigner(s)
-			setAccounts([address])
-			setWeb3Provider(w3p)
-			setIsConnected(true)
-		},
-		[web3Modal]
-	)
+		const address = await s.getAddress()
+
+		const n = await p.getNetwork()
+
+		setNetwork(n)
+		setChainId(n.chainId)
+		setProvider(p)
+
+		setSigner(s)
+		setAccounts([address])
+		setWeb3Provider(p)
+		setIsConnected(true)
+	}, [chainId])
 
 	useEffect(() => {
-		if (typeof window !== 'undefined') {
-			const w3m = new Web3Modal({
-				// network: 'mainnet', // optional
-				cacheProvider: true,
-				providerOptions: {
-					walletconnect: {
-						package: WalletConnectProvider, // required
-						options: {
-							rpc: rpcUrls
-						}
-					}
-				}
-			})
-			setWeb3Modal(w3m)
+		const go = async () => {
+			const walletInfo = await magic?.connect.getWalletInfo()
+			setWalletType(walletInfo?.walletType)
 		}
-	}, [])
+
+		go()
+	}, [magic])
 
 	// Auto connect to the cached provider
 	useEffect(() => {
-		if (web3Modal?.cachedProvider) {
+		if (meData) {
 			connectWallet()
 		}
-	}, [connectWallet, web3Modal])
+	}, [connectWallet, meData])
 
 	const handleAccountsChanged = useCallback((acc: string[]) => {
 		setAccounts(acc)
@@ -305,15 +323,16 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 
 	const disconnectWallet = useCallback(async () => {
 		setMeemJwt(undefined)
-		web3Modal?.clearCachedProvider()
+
 		if (provider?.disconnect && typeof provider.disconnect === 'function') {
 			await provider.disconnect()
 		}
 
+		magic?.connect.disconnect()
 		setWeb3Provider(undefined)
 		setAccounts([])
 		meMutate()
-	}, [provider, web3Modal])
+	}, [provider])
 
 	const handleChainChanged = useCallback(
 		(chainHex: string) => {
@@ -327,6 +346,7 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 		if (network?.chainId === newChainId) {
 			return
 		}
+		// @ts-ignore
 		const { ethereum } = window
 
 		const chain = chains.find(c => +c.chainId === +newChainId)
@@ -363,6 +383,7 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 			}
 
 			try {
+				// @ts-ignore
 				await window.ethereum.request({
 					method: 'wallet_switchEthereumChain',
 					params: [{ chainId: formattedChainId }]
@@ -421,7 +442,9 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 			jwt,
 			setChain,
 			chainId,
-			me: meData
+			me: meData,
+			walletType,
+			magic
 		}),
 		[
 			web3Provider,
@@ -438,7 +461,9 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 			jwt,
 			setChain,
 			chainId,
-			meData
+			meData,
+			walletType,
+			magic
 		]
 	)
 

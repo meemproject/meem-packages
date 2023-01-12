@@ -3,7 +3,7 @@ export const chains = [
 		name: 'Ethereum Mainnet',
 		chain: 'ETH',
 		icon: 'ethereum',
-		rpc: ['https://cloudflare-eth.com/'],
+		rpc: ['https://nodes.mewapi.io/rpc/eth'],
 		faucets: [],
 		nativeCurrency: {
 			name: 'Ether',
