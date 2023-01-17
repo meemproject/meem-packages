@@ -330,6 +330,53 @@ export class Agreement {
 		return result
 	}
 
+	/** Bulk burn tokens */
+	public async bulkBurn(options: { agreementId: string; tokenIds: string[] }) {
+		const { agreementId, tokenIds } = options
+
+		const result =
+			await makeRequest<MeemAPI.v1.BulkBurnAgreementTokens.IDefinition>(
+				MeemAPI.v1.BulkBurnAgreementTokens.path({ agreementId }),
+				{
+					jwt: this.jwt,
+					method: MeemAPI.v1.BulkBurnAgreementTokens.method,
+					body: {
+						tokenIds
+					}
+				}
+			)
+
+		return result
+	}
+
+	/** Bulk burn agreement role tokens */
+	public async bulkBurnAgreementRoleTokens(options: {
+		/** The id of the agreement */
+		agreementId: string
+		/** The id of the agreement role */
+		agreementRoleId: string
+		tokenIds: string[]
+	}) {
+		const { agreementId, agreementRoleId, tokenIds } = options
+
+		const result =
+			await makeRequest<MeemAPI.v1.BulkBurnAgreementRoleTokens.IDefinition>(
+				MeemAPI.v1.BulkBurnAgreementRoleTokens.path({
+					agreementId,
+					agreementRoleId
+				}),
+				{
+					jwt: this.jwt,
+					method: MeemAPI.v1.BulkBurnAgreementRoleTokens.method,
+					body: {
+						tokenIds
+					}
+				}
+			)
+
+		return result
+	}
+
 	/** Mint a token directly on the contract. */
 	public async mint(options: {
 		/** The wallet used to mint the token */
