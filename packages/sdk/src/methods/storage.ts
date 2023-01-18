@@ -11,7 +11,7 @@ import {
 } from '@meemproject/utils'
 import { connect } from '@tableland/sdk'
 import type { Connection } from '@tableland/sdk'
-import Gun from 'gun/gun'
+import SEA from 'gun/sea'
 import request from 'superagent'
 import type TypedEmitter from 'typed-emitter'
 import { v4 as uuidv4 } from 'uuid'
@@ -19,6 +19,8 @@ import { MeemAPI } from '../generated/api.generated'
 import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
 import { Id } from './id'
+
+const Gun = typeof window !== 'undefined' ? require('gun/gun') : require('gun')
 
 export interface IPartialAccessControlCondition
 	extends Partial<AccsDefaultParams> {
@@ -32,6 +34,41 @@ export interface IPartialAccessControlCondition
 export type EmitterEvents = {
 	[path: string]: (items: { [id: string]: any }) => void
 }
+
+export type GunOptions = Partial<{
+	/** Undocumented but mentioned. Write data to a JSON. */
+	file: string
+
+	/** Undocumented but mentioned. Create a websocket server */
+	web: any
+
+	/** Undocumented but mentioned. Amazon S3 */
+	s3: {
+		key: string
+		secret: string
+		bucket: string
+		region?: string
+		fakes3?: any
+	}
+
+	/** The URLs are properties, and the value is an empty object. */
+	peers: string[]
+
+	/** Default: true, creates and persists local (nodejs) data using Radisk. */
+	radisk: boolean
+
+	/** Default: true, persists local (browser) data to localStorage. */
+	localStorage: boolean
+
+	/** Uuid allows you to override the default 24 random alphanumeric soul generator with your own function. */
+	uuid(): string
+
+	/**
+	 * Allows you to pass options to a 3rd party module. Their project README will likely list the exposed options
+	 * @see https://github.com/amark/gun/wiki/Modules
+	 */
+	[key: string]: any
+}>
 
 export class Storage {
 	private id: Id
@@ -48,8 +85,12 @@ export class Storage {
 
 	private emitter: TypedEmitter<EmitterEvents>
 
-	public constructor(options: { id: Id; jwt?: string; peers?: string[] }) {
-		let peers = options.peers
+	public constructor(options: {
+		id: Id
+		jwt?: string
+		gunOptions?: GunOptions
+	}) {
+		let peers = options.gunOptions?.peers
 
 		if (!peers && process.env.NEXT_PUBLIC_GUN_DB_PEERS) {
 			peers = process.env.NEXT_PUBLIC_GUN_DB_PEERS.split(',').map(p => p.trim())
@@ -61,9 +102,12 @@ export class Storage {
 
 		this.id = options.id
 		this.jwt = options.jwt
+
 		this.gun = Gun({
+			...options.gunOptions,
 			peers
 		})
+		this.gun.SEA = SEA
 		this.emitter = new EventEmitter() as TypedEmitter<EmitterEvents>
 		this.importGunExtensions()
 	}
@@ -1050,12 +1094,14 @@ export class Storage {
 	}
 
 	private async importGunExtensions() {
-		try {
-			await import('gun/sea')
-			log.trace('Imported gun/sea')
-		} catch (e) {
-			log.debug('Failed to import gun/sea', e)
-		}
+		// try {
+		// 	console.log('importing gun/sea')
+		// 	// await import('gun/sea')
+		// 	console.log('Imported gun/sea')
+		// } catch (e) {
+		// 	console.log(e)
+		// 	log.debug('Failed to import gun/sea', e)
+		// }
 
 		try {
 			await import('gun/lib/open')

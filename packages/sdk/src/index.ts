@@ -1,7 +1,7 @@
 import { Agreement } from './methods/agreement'
 import { AgreementExtension } from './methods/agreementExtension'
 import { Id } from './methods/id'
-import { Storage } from './methods/storage'
+import { GunOptions, Storage } from './methods/storage'
 
 export * from './generated/api.generated'
 export * from './abis'
@@ -24,15 +24,16 @@ export class MeemSDK {
 
 	private jwt?: string
 
-	public constructor(options: { jwt?: string; gunDbPeers?: string[] }) {
+	public constructor(options: { jwt?: string; gunOptions?: GunOptions }) {
 		this.jwt = options.jwt
 		this.id = new Id({ jwt: this.jwt })
 		this.agreement = new Agreement({ jwt: this.jwt })
 		this.agreementExtension = new AgreementExtension({ jwt: this.jwt })
+		console.log('options.gunOptions', options.gunOptions)
 		this.storage = new Storage({
+			gunOptions: options.gunOptions,
 			id: this.id,
-			jwt: this.jwt,
-			peers: options.gunDbPeers
+			jwt: this.jwt
 		})
 	}
 
