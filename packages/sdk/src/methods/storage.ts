@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import EventEmitter from 'events'
 import type {
 	AccessControlConditions,
@@ -12,6 +13,7 @@ import {
 import { connect } from '@tableland/sdk'
 import type { Connection } from '@tableland/sdk'
 import SEA from 'gun/sea'
+import type { IGun } from 'gun/types'
 import request from 'superagent'
 import type TypedEmitter from 'typed-emitter'
 import { v4 as uuidv4 } from 'uuid'
@@ -20,7 +22,14 @@ import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
 import { Id } from './id'
 
-const Gun = typeof window !== 'undefined' ? require('gun/gun') : require('gun')
+let Gun: IGun
+
+if (typeof window !== 'undefined') {
+	Gun = require('gun/gun')
+} else {
+	Gun = require('gun')
+	global.crypto = require('crypto').webcrypto
+}
 
 export interface IPartialAccessControlCondition
 	extends Partial<AccsDefaultParams> {
@@ -81,7 +90,7 @@ export class Storage {
 	/** The LIT protocol client */
 	private lit?: Lit.LitNodeClient
 
-	private gun: ReturnType<typeof Gun>
+	private gun: IGun
 
 	private emitter: TypedEmitter<EmitterEvents>
 
