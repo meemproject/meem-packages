@@ -14,6 +14,7 @@ import { connect } from '@tableland/sdk'
 import type { Connection } from '@tableland/sdk'
 import SEA from 'gun/sea'
 import type { IGun } from 'gun/types'
+import type { IGunUserInstance } from 'gun/types/sea'
 import request from 'superagent'
 import type TypedEmitter from 'typed-emitter'
 import { v4 as uuidv4 } from 'uuid'
@@ -90,35 +91,47 @@ export class Storage {
 	/** The LIT protocol client */
 	private lit?: Lit.LitNodeClient
 
-	private gun: IGun
+	private gun?: IGunUserInstance<any>
 
 	private emitter: TypedEmitter<EmitterEvents>
+
+	private apiUrl?: string
 
 	public constructor(options: {
 		id: Id
 		jwt?: string
+		isGunEnabled: boolean
 		gunOptions?: GunOptions
+		apiUrl?: string
 	}) {
-		let peers = options.gunOptions?.peers
+		const { id, jwt, isGunEnabled, gunOptions, apiUrl } = options
+		this.id = id
+		this.jwt = jwt
+		this.apiUrl = apiUrl
 
-		if (!peers && process.env.NEXT_PUBLIC_GUN_DB_PEERS) {
-			peers = process.env.NEXT_PUBLIC_GUN_DB_PEERS.split(',').map(p => p.trim())
+		if (isGunEnabled) {
+			let peers = gunOptions?.peers
+
+			if (!peers && process.env.NEXT_PUBLIC_GUN_DB_PEERS) {
+				peers = process.env.NEXT_PUBLIC_GUN_DB_PEERS.split(',').map(p =>
+					p.trim()
+				)
+			}
+
+			if (!peers) {
+				peers = ['https://api-indexer.meem.wtf/gun']
+			}
+
+			// @ts-ignore
+			this.gun = Gun({
+				...gunOptions,
+				peers
+			})
+			// @ts-ignore
+			this.gun.SEA = SEA
+			this.importGunExtensions()
 		}
-
-		if (!peers) {
-			peers = ['https://api-indexer.meem.wtf/gun']
-		}
-
-		this.id = options.id
-		this.jwt = options.jwt
-
-		this.gun = Gun({
-			...options.gunOptions,
-			peers
-		})
-		this.gun.SEA = SEA
 		this.emitter = new EventEmitter() as TypedEmitter<EmitterEvents>
-		this.importGunExtensions()
 	}
 
 	/** Sets the JWT used in api calls */
@@ -1066,6 +1079,8 @@ export class Storage {
 		const result = await makeRequest<MeemAPI.v1.SaveToIPFS.IDefinition>(
 			MeemAPI.v1.SaveToIPFS.path(),
 			{
+				jwt: this.jwt,
+				baseUrl: this.apiUrl,
 				method: MeemAPI.v1.SaveToIPFS.method,
 				body: {
 					data,

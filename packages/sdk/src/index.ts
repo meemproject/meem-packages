@@ -24,16 +24,32 @@ export class MeemSDK {
 
 	private jwt?: string
 
-	public constructor(options: { jwt?: string; gunOptions?: GunOptions }) {
-		this.jwt = options.jwt
-		this.id = new Id({ jwt: this.jwt })
-		this.agreement = new Agreement({ jwt: this.jwt })
-		this.agreementExtension = new AgreementExtension({ jwt: this.jwt })
-		console.log('options.gunOptions', options.gunOptions)
+	public constructor(options: {
+		jwt?: string
+		apiUrl?: string
+		isGunEnabled?: boolean
+		gunOptions?: GunOptions
+		gqlHttpUrl?: string
+		gqlWsUri?: string
+	}) {
+		const { jwt, apiUrl, gunOptions, gqlHttpUrl, gqlWsUri, isGunEnabled } =
+			options
+		this.jwt = jwt
+		this.id = new Id({ jwt: this.jwt, gqlHttpUrl, gqlWsUri, apiUrl })
+		this.agreement = new Agreement({
+			jwt: this.jwt,
+			gqlHttpUrl,
+			gqlWsUri,
+			apiUrl
+		})
+		this.agreementExtension = new AgreementExtension({ jwt: this.jwt, apiUrl })
+
 		this.storage = new Storage({
-			gunOptions: options.gunOptions,
+			gunOptions,
+			isGunEnabled: typeof isGunEnabled === 'boolean' ? isGunEnabled : true,
 			id: this.id,
-			jwt: this.jwt
+			jwt: this.jwt,
+			apiUrl
 		})
 	}
 
