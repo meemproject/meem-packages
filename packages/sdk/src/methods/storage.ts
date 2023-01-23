@@ -12,7 +12,6 @@ import {
 } from '@meemproject/utils'
 import { connect } from '@tableland/sdk'
 import type { Connection } from '@tableland/sdk'
-import SEA from 'gun/sea'
 import type { IGun } from 'gun/types'
 import type { IGunUserInstance } from 'gun/types/sea'
 import request from 'superagent'
@@ -24,13 +23,7 @@ import log from '../lib/log'
 import { Id } from './id'
 
 let Gun: IGun
-
-if (typeof window !== 'undefined') {
-	Gun = require('gun/gun')
-} else {
-	Gun = require('gun')
-	global.crypto = require('crypto').webcrypto
-}
+let SEA: any
 
 export interface IPartialAccessControlCondition
 	extends Partial<AccsDefaultParams> {
@@ -110,6 +103,14 @@ export class Storage {
 		this.apiUrl = apiUrl
 
 		if (isGunEnabled) {
+			if (typeof window !== 'undefined') {
+				Gun = require('gun/gun')
+				SEA = require('gun/sea')
+			} else {
+				Gun = require('gun')
+				SEA = require('gun/sea')
+				global.crypto = require('crypto').webcrypto
+			}
 			let peers = gunOptions?.peers
 
 			if (!peers && process.env.NEXT_PUBLIC_GUN_DB_PEERS) {
@@ -692,7 +693,7 @@ export class Storage {
 		const id = uuidv4()
 
 		const item = this.gun
-			.get(path)
+			?.get(path)
 			// @ts-ignore
 			.get(id)
 			// @ts-ignore
@@ -767,7 +768,7 @@ export class Storage {
 		const id = uuidv4()
 
 		this.gun
-			.get(path)
+			?.get(path)
 			// @ts-ignore
 			.get(id)
 			// @ts-ignore
