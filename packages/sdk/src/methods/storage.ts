@@ -1118,6 +1118,62 @@ export class Storage {
 		}
 	}
 
+	/**
+	 * Converts nested arrays in an object to objects
+	 *
+	 * GunDB doesn't allow arrays so this is a necessary step before saving data
+	 */
+	public sanitizeGunData(obj: any) {
+		let result: any = {}
+		if (Array.isArray(obj)) {
+			obj.forEach((item, i) => {
+				result[i.toString()] = this.sanitizeGunData(item)
+			})
+		} else if (typeof obj === 'object') {
+			Object.keys(obj).forEach(key => {
+				if (typeof obj[key] === 'object') {
+					result[key] = this.sanitizeGunData(obj[key])
+				} else {
+					result[key] = obj[key]
+				}
+			})
+		} else {
+			result = obj
+		}
+
+		return result
+	}
+
+	/**
+	 * Converts objects back to regular after using sanitizeForGun
+	 *
+	 * GunDB doesn't allow arrays so this is a necessary step before saving data
+	 */
+	public desanitizeGunData(obj: any) {
+		let result: any = {}
+		if (typeof obj === 'object') {
+			const keys = Object.keys(obj)
+			let isArray = true
+			keys.forEach((k, i) => {
+				if (+k !== i) {
+					isArray = false
+					return
+				}
+			})
+			if (isArray) {
+				result = Object.values(obj).map(v => this.desanitizeGunData(v))
+			} else {
+				Object.keys(obj).forEach(k => {
+					result[k] = this.desanitizeGunData(obj[k])
+				})
+			}
+		} else {
+			result = obj
+		}
+
+		return result
+	}
+
 	private async importGunExtensions() {
 		// try {
 		// 	console.log('importing gun/sea')
