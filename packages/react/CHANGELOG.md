@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.17.0](https://github.com/meemproject/meem-packages/compare/v0.16.0...v0.17.0) (2023-01-17)
+
+
+### Features
+
+* bulk burn tokens ([33922fd](https://github.com/meemproject/meem-packages/commit/33922fd))
+
+
+
+
+
+# [0.16.0](https://github.com/meemproject/meem-packages/compare/v0.15.2...v0.16.0) (2023-01-12)
+
+
+### Features
+
+* support for magic link ([d8ab827](https://github.com/meemproject/meem-packages/commit/d8ab827))
+
+
+
+
+
+## [0.15.2](https://github.com/meemproject/meem-packages/compare/v0.15.1...v0.15.2) (2023-01-11)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
 ## [0.15.1](https://github.com/meemproject/meem-packages/compare/v0.15.0...v0.15.1) (2023-01-09)
 
 **Note:** Version bump only for package @meemproject/react
