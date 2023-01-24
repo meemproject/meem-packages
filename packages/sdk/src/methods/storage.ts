@@ -109,6 +109,7 @@ export class Storage {
 			} else {
 				Gun = require('gun')
 				SEA = require('gun/sea')
+				Gun.SEA = SEA
 				global.crypto = require('crypto').webcrypto
 			}
 			let peers = gunOptions?.peers
@@ -1124,24 +1125,18 @@ export class Storage {
 	 * GunDB doesn't allow arrays so this is a necessary step before saving data
 	 */
 	public sanitizeGunData(obj: any) {
-		let result: any = {}
-		if (Array.isArray(obj)) {
-			obj.forEach((item, i) => {
-				result[i.toString()] = this.sanitizeGunData(item)
-			})
-		} else if (typeof obj === 'object') {
-			Object.keys(obj).forEach(key => {
-				if (typeof obj[key] === 'object') {
-					result[key] = this.sanitizeGunData(obj[key])
-				} else {
-					result[key] = obj[key]
-				}
-			})
-		} else {
-			result = obj
-		}
+		const data = this.convertArraysToObjects(obj)
+		const cleanData: Record<string, any> = {}
+		Object.keys(data).forEach(key => {
+			if (
+				typeof data[key] !== 'object' ||
+				(typeof data[key] === 'object' && Object.keys(data[key]).length > 0)
+			) {
+				cleanData[key] = data[key]
+			}
+		})
 
-		return result
+		return cleanData
 	}
 
 	/**
@@ -1167,6 +1162,27 @@ export class Storage {
 					result[k] = this.desanitizeGunData(obj[k])
 				})
 			}
+		} else {
+			result = obj
+		}
+
+		return result
+	}
+
+	private convertArraysToObjects(obj: any) {
+		let result: any = {}
+		if (Array.isArray(obj)) {
+			obj.forEach((item, i) => {
+				result[i.toString()] = this.convertArraysToObjects(item)
+			})
+		} else if (typeof obj === 'object') {
+			Object.keys(obj).forEach(key => {
+				if (typeof obj[key] === 'object') {
+					result[key] = this.convertArraysToObjects(obj[key])
+				} else {
+					result[key] = obj[key]
+				}
+			})
 		} else {
 			result = obj
 		}
