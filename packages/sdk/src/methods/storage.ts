@@ -106,9 +106,11 @@ export class Storage {
 			if (typeof window !== 'undefined') {
 				Gun = require('gun/gun')
 				SEA = require('gun/sea')
+				require('gun/lib/unset')
 			} else {
 				Gun = require('gun')
 				SEA = require('gun/sea')
+				require('gun/lib/unset')
 				Gun.SEA = SEA
 				global.crypto = require('crypto').webcrypto
 			}
