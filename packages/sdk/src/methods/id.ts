@@ -1,8 +1,12 @@
 import type { JsonAuthSig } from '@lit-protocol/constants'
 import { ethers } from 'ethers'
+import jwtDecode from 'jwt-decode'
 import { SiweMessage } from 'siwe'
 import { MeemAPI } from '../generated/api.generated'
+import { GetMeQuery } from '../generated/graphql'
+import { GET_ME_QUERY } from '../gql/getMe.gql'
 import { makeRequest } from '../lib/fetcher'
+import { createApolloClient, QueryRole } from '../lib/GQLClient'
 
 export class Id {
 	/** The last message the was signed */
@@ -16,13 +20,50 @@ export class Id {
 
 	private jwt?: string
 
-	public constructor(options: { jwt?: string }) {
-		this.jwt = options.jwt
+	private gqlHttpUrl?: string
+
+	private gqlWsUri?: string
+
+	private apiUrl?: string
+
+	public constructor(options: {
+		jwt?: string
+		gqlHttpUrl?: string
+		gqlWsUri?: string
+		apiUrl?: string
+	}) {
+		const { jwt, gqlHttpUrl, gqlWsUri, apiUrl } = options
+		this.jwt = jwt
+		this.gqlHttpUrl = gqlHttpUrl
+		this.gqlWsUri = gqlWsUri
+		this.apiUrl = apiUrl
 	}
 
 	/** Sets the JWT used in api calls */
 	public setJwt(jwt?: string) {
 		this.jwt = jwt
+	}
+
+	public async getMe() {
+		if (!this.jwt) {
+			throw new Error('NOT_LOGGED_IN')
+		}
+
+		const apolloClient = createApolloClient({
+			jwt: this.jwt,
+			role: QueryRole.User,
+			httpUrl: this.gqlHttpUrl,
+			wsUri: this.gqlWsUri
+		})
+
+		const decoded = jwtDecode(this.jwt) as Record<string, any>
+
+		const result = await apolloClient.query<GetMeQuery>({
+			query: GET_ME_QUERY,
+			variables: { walletAddress: decoded.walletAddress }
+		})
+
+		return result
 	}
 
 	public getLitAuthSig(): JsonAuthSig {
@@ -123,6 +164,8 @@ export class Id {
 		const result = await makeRequest<MeemAPI.v1.Login.IDefinition>(
 			MeemAPI.v1.Login.path(),
 			{
+				jwt: this.jwt,
+				baseUrl: this.apiUrl,
 				method: MeemAPI.v1.Login.method,
 				body: {
 					accessToken,
@@ -154,6 +197,8 @@ export class Id {
 				userIdentityId
 			}),
 			{
+				jwt: this.jwt,
+				baseUrl: this.apiUrl,
 				method: MeemAPI.v1.UpdateUserIdentity.method,
 				body: {
 					visibility,
@@ -177,6 +222,8 @@ export class Id {
 				userIdentityId
 			}),
 			{
+				jwt: this.jwt,
+				baseUrl: this.apiUrl,
 				method: MeemAPI.v1.RemoveUserIdentity.method
 			}
 		)
@@ -196,6 +243,8 @@ export class Id {
 		const result = await makeRequest<MeemAPI.v1.CreateOrUpdateUser.IDefinition>(
 			MeemAPI.v1.CreateOrUpdateUser.path(),
 			{
+				jwt: this.jwt,
+				baseUrl: this.apiUrl,
 				method: MeemAPI.v1.CreateOrUpdateUser.method,
 				body: {
 					profilePicBase64,
@@ -216,6 +265,8 @@ export class Id {
 		const result = await makeRequest<MeemAPI.v1.GetNonce.IDefinition>(
 			MeemAPI.v1.GetNonce.path(),
 			{
+				jwt: this.jwt,
+				baseUrl: this.apiUrl,
 				method: MeemAPI.v1.GetNonce.method,
 				query: {
 					address
@@ -231,6 +282,8 @@ export class Id {
 		const result = await makeRequest<MeemAPI.v1.RefreshENS.IDefinition>(
 			MeemAPI.v1.RefreshENS.path(),
 			{
+				jwt: this.jwt,
+				baseUrl: this.apiUrl,
 				method: MeemAPI.v1.RefreshENS.method
 			}
 		)

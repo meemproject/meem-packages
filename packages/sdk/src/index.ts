@@ -1,7 +1,7 @@
 import { Agreement } from './methods/agreement'
 import { AgreementExtension } from './methods/agreementExtension'
 import { Id } from './methods/id'
-import { Storage } from './methods/storage'
+import { GunOptions, Storage } from './methods/storage'
 
 export * from './generated/api.generated'
 export * from './abis'
@@ -24,15 +24,32 @@ export class MeemSDK {
 
 	private jwt?: string
 
-	public constructor(options: { jwt?: string; gunDbPeers?: string[] }) {
-		this.jwt = options.jwt
-		this.id = new Id({ jwt: this.jwt })
-		this.agreement = new Agreement({ jwt: this.jwt })
-		this.agreementExtension = new AgreementExtension({ jwt: this.jwt })
+	public constructor(options: {
+		jwt?: string
+		apiUrl?: string
+		isGunEnabled?: boolean
+		gunOptions?: GunOptions
+		gqlHttpUrl?: string
+		gqlWsUri?: string
+	}) {
+		const { jwt, apiUrl, gunOptions, gqlHttpUrl, gqlWsUri, isGunEnabled } =
+			options
+		this.jwt = jwt
+		this.id = new Id({ jwt: this.jwt, gqlHttpUrl, gqlWsUri, apiUrl })
+		this.agreement = new Agreement({
+			jwt: this.jwt,
+			gqlHttpUrl,
+			gqlWsUri,
+			apiUrl
+		})
+		this.agreementExtension = new AgreementExtension({ jwt: this.jwt, apiUrl })
+
 		this.storage = new Storage({
+			gunOptions,
+			isGunEnabled: typeof isGunEnabled === 'boolean' ? isGunEnabled : true,
 			id: this.id,
 			jwt: this.jwt,
-			peers: options.gunDbPeers
+			apiUrl
 		})
 	}
 

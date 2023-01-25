@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import EventEmitter from 'events'
 import type {
 	AccessControlConditions,
@@ -11,7 +12,8 @@ import {
 } from '@meemproject/utils'
 import { connect } from '@tableland/sdk'
 import type { Connection } from '@tableland/sdk'
-import Gun from 'gun/gun'
+import type { IGun } from 'gun/types'
+import type { IGunUserInstance } from 'gun/types/sea'
 import request from 'superagent'
 import type TypedEmitter from 'typed-emitter'
 import { v4 as uuidv4 } from 'uuid'
@@ -19,6 +21,9 @@ import { MeemAPI } from '../generated/api.generated'
 import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
 import { Id } from './id'
+
+let Gun: IGun
+let SEA: any
 
 export interface IPartialAccessControlCondition
 	extends Partial<AccsDefaultParams> {
@@ -33,6 +38,41 @@ export type EmitterEvents = {
 	[path: string]: (items: { [id: string]: any }) => void
 }
 
+export type GunOptions = Partial<{
+	/** Undocumented but mentioned. Write data to a JSON. */
+	file: string
+
+	/** Undocumented but mentioned. Create a websocket server */
+	web: any
+
+	/** Undocumented but mentioned. Amazon S3 */
+	s3: {
+		key: string
+		secret: string
+		bucket: string
+		region?: string
+		fakes3?: any
+	}
+
+	/** The URLs are properties, and the value is an empty object. */
+	peers: string[]
+
+	/** Default: true, creates and persists local (nodejs) data using Radisk. */
+	radisk: boolean
+
+	/** Default: true, persists local (browser) data to localStorage. */
+	localStorage: boolean
+
+	/** Uuid allows you to override the default 24 random alphanumeric soul generator with your own function. */
+	uuid(): string
+
+	/**
+	 * Allows you to pass options to a 3rd party module. Their project README will likely list the exposed options
+	 * @see https://github.com/amark/gun/wiki/Modules
+	 */
+	[key: string]: any
+}>
+
 export class Storage {
 	private id: Id
 
@@ -44,28 +84,60 @@ export class Storage {
 	/** The LIT protocol client */
 	private lit?: Lit.LitNodeClient
 
-	private gun: ReturnType<typeof Gun>
+	private gun?: IGunUserInstance<any>
 
 	private emitter: TypedEmitter<EmitterEvents>
 
-	public constructor(options: { id: Id; jwt?: string; peers?: string[] }) {
-		let peers = options.peers
+	private apiUrl?: string
 
-		if (!peers && process.env.NEXT_PUBLIC_GUN_DB_PEERS) {
-			peers = process.env.NEXT_PUBLIC_GUN_DB_PEERS.split(',').map(p => p.trim())
+	public constructor(options: {
+		id: Id
+		jwt?: string
+		isGunEnabled: boolean
+		gunOptions?: GunOptions
+		apiUrl?: string
+	}) {
+		const { id, jwt, isGunEnabled, gunOptions, apiUrl } = options
+		this.id = id
+		this.jwt = jwt
+		this.apiUrl = apiUrl
+
+		if (isGunEnabled) {
+			if (typeof window !== 'undefined') {
+				Gun = require('gun/gun')
+				SEA = require('gun/sea')
+				require('gun/lib/unset')
+				require('gun/lib/load')
+			} else {
+				Gun = require('gun')
+				SEA = require('gun/sea')
+				require('gun/lib/unset')
+				require('gun/lib/load')
+				Gun.SEA = SEA
+				global.crypto = require('crypto').webcrypto
+			}
+			let peers = gunOptions?.peers
+
+			if (!peers && process.env.NEXT_PUBLIC_GUN_DB_PEERS) {
+				peers = process.env.NEXT_PUBLIC_GUN_DB_PEERS.split(',').map(p =>
+					p.trim()
+				)
+			}
+
+			if (!peers) {
+				peers = ['https://api-indexer.meem.wtf/gun']
+			}
+
+			// @ts-ignore
+			this.gun = Gun({
+				...gunOptions,
+				peers
+			})
+			// @ts-ignore
+			this.gun.SEA = SEA
+			this.importGunExtensions()
 		}
-
-		if (!peers) {
-			peers = ['https://api-indexer.meem.wtf/gun']
-		}
-
-		this.id = options.id
-		this.jwt = options.jwt
-		this.gun = Gun({
-			peers
-		})
 		this.emitter = new EventEmitter() as TypedEmitter<EmitterEvents>
-		this.importGunExtensions()
 	}
 
 	/** Sets the JWT used in api calls */
@@ -626,7 +698,7 @@ export class Storage {
 		const id = uuidv4()
 
 		const item = this.gun
-			.get(path)
+			?.get(path)
 			// @ts-ignore
 			.get(id)
 			// @ts-ignore
@@ -701,7 +773,7 @@ export class Storage {
 		const id = uuidv4()
 
 		this.gun
-			.get(path)
+			?.get(path)
 			// @ts-ignore
 			.get(id)
 			// @ts-ignore
@@ -1013,6 +1085,8 @@ export class Storage {
 		const result = await makeRequest<MeemAPI.v1.SaveToIPFS.IDefinition>(
 			MeemAPI.v1.SaveToIPFS.path(),
 			{
+				jwt: this.jwt,
+				baseUrl: this.apiUrl,
 				method: MeemAPI.v1.SaveToIPFS.method,
 				body: {
 					data,
@@ -1049,13 +1123,86 @@ export class Storage {
 		}
 	}
 
-	private async importGunExtensions() {
-		try {
-			await import('gun/sea')
-			log.trace('Imported gun/sea')
-		} catch (e) {
-			log.debug('Failed to import gun/sea', e)
+	/**
+	 * Converts nested arrays in an object to objects
+	 *
+	 * GunDB doesn't allow arrays so this is a necessary step before saving data
+	 */
+	public sanitizeGunData(obj: any) {
+		const data = this.convertArraysToObjects(obj)
+		const cleanData: Record<string, any> = {}
+		Object.keys(data).forEach(key => {
+			if (
+				typeof data[key] !== 'object' ||
+				(typeof data[key] === 'object' && Object.keys(data[key]).length > 0)
+			) {
+				cleanData[key] = data[key]
+			}
+		})
+
+		return cleanData
+	}
+
+	/**
+	 * Converts objects back to regular after using sanitizeForGun
+	 *
+	 * GunDB doesn't allow arrays so this is a necessary step before saving data
+	 */
+	public desanitizeGunData(obj: any) {
+		let result: any = {}
+		if (typeof obj === 'object') {
+			const keys = Object.keys(obj)
+			let isArray = true
+			keys.forEach((k, i) => {
+				if (+k !== i) {
+					isArray = false
+					return
+				}
+			})
+			if (isArray) {
+				result = Object.values(obj).map(v => this.desanitizeGunData(v))
+			} else {
+				Object.keys(obj).forEach(k => {
+					result[k] = this.desanitizeGunData(obj[k])
+				})
+			}
+		} else {
+			result = obj
 		}
+
+		return result
+	}
+
+	private convertArraysToObjects(obj: any) {
+		let result: any = {}
+		if (Array.isArray(obj)) {
+			obj.forEach((item, i) => {
+				result[i.toString()] = this.convertArraysToObjects(item)
+			})
+		} else if (typeof obj === 'object') {
+			Object.keys(obj).forEach(key => {
+				if (typeof obj[key] === 'object') {
+					result[key] = this.convertArraysToObjects(obj[key])
+				} else {
+					result[key] = obj[key]
+				}
+			})
+		} else {
+			result = obj
+		}
+
+		return result
+	}
+
+	private async importGunExtensions() {
+		// try {
+		// 	console.log('importing gun/sea')
+		// 	// await import('gun/sea')
+		// 	console.log('Imported gun/sea')
+		// } catch (e) {
+		// 	console.log(e)
+		// 	log.debug('Failed to import gun/sea', e)
+		// }
 
 		try {
 			await import('gun/lib/open')
