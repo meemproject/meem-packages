@@ -1,11 +1,6 @@
-import { useQuery } from '@apollo/client'
-import { useAuth0 } from '@auth0/auth0-react'
 import { Text, Space, Modal, Image, Grid, Center } from '@mantine/core'
 import React from 'react'
-import { GetIdentityProvidersQuery } from '../../generated/graphql'
-import { useMeemApollo } from '../contexts/apolloContext'
 import { useAuth } from '../contexts/authContext'
-import { IDENTITY_PROVIDERS_QUERY } from '../gql/auth'
 import { useMeemTheme } from '../themes/MeemTheme'
 
 export interface ILoginModalProps {

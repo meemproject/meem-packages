@@ -229,8 +229,8 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 		const wt = Cookies.get('walletType')
 
 		if (wt) {
-			console.log('setting wallet type from cookie', { wt })
-			setWalletType(wt)
+			log.debug('setting wallet type from cookie', { wt })
+			setWalletType(wt as WalletType)
 		}
 
 		if (meemJwtToken) {
@@ -253,13 +253,10 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 			let p: any
 			let w3p: any
 
-			console.log({ walletType })
-
 			if (to === 'walletconnect' || to === 'injected') {
 				try {
 					// This is the initial `provider` that is returned when
 					// using web3Modal to connect. Can be MetaMask or WalletConnect.
-					console.log({ web3Modal })
 					p = to ? await web3Modal?.connectTo(to) : await web3Modal?.connect()
 					setWalletType(to)
 					w3p = new providers.Web3Provider(p, 'any')
@@ -285,8 +282,6 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 						network: customNodeOptions,
 						extensions: [new ConnectExtension()]
 					})
-
-					console.log({ m })
 
 					// @ts-ignore
 					w3p = new ethers.providers.Web3Provider(m.rpcProvider)
@@ -326,7 +321,6 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 	useEffect(() => {
 		const go = async () => {
 			const walletInfo = await magic?.connect.getWalletInfo()
-			console.log('SETTING WALLET INFO', { walletInfo })
 			if (walletInfo) {
 				Cookies.set('walletType', walletInfo.walletType, {
 					secure:
@@ -343,7 +337,6 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
-			console.log('creating web3modal')
 			const w3m = new Web3Modal({
 				// network: 'mainnet', // optional
 				cacheProvider: true,
@@ -356,14 +349,12 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 					}
 				}
 			})
-			console.log({ w3m })
 			setWeb3Modal(w3m)
 		}
 	}, [])
 
 	// Auto connect to the cached provider
 	useEffect(() => {
-		console.log({ meData, walletType })
 		if (meData && walletType) {
 			connectWallet()
 		}
@@ -402,8 +393,6 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 		Cookies.remove('walletType')
 
 		web3Modal?.clearCachedProvider()
-
-		console.log({ magic })
 
 		magic?.connect.disconnect()
 		setWeb3Provider(undefined)
