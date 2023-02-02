@@ -1,7 +1,7 @@
 import { ApolloError } from '@apollo/client'
 import { ConnectExtension } from '@magic-ext/connect'
 import { MeemAPI, makeFetcher } from '@meemproject/sdk'
-// import WalletConnectProvider from '@walletconnect/web3-provider'
+import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers, ethers } from 'ethers'
 import Cookies from 'js-cookie'
 import JWT from 'jsonwebtoken'
@@ -17,7 +17,7 @@ import React, {
 	ReactNode
 } from 'react'
 import useSWR from 'swr'
-// import Web3Modal from 'web3modal'
+import Web3Modal from 'web3modal'
 import { chains } from '../lib/chains'
 import log from '../lib/log'
 
@@ -140,11 +140,15 @@ export interface IAuthContextProps {
 	}
 }
 
+// export type WalletType = 'magic' | 'injected' | 'wallet' | undefined
+
 export type WalletType =
 	| 'magic'
 	| 'metamask'
 	| 'coinbase_wallet'
 	| 'wallet_connect'
+	| 'injected'
+	| 'walletconnect'
 	| undefined
 
 export const AuthProvider: React.FC<IAuthContextProps> = ({
@@ -156,6 +160,7 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 	const [accounts, setAccounts] = useState<string[]>([])
 	const [jwt, setJwt] = useState<string>()
 	const [magic, setMagic] = useState<Magic<ConnectExtension[]>>()
+	const [web3Modal, setWeb3Modal] = useState<Web3Modal | undefined>(undefined)
 	const [walletType, setWalletType] = useState<WalletType>()
 	const [chainId, setChainId] = useState<number>(initialChainId)
 	const [loginState, setLoginState] = useState<LoginState>(LoginState.Unknown)
@@ -221,6 +226,12 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 
 	useEffect(() => {
 		const meemJwtToken = Cookies.get('meemJwtToken')
+		const wt = Cookies.get('walletType')
+
+		if (wt) {
+			log.debug('setting wallet type from cookie', { wt })
+			setWalletType(wt as WalletType)
+		}
 
 		if (meemJwtToken) {
 			const result = JWT.decode(meemJwtToken) as Record<string, any>
@@ -237,63 +248,114 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 		setJwt(undefined)
 	}, [])
 
-	const connectWallet = useCallback(async () => {
-		let p: any
+	const connectWallet = useCallback(
+		async (to?: string) => {
+			let p: any
+			let w3p: any
 
-		try {
-			const customNodeOptions = {
-				rpcUrl:
-					chainId && rpcUrls[chainId] ? (rpcUrls[chainId][0] as string) : '',
-				chainId
+			if (to === 'walletconnect' || to === 'injected') {
+				try {
+					// This is the initial `provider` that is returned when
+					// using web3Modal to connect. Can be MetaMask or WalletConnect.
+					p = to ? await web3Modal?.connectTo(to) : await web3Modal?.connect()
+					setWalletType(to)
+					w3p = new providers.Web3Provider(p, 'any')
+					log.debug('Connected', { provider: p })
+				} catch (e) {
+					log.warn(e)
+					log.warn(
+						'Error: unable to connect with web3modal. Did the user close the modal?'
+					)
+					return
+				}
+			} else if (walletType === 'magic' || to === 'magic') {
+				try {
+					const customNodeOptions = {
+						rpcUrl:
+							chainId && rpcUrls[chainId]
+								? (rpcUrls[chainId][0] as string)
+								: '',
+						chainId
+					}
+
+					const m = new Magic(magicApiKey, {
+						network: customNodeOptions,
+						extensions: [new ConnectExtension()]
+					})
+
+					// @ts-ignore
+					w3p = new ethers.providers.Web3Provider(m.rpcProvider)
+
+					setMagic(m)
+					log.debug('Connected via magic')
+				} catch (e) {
+					log.warn(e)
+					log.warn('Error: unable to connect with magic link.')
+					return
+				}
+			} else {
+				log.warn('Unable to determine wallet type to connect')
+				return
 			}
 
-			const m = new Magic(magicApiKey, {
-				network: customNodeOptions,
-				extensions: [new ConnectExtension()]
-			})
+			// const p = new ethers.providers.Web3Provider(m.rpcProvider)
 
-			setMagic(m)
+			const s = w3p.getSigner()
 
-			// @ts-ignore
-			p = new ethers.providers.Web3Provider(m.rpcProvider)
+			const address = await s.getAddress()
 
-			log.debug('Connected')
-		} catch (e) {
-			log.warn(e)
-			log.warn(
-				'Error: unable to connect with web3modal. Did the user close the modal?'
-			)
-			return
-		}
+			const n = await w3p.getNetwork()
 
-		const s = p.getSigner()
+			setNetwork(n)
+			setChainId(n.chainId)
+			setProvider(p)
 
-		const address = await s.getAddress()
-
-		const n = await p.getNetwork()
-
-		setNetwork(n)
-		setChainId(n.chainId)
-		setProvider(p)
-
-		setSigner(s)
-		setAccounts([address])
-		setWeb3Provider(p)
-		setIsConnected(true)
-	}, [chainId])
+			setSigner(s)
+			setAccounts([address])
+			setWeb3Provider(w3p)
+			setIsConnected(true)
+		},
+		[chainId, web3Modal, walletType]
+	)
 
 	useEffect(() => {
 		const go = async () => {
 			const walletInfo = await magic?.connect.getWalletInfo()
-			setWalletType(walletInfo?.walletType)
+			if (walletInfo) {
+				Cookies.set('walletType', walletInfo.walletType, {
+					secure:
+						typeof window !== 'undefined' &&
+						window.location.protocol === 'https:'
+				})
+
+				setWalletType(walletInfo?.walletType)
+			}
 		}
 
 		go()
 	}, [magic])
 
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			const w3m = new Web3Modal({
+				// network: 'mainnet', // optional
+				cacheProvider: true,
+				providerOptions: {
+					walletconnect: {
+						package: WalletConnectProvider, // required
+						options: {
+							rpc: rpcUrls
+						}
+					}
+				}
+			})
+			setWeb3Modal(w3m)
+		}
+	}, [])
+
 	// Auto connect to the cached provider
 	useEffect(() => {
-		if (meData) {
+		if (meData && walletType) {
 			connectWallet()
 		}
 	}, [connectWallet, meData])
@@ -328,11 +390,15 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 			await provider.disconnect()
 		}
 
+		Cookies.remove('walletType')
+
+		web3Modal?.clearCachedProvider()
+
 		magic?.connect.disconnect()
 		setWeb3Provider(undefined)
 		setAccounts([])
 		meMutate()
-	}, [provider])
+	}, [provider, magic, web3Modal])
 
 	const handleChainChanged = useCallback(
 		(chainHex: string) => {

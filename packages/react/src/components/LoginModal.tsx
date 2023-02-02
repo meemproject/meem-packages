@@ -1,11 +1,6 @@
-import { useQuery } from '@apollo/client'
-import { useAuth0 } from '@auth0/auth0-react'
 import { Text, Space, Modal, Image, Grid, Center } from '@mantine/core'
 import React from 'react'
-import { GetIdentityProvidersQuery } from '../../generated/graphql'
-import { useMeemApollo } from '../contexts/apolloContext'
 import { useAuth } from '../contexts/authContext'
-import { IDENTITY_PROVIDERS_QUERY } from '../gql/auth'
 import { useMeemTheme } from '../themes/MeemTheme'
 
 export interface ILoginModalProps {
@@ -19,34 +14,23 @@ export interface ILoginModalProps {
 	isLoginForced?: boolean
 }
 
-export const LoginModal: React.FC<ILoginModalProps> = ({
-	isOpen,
-	onRequestClose,
-	isLoginForced
-}) => {
+export interface ILoginFormProps {
+	/** Called when the modal is requesting that it be closed */
+	onRequestClose?: () => any
+}
+
+export const LoginForm: React.FC<ILoginFormProps> = ({ onRequestClose }) => {
+	const { connectWallet } = useAuth()
 	const { classes: meemTheme } = useMeemTheme()
 
-	const { loginWithRedirect } = useAuth0()
-
-	const { anonClient } = useMeemApollo()
-
-	const { connectWallet } = useAuth()
-
-	const { data: identityProvidersData } = useQuery<GetIdentityProvidersQuery>(
-		IDENTITY_PROVIDERS_QUERY,
-		{
-			client: anonClient
-		}
-	)
-
-	const modalContents = (
+	return (
 		<>
 			<div>
 				<Space h={24} />
 
 				<Center>
 					<Grid>
-						<Grid.Col xs={4} sm={3} md={4} lg={3} xl={3} key={'wallet'}>
+						<Grid.Col xs={4} sm={3} md={4} lg={3} xl={3} key={'injected'}>
 							<div
 								className={meemTheme.connectMethodGridItem}
 								style={{
@@ -54,7 +38,9 @@ export const LoginModal: React.FC<ILoginModalProps> = ({
 								}}
 								onClick={() => {
 									connectWallet('injected')
-									onRequestClose()
+									if (onRequestClose) {
+										onRequestClose()
+									}
 								}}
 							>
 								<div className={meemTheme.connectMethodGridItemContent}>
@@ -81,7 +67,9 @@ export const LoginModal: React.FC<ILoginModalProps> = ({
 								}}
 								onClick={() => {
 									connectWallet('walletconnect')
-									onRequestClose()
+									if (onRequestClose) {
+										onRequestClose()
+									}
 								}}
 							>
 								<div className={meemTheme.connectMethodGridItemContent}>
@@ -101,7 +89,37 @@ export const LoginModal: React.FC<ILoginModalProps> = ({
 								</div>
 							</div>
 						</Grid.Col>
-						{identityProvidersData?.IdentityProviders.map(identityProvider => (
+						<Grid.Col xs={4} sm={3} md={4} lg={3} xl={3} key={'magic'}>
+							<div
+								className={meemTheme.connectMethodGridItem}
+								style={{
+									position: 'relative'
+								}}
+								onClick={() => {
+									connectWallet('magic')
+									if (onRequestClose) {
+										onRequestClose()
+									}
+								}}
+							>
+								<div className={meemTheme.connectMethodGridItemContent}>
+									<Center>
+										<Image
+											src={`/connect-email.png`}
+											height={24}
+											width={24}
+											fit={'contain'}
+										/>
+									</Center>
+
+									<Space h={16} />
+									<Center>
+										<Text className={meemTheme.tSmallBold}>Email / Google</Text>
+									</Center>
+								</div>
+							</div>
+						</Grid.Col>
+						{/* {identityProvidersData?.IdentityProviders.map(identityProvider => (
 							<Grid.Col
 								xs={4}
 								sm={3}
@@ -140,14 +158,20 @@ export const LoginModal: React.FC<ILoginModalProps> = ({
 									</div>
 								</div>
 							</Grid.Col>
-						))}
+						))} */}
 					</Grid>
 				</Center>
-
-				<Space h={24} />
 			</div>
 		</>
 	)
+}
+
+export const LoginModal: React.FC<ILoginModalProps> = ({
+	isOpen,
+	onRequestClose,
+	isLoginForced
+}) => {
+	const { classes: meemTheme } = useMeemTheme()
 
 	return (
 		<>
@@ -168,7 +192,7 @@ export const LoginModal: React.FC<ILoginModalProps> = ({
 					onRequestClose()
 				}}
 			>
-				{modalContents}
+				<LoginForm />
 			</Modal>
 			<Modal
 				centered
@@ -187,7 +211,7 @@ export const LoginModal: React.FC<ILoginModalProps> = ({
 					onRequestClose()
 				}}
 			>
-				{modalContents}
+				<LoginForm />
 			</Modal>
 		</>
 	)
