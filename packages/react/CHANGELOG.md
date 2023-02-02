@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.1](https://github.com/meemproject/meem-packages/compare/v0.19.0...v0.19.1) (2023-02-02)
+
+
+### Bug Fixes
+
+* workaround magic logout issue w/ hybrid w3modal / magic solution ([6c806c4](https://github.com/meemproject/meem-packages/commit/6c806c4))
+
+
+
+
+
 # [0.19.0](https://github.com/meemproject/meem-packages/compare/v0.18.0...v0.19.0) (2023-01-26)
 
 **Note:** Version bump only for package @meemproject/react
