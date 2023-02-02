@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.19.0](https://github.com/meemproject/meem-packages/compare/v0.18.0...v0.19.0) (2023-01-26)
+
+
+### Features
+
+* add extension categories and capabilities ([a1e6039](https://github.com/meemproject/meem-packages/commit/a1e6039))
+
+
+
+
+
+# [0.18.0](https://github.com/meemproject/meem-packages/compare/v0.17.1...v0.18.0) (2023-01-25)
+
+
+### Features
+
+* add isSetupComplete to createAgreementExtension ([4ea2a93](https://github.com/meemproject/meem-packages/commit/4ea2a93))
+
+
+
+
+
+## [0.17.1](https://github.com/meemproject/meem-packages/compare/v0.17.0...v0.17.1) (2023-01-25)
+
+**Note:** Version bump only for package meem-packages
+
+
+
+
+
 # [0.17.0](https://github.com/meemproject/meem-packages/compare/v0.16.0...v0.17.0) (2023-01-17)
 
 
