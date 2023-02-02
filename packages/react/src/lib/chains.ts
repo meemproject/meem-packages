@@ -188,7 +188,7 @@ export const chains = [
 	},
 	{
 		name: 'Mumbai',
-		title: 'Polygon Testnet Mumbai',
+		title: 'Mumbai',
 		chain: 'Polygon',
 		rpc: [
 			'https://matic-mumbai.chainstacklabs.com',
@@ -197,8 +197,8 @@ export const chains = [
 		],
 		faucets: ['https://faucet.polygon.technology/'],
 		nativeCurrency: {
-			name: 'MATIC',
-			symbol: 'mumbaiMATIC',
+			name: 'Mumbai MATIC',
+			symbol: 'MATIC',
 			decimals: 18
 		},
 		infoURL: 'https://polygon.technology/',
