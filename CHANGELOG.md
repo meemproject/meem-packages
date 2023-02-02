@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.3](https://github.com/meemproject/meem-packages/compare/v0.19.2...v0.19.3) (2023-02-02)
+
+
+### Bug Fixes
+
+* mumbai symbol too long to add ([770db51](https://github.com/meemproject/meem-packages/commit/770db51))
+
+
+
+
+
 ## [0.19.2](https://github.com/meemproject/meem-packages/compare/v0.19.1...v0.19.2) (2023-02-02)
 
 **Note:** Version bump only for package meem-packages
