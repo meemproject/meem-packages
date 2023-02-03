@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.4](https://github.com/meemproject/meem-packages/compare/v0.19.3...v0.19.4) (2023-02-03)
+
+
+### Bug Fixes
+
+* connect wallet if we have a cached provider ([60e57d6](https://github.com/meemproject/meem-packages/commit/60e57d6))
+
+
+
+
+
 ## [0.19.3](https://github.com/meemproject/meem-packages/compare/v0.19.2...v0.19.3) (2023-02-02)
 
 
