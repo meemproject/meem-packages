@@ -355,6 +355,12 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 
 	// Auto connect to the cached provider
 	useEffect(() => {
+		if (web3Modal?.cachedProvider) {
+			connectWallet('injected')
+		}
+	}, [connectWallet, web3Modal])
+
+	useEffect(() => {
 		if (meData && walletType) {
 			connectWallet()
 		}
