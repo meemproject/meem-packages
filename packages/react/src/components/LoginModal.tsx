@@ -1,4 +1,4 @@
-import { Text, Space, Modal, Image, Grid, Center } from '@mantine/core'
+import { Text, Space, Modal, Image, Center } from '@mantine/core'
 import React from 'react'
 import { useAuth } from '../contexts/authContext'
 import { useMeemTheme } from '../themes/MeemTheme'
@@ -26,140 +26,97 @@ export const LoginForm: React.FC<ILoginFormProps> = ({ onRequestClose }) => {
 	return (
 		<>
 			<div>
-				<Space h={24} />
-
 				<Center>
-					<Grid>
-						<Grid.Col xs={4} sm={3} md={4} lg={3} xl={3} key={'injected'}>
-							<div
-								className={meemTheme.connectMethodGridItem}
-								style={{
-									position: 'relative'
-								}}
-								onClick={() => {
-									connectWallet('injected')
-									if (onRequestClose) {
-										onRequestClose()
-									}
-								}}
-							>
-								<div className={meemTheme.connectMethodGridItemContent}>
-									<Center>
-										<Image
-											src={`/connect-metamask.svg`}
-											height={24}
-											fit={'contain'}
-										/>
-									</Center>
+					<div className={meemTheme.rowResponsive}>
+						<div
+							className={meemTheme.connectMethodGridItem}
+							style={{
+								position: 'relative'
+							}}
+							onClick={() => {
+								connectWallet('injected')
+								if (onRequestClose) {
+									onRequestClose()
+								}
+							}}
+						>
+							<div className={meemTheme.connectMethodGridItemContent}>
+								<Center>
+									<Image
+										src={`/connect-metamask.svg`}
+										height={24}
+										fit={'contain'}
+									/>
+								</Center>
 
-									<Space h={16} />
-									<Center>
-										<Text className={meemTheme.tSmallBold}>Metamask</Text>
-									</Center>
-								</div>
+								<Space h={16} />
+
+								<Center>
+									<Text className={meemTheme.tSmallBold}>Metamask</Text>
+								</Center>
 							</div>
-						</Grid.Col>
-						<Grid.Col xs={4} sm={3} md={4} lg={3} xl={3} key={'wallet'}>
-							<div
-								className={meemTheme.connectMethodGridItem}
-								style={{
-									position: 'relative'
-								}}
-								onClick={() => {
-									connectWallet('walletconnect')
-									if (onRequestClose) {
-										onRequestClose()
-									}
-								}}
-							>
-								<div className={meemTheme.connectMethodGridItemContent}>
-									<Center>
-										<Image
-											src={`/connect-walletconnect.png`}
-											height={24}
-											width={24}
-											fit={'contain'}
-										/>
-									</Center>
+						</div>
+						<Space w={24} />
+						<Space h={16} />
+						<div
+							className={meemTheme.connectMethodGridItem}
+							style={{
+								position: 'relative'
+							}}
+							onClick={() => {
+								connectWallet('walletconnect')
+								if (onRequestClose) {
+									onRequestClose()
+								}
+							}}
+						>
+							<div className={meemTheme.connectMethodGridItemContent}>
+								<Center>
+									<Image
+										src={`/connect-walletconnect.png`}
+										height={24}
+										width={24}
+										fit={'contain'}
+									/>
+								</Center>
 
-									<Space h={16} />
-									<Center>
-										<Text className={meemTheme.tSmallBold}>WalletConnect</Text>
-									</Center>
-								</div>
+								<Space h={16} />
+								<Center>
+									<Text className={meemTheme.tSmallBold}>WalletConnect</Text>
+								</Center>
 							</div>
-						</Grid.Col>
-						<Grid.Col xs={4} sm={3} md={4} lg={3} xl={3} key={'magic'}>
-							<div
-								className={meemTheme.connectMethodGridItem}
-								style={{
-									position: 'relative'
-								}}
-								onClick={() => {
-									connectWallet('magic')
-									if (onRequestClose) {
-										onRequestClose()
-									}
-								}}
-							>
-								<div className={meemTheme.connectMethodGridItemContent}>
-									<Center>
-										<Image
-											src={`/connect-email.png`}
-											height={24}
-											width={24}
-											fit={'contain'}
-										/>
-									</Center>
+						</div>
+						<Space w={24} />
+						<Space h={16} />
+						<div
+							className={meemTheme.connectMethodGridItem}
+							style={{
+								position: 'relative'
+							}}
+							onClick={() => {
+								connectWallet('magic')
+								if (onRequestClose) {
+									onRequestClose()
+								}
+							}}
+						>
+							<div className={meemTheme.connectMethodGridItemContent}>
+								<Center>
+									<Image
+										src={`/connect-email.png`}
+										height={24}
+										width={24}
+										fit={'contain'}
+									/>
+								</Center>
 
-									<Space h={16} />
-									<Center>
-										<Text className={meemTheme.tSmallBold}>Email / Google</Text>
-									</Center>
-								</div>
+								<Space h={16} />
+								<Center>
+									<Text className={meemTheme.tSmallBold}>Email / Google</Text>
+								</Center>
 							</div>
-						</Grid.Col>
-						{/* {identityProvidersData?.IdentityProviders.map(identityProvider => (
-							<Grid.Col
-								xs={4}
-								sm={3}
-								md={4}
-								lg={3}
-								xl={3}
-								key={identityProvider.id}
-							>
-								<div
-									className={meemTheme.connectMethodGridItem}
-									style={{
-										position: 'relative'
-									}}
-									onClick={() => {
-										loginWithRedirect({
-											connection: identityProvider.connectionName
-										})
-									}}
-								>
-									<div className={meemTheme.connectMethodGridItemContent}>
-										<Center>
-											<Image
-												src={identityProvider.icon}
-												height={24}
-												width={24}
-												fit={'contain'}
-											/>
-										</Center>
-
-										<Space h={16} />
-										<Center>
-											<Text className={meemTheme.tSmallBold}>
-												{identityProvider.name}
-											</Text>
-										</Center>
-									</div>
-								</div>
-							</Grid.Col>
-						))} */}
-					</Grid>
+						</div>
+					</div>
 				</Center>
 			</div>
 		</>
