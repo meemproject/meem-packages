@@ -19,8 +19,10 @@ import { SocketProvider } from './socketContext'
 // )
 
 export const MeemProvider: React.FC<{
+	chainId: number
+	magicApiKey: string
 	children?: React.ReactNode
-}> = ({ children }) => {
+}> = ({ chainId, magicApiKey, children }) => {
 	return (
 		<SocketProvider wsUrl={process.env.NEXT_PUBLIC_WS_URL ?? ''}>
 			<Auth0Provider
@@ -30,7 +32,7 @@ export const MeemProvider: React.FC<{
 					typeof window !== 'undefined' ? window.location.origin : ''
 				}
 			>
-				<AuthProvider>
+				<AuthProvider chainId={chainId} magicApiKey={magicApiKey}>
 					<CustomApolloProvider>
 						<MeemUserProvider>
 							<SDKProvider>{children}</SDKProvider>

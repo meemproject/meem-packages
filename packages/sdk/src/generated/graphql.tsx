@@ -346,6 +346,7 @@ export type AgreementExtensionLinks_Updates = {
   _prepend?: InputMaybe<AgreementExtensionLinks_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementExtensionLinks_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementExtensionLinks_Bool_Exp;
 };
 
@@ -619,6 +620,7 @@ export type AgreementExtensionRoles_Updates = {
   _prepend?: InputMaybe<AgreementExtensionRoles_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementExtensionRoles_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementExtensionRoles_Bool_Exp;
 };
 
@@ -851,6 +853,7 @@ export type AgreementExtensionStorages_Updates = {
   _prepend?: InputMaybe<AgreementExtensionStorages_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementExtensionStorages_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementExtensionStorages_Bool_Exp;
 };
 
@@ -1157,6 +1160,7 @@ export type AgreementExtensionWidgets_Updates = {
   _prepend?: InputMaybe<AgreementExtensionWidgets_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementExtensionWidgets_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementExtensionWidgets_Bool_Exp;
 };
 
@@ -1190,6 +1194,7 @@ export type AgreementExtensions = {
   ExtensionId?: Maybe<Scalars['uuid']>;
   createdAt: Scalars['timestamptz'];
   id: Scalars['uuid'];
+  isInitialized?: Maybe<Scalars['Boolean']>;
   metadata?: Maybe<Scalars['jsonb']>;
   updatedAt: Scalars['timestamptz'];
 };
@@ -1288,7 +1293,23 @@ export type AgreementExtensions_Aggregate = {
 };
 
 export type AgreementExtensions_Aggregate_Bool_Exp = {
+  bool_and?: InputMaybe<AgreementExtensions_Aggregate_Bool_Exp_Bool_And>;
+  bool_or?: InputMaybe<AgreementExtensions_Aggregate_Bool_Exp_Bool_Or>;
   count?: InputMaybe<AgreementExtensions_Aggregate_Bool_Exp_Count>;
+};
+
+export type AgreementExtensions_Aggregate_Bool_Exp_Bool_And = {
+  arguments: AgreementExtensions_Select_Column_AgreementExtensions_Aggregate_Bool_Exp_Bool_And_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<AgreementExtensions_Bool_Exp>;
+  predicate: Boolean_Comparison_Exp;
+};
+
+export type AgreementExtensions_Aggregate_Bool_Exp_Bool_Or = {
+  arguments: AgreementExtensions_Select_Column_AgreementExtensions_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns;
+  distinct?: InputMaybe<Scalars['Boolean']>;
+  filter?: InputMaybe<AgreementExtensions_Bool_Exp>;
+  predicate: Boolean_Comparison_Exp;
 };
 
 export type AgreementExtensions_Aggregate_Bool_Exp_Count = {
@@ -1353,6 +1374,7 @@ export type AgreementExtensions_Bool_Exp = {
   _or?: InputMaybe<Array<AgreementExtensions_Bool_Exp>>;
   createdAt?: InputMaybe<Timestamptz_Comparison_Exp>;
   id?: InputMaybe<Uuid_Comparison_Exp>;
+  isInitialized?: InputMaybe<Boolean_Comparison_Exp>;
   metadata?: InputMaybe<Jsonb_Comparison_Exp>;
   updatedAt?: InputMaybe<Timestamptz_Comparison_Exp>;
 };
@@ -1396,6 +1418,7 @@ export type AgreementExtensions_Insert_Input = {
   ExtensionId?: InputMaybe<Scalars['uuid']>;
   createdAt?: InputMaybe<Scalars['timestamptz']>;
   id?: InputMaybe<Scalars['uuid']>;
+  isInitialized?: InputMaybe<Scalars['Boolean']>;
   metadata?: InputMaybe<Scalars['jsonb']>;
   updatedAt?: InputMaybe<Scalars['timestamptz']>;
 };
@@ -1479,6 +1502,7 @@ export type AgreementExtensions_Order_By = {
   ExtensionId?: InputMaybe<Order_By>;
   createdAt?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
+  isInitialized?: InputMaybe<Order_By>;
   metadata?: InputMaybe<Order_By>;
   updatedAt?: InputMaybe<Order_By>;
 };
@@ -1506,9 +1530,23 @@ export enum AgreementExtensions_Select_Column {
   /** column name */
   Id = 'id',
   /** column name */
+  IsInitialized = 'isInitialized',
+  /** column name */
   Metadata = 'metadata',
   /** column name */
   UpdatedAt = 'updatedAt'
+}
+
+/** select "AgreementExtensions_aggregate_bool_exp_bool_and_arguments_columns" columns of table "AgreementExtensions" */
+export enum AgreementExtensions_Select_Column_AgreementExtensions_Aggregate_Bool_Exp_Bool_And_Arguments_Columns {
+  /** column name */
+  IsInitialized = 'isInitialized'
+}
+
+/** select "AgreementExtensions_aggregate_bool_exp_bool_or_arguments_columns" columns of table "AgreementExtensions" */
+export enum AgreementExtensions_Select_Column_AgreementExtensions_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns {
+  /** column name */
+  IsInitialized = 'isInitialized'
 }
 
 /** input type for updating data in table "AgreementExtensions" */
@@ -1518,6 +1556,7 @@ export type AgreementExtensions_Set_Input = {
   ExtensionId?: InputMaybe<Scalars['uuid']>;
   createdAt?: InputMaybe<Scalars['timestamptz']>;
   id?: InputMaybe<Scalars['uuid']>;
+  isInitialized?: InputMaybe<Scalars['Boolean']>;
   metadata?: InputMaybe<Scalars['jsonb']>;
   updatedAt?: InputMaybe<Scalars['timestamptz']>;
 };
@@ -1537,6 +1576,7 @@ export type AgreementExtensions_Stream_Cursor_Value_Input = {
   ExtensionId?: InputMaybe<Scalars['uuid']>;
   createdAt?: InputMaybe<Scalars['timestamptz']>;
   id?: InputMaybe<Scalars['uuid']>;
+  isInitialized?: InputMaybe<Scalars['Boolean']>;
   metadata?: InputMaybe<Scalars['jsonb']>;
   updatedAt?: InputMaybe<Scalars['timestamptz']>;
 };
@@ -1553,6 +1593,8 @@ export enum AgreementExtensions_Update_Column {
   CreatedAt = 'createdAt',
   /** column name */
   Id = 'id',
+  /** column name */
+  IsInitialized = 'isInitialized',
   /** column name */
   Metadata = 'metadata',
   /** column name */
@@ -1572,6 +1614,7 @@ export type AgreementExtensions_Updates = {
   _prepend?: InputMaybe<AgreementExtensions_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementExtensions_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementExtensions_Bool_Exp;
 };
 
@@ -1921,6 +1964,7 @@ export type AgreementRoleExtensions_Updates = {
   _prepend?: InputMaybe<AgreementRoleExtensions_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementRoleExtensions_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementRoleExtensions_Bool_Exp;
 };
 
@@ -2180,6 +2224,7 @@ export enum AgreementRoleTokenTransfers_Update_Column {
 export type AgreementRoleTokenTransfers_Updates = {
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementRoleTokenTransfers_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementRoleTokenTransfers_Bool_Exp;
 };
 
@@ -2563,6 +2608,7 @@ export type AgreementRoleTokens_Updates = {
   _prepend?: InputMaybe<AgreementRoleTokens_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementRoleTokens_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementRoleTokens_Bool_Exp;
 };
 
@@ -2744,6 +2790,7 @@ export enum AgreementRoleWallets_Update_Column {
 export type AgreementRoleWallets_Updates = {
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementRoleWallets_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementRoleWallets_Bool_Exp;
 };
 
@@ -3430,6 +3477,7 @@ export type AgreementRoles_Updates = {
   _prepend?: InputMaybe<AgreementRoles_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementRoles_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementRoles_Bool_Exp;
 };
 
@@ -3722,6 +3770,7 @@ export enum AgreementTokenTransfers_Update_Column {
 export type AgreementTokenTransfers_Updates = {
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementTokenTransfers_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementTokenTransfers_Bool_Exp;
 };
 
@@ -4105,6 +4154,7 @@ export type AgreementTokens_Updates = {
   _prepend?: InputMaybe<AgreementTokens_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementTokens_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementTokens_Bool_Exp;
 };
 
@@ -4343,6 +4393,7 @@ export enum AgreementWallets_Update_Column {
 export type AgreementWallets_Updates = {
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<AgreementWallets_Set_Input>;
+  /** filter the rows which have to be updated */
   where: AgreementWallets_Bool_Exp;
 };
 
@@ -4388,6 +4439,7 @@ export type Agreements = {
   ensFetchedAt?: Maybe<Scalars['timestamptz']>;
   gnosisSafeAddress?: Maybe<Scalars['String']>;
   id: Scalars['uuid'];
+  isLaunched: Scalars['Boolean'];
   isTransferrable: Scalars['Boolean'];
   maxSupply: Scalars['String'];
   metadata: Scalars['jsonb'];
@@ -4665,6 +4717,7 @@ export type Agreements_Bool_Exp = {
   ensFetchedAt?: InputMaybe<Timestamptz_Comparison_Exp>;
   gnosisSafeAddress?: InputMaybe<String_Comparison_Exp>;
   id?: InputMaybe<Uuid_Comparison_Exp>;
+  isLaunched?: InputMaybe<Boolean_Comparison_Exp>;
   isTransferrable?: InputMaybe<Boolean_Comparison_Exp>;
   maxSupply?: InputMaybe<String_Comparison_Exp>;
   metadata?: InputMaybe<Jsonb_Comparison_Exp>;
@@ -4730,6 +4783,7 @@ export type Agreements_Insert_Input = {
   ensFetchedAt?: InputMaybe<Scalars['timestamptz']>;
   gnosisSafeAddress?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['uuid']>;
+  isLaunched?: InputMaybe<Scalars['Boolean']>;
   isTransferrable?: InputMaybe<Scalars['Boolean']>;
   maxSupply?: InputMaybe<Scalars['String']>;
   metadata?: InputMaybe<Scalars['jsonb']>;
@@ -4872,6 +4926,7 @@ export type Agreements_Order_By = {
   ensFetchedAt?: InputMaybe<Order_By>;
   gnosisSafeAddress?: InputMaybe<Order_By>;
   id?: InputMaybe<Order_By>;
+  isLaunched?: InputMaybe<Order_By>;
   isTransferrable?: InputMaybe<Order_By>;
   maxSupply?: InputMaybe<Order_By>;
   metadata?: InputMaybe<Order_By>;
@@ -4921,6 +4976,8 @@ export enum Agreements_Select_Column {
   /** column name */
   Id = 'id',
   /** column name */
+  IsLaunched = 'isLaunched',
+  /** column name */
   IsTransferrable = 'isTransferrable',
   /** column name */
   MaxSupply = 'maxSupply',
@@ -4945,11 +5002,15 @@ export enum Agreements_Select_Column {
 /** select "Agreements_aggregate_bool_exp_bool_and_arguments_columns" columns of table "Agreements" */
 export enum Agreements_Select_Column_Agreements_Aggregate_Bool_Exp_Bool_And_Arguments_Columns {
   /** column name */
+  IsLaunched = 'isLaunched',
+  /** column name */
   IsTransferrable = 'isTransferrable'
 }
 
 /** select "Agreements_aggregate_bool_exp_bool_or_arguments_columns" columns of table "Agreements" */
 export enum Agreements_Select_Column_Agreements_Aggregate_Bool_Exp_Bool_Or_Arguments_Columns {
+  /** column name */
+  IsLaunched = 'isLaunched',
   /** column name */
   IsTransferrable = 'isTransferrable'
 }
@@ -4967,6 +5028,7 @@ export type Agreements_Set_Input = {
   ensFetchedAt?: InputMaybe<Scalars['timestamptz']>;
   gnosisSafeAddress?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['uuid']>;
+  isLaunched?: InputMaybe<Scalars['Boolean']>;
   isTransferrable?: InputMaybe<Scalars['Boolean']>;
   maxSupply?: InputMaybe<Scalars['String']>;
   metadata?: InputMaybe<Scalars['jsonb']>;
@@ -5033,6 +5095,7 @@ export type Agreements_Stream_Cursor_Value_Input = {
   ensFetchedAt?: InputMaybe<Scalars['timestamptz']>;
   gnosisSafeAddress?: InputMaybe<Scalars['String']>;
   id?: InputMaybe<Scalars['uuid']>;
+  isLaunched?: InputMaybe<Scalars['Boolean']>;
   isTransferrable?: InputMaybe<Scalars['Boolean']>;
   maxSupply?: InputMaybe<Scalars['String']>;
   metadata?: InputMaybe<Scalars['jsonb']>;
@@ -5081,6 +5144,8 @@ export enum Agreements_Update_Column {
   /** column name */
   Id = 'id',
   /** column name */
+  IsLaunched = 'isLaunched',
+  /** column name */
   IsTransferrable = 'isTransferrable',
   /** column name */
   MaxSupply = 'maxSupply',
@@ -5117,6 +5182,7 @@ export type Agreements_Updates = {
   _prepend?: InputMaybe<Agreements_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<Agreements_Set_Input>;
+  /** filter the rows which have to be updated */
   where: Agreements_Bool_Exp;
 };
 
@@ -5530,6 +5596,7 @@ export type BundleContracts_Updates = {
   _prepend?: InputMaybe<BundleContracts_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<BundleContracts_Set_Input>;
+  /** filter the rows which have to be updated */
   where: BundleContracts_Bool_Exp;
 };
 
@@ -5894,6 +5961,7 @@ export type Bundles_Updates = {
   _prepend?: InputMaybe<Bundles_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<Bundles_Set_Input>;
+  /** filter the rows which have to be updated */
   where: Bundles_Bool_Exp;
 };
 
@@ -5994,6 +6062,10 @@ export enum ChainNonces_Constraint {
   ChainNoncesChainIdKey16 = 'ChainNonces_chainId_key16',
   /** unique or primary key constraint on columns "chainId" */
   ChainNoncesChainIdKey17 = 'ChainNonces_chainId_key17',
+  /** unique or primary key constraint on columns "chainId" */
+  ChainNoncesChainIdKey18 = 'ChainNonces_chainId_key18',
+  /** unique or primary key constraint on columns "chainId" */
+  ChainNoncesChainIdKey19 = 'ChainNonces_chainId_key19',
   /** unique or primary key constraint on columns "id" */
   ChainNoncesPkey = 'ChainNonces_pkey'
 }
@@ -6150,6 +6222,7 @@ export type ChainNonces_Updates = {
   _inc?: InputMaybe<ChainNonces_Inc_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<ChainNonces_Set_Input>;
+  /** filter the rows which have to be updated */
   where: ChainNonces_Bool_Exp;
 };
 
@@ -6515,6 +6588,7 @@ export type ContractInstances_Updates = {
   _inc?: InputMaybe<ContractInstances_Inc_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<ContractInstances_Set_Input>;
+  /** filter the rows which have to be updated */
   where: ContractInstances_Bool_Exp;
 };
 
@@ -7034,6 +7108,7 @@ export type Contracts_Updates = {
   _prepend?: InputMaybe<Contracts_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<Contracts_Set_Input>;
+  /** filter the rows which have to be updated */
   where: Contracts_Bool_Exp;
 };
 
@@ -7090,6 +7165,7 @@ export type Extensions = {
   slug: Scalars['String'];
   storageDefinition: Scalars['jsonb'];
   updatedAt: Scalars['timestamptz'];
+  widgetDefinition: Scalars['jsonb'];
 };
 
 
@@ -7138,6 +7214,12 @@ export type ExtensionsStorageDefinitionArgs = {
   path?: InputMaybe<Scalars['String']>;
 };
 
+
+/** columns and relationships of "Extensions" */
+export type ExtensionsWidgetDefinitionArgs = {
+  path?: InputMaybe<Scalars['String']>;
+};
+
 /** aggregated selection of "Extensions" */
 export type Extensions_Aggregate = {
   __typename?: 'Extensions_aggregate';
@@ -7163,6 +7245,7 @@ export type Extensions_Aggregate_FieldsCountArgs = {
 /** append existing jsonb value of filtered columns with new jsonb value */
 export type Extensions_Append_Input = {
   storageDefinition?: InputMaybe<Scalars['jsonb']>;
+  widgetDefinition?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** Boolean expression to filter rows from the table "Extensions". All fields are combined with a logical 'AND'. */
@@ -7183,6 +7266,7 @@ export type Extensions_Bool_Exp = {
   slug?: InputMaybe<String_Comparison_Exp>;
   storageDefinition?: InputMaybe<Jsonb_Comparison_Exp>;
   updatedAt?: InputMaybe<Timestamptz_Comparison_Exp>;
+  widgetDefinition?: InputMaybe<Jsonb_Comparison_Exp>;
 };
 
 /** unique or primary key constraints on table "Extensions" */
@@ -7194,16 +7278,19 @@ export enum Extensions_Constraint {
 /** delete the field or element with specified path (for JSON arrays, negative integers count from the end) */
 export type Extensions_Delete_At_Path_Input = {
   storageDefinition?: InputMaybe<Array<Scalars['String']>>;
+  widgetDefinition?: InputMaybe<Array<Scalars['String']>>;
 };
 
 /** delete the array element with specified index (negative integers count from the end). throws an error if top level container is not an array */
 export type Extensions_Delete_Elem_Input = {
   storageDefinition?: InputMaybe<Scalars['Int']>;
+  widgetDefinition?: InputMaybe<Scalars['Int']>;
 };
 
 /** delete key/value pair or string element. key/value pairs are matched based on their key value */
 export type Extensions_Delete_Key_Input = {
   storageDefinition?: InputMaybe<Scalars['String']>;
+  widgetDefinition?: InputMaybe<Scalars['String']>;
 };
 
 /** input type for inserting data into table "Extensions" */
@@ -7219,6 +7306,7 @@ export type Extensions_Insert_Input = {
   slug?: InputMaybe<Scalars['String']>;
   storageDefinition?: InputMaybe<Scalars['jsonb']>;
   updatedAt?: InputMaybe<Scalars['timestamptz']>;
+  widgetDefinition?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** aggregate max on columns */
@@ -7283,6 +7371,7 @@ export type Extensions_Order_By = {
   slug?: InputMaybe<Order_By>;
   storageDefinition?: InputMaybe<Order_By>;
   updatedAt?: InputMaybe<Order_By>;
+  widgetDefinition?: InputMaybe<Order_By>;
 };
 
 /** primary key columns input for table: Extensions */
@@ -7293,6 +7382,7 @@ export type Extensions_Pk_Columns_Input = {
 /** prepend existing jsonb value of filtered columns with new jsonb value */
 export type Extensions_Prepend_Input = {
   storageDefinition?: InputMaybe<Scalars['jsonb']>;
+  widgetDefinition?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** select columns of table "Extensions" */
@@ -7314,7 +7404,9 @@ export enum Extensions_Select_Column {
   /** column name */
   StorageDefinition = 'storageDefinition',
   /** column name */
-  UpdatedAt = 'updatedAt'
+  UpdatedAt = 'updatedAt',
+  /** column name */
+  WidgetDefinition = 'widgetDefinition'
 }
 
 /** input type for updating data in table "Extensions" */
@@ -7328,6 +7420,7 @@ export type Extensions_Set_Input = {
   slug?: InputMaybe<Scalars['String']>;
   storageDefinition?: InputMaybe<Scalars['jsonb']>;
   updatedAt?: InputMaybe<Scalars['timestamptz']>;
+  widgetDefinition?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** Streaming cursor of the table "Extensions" */
@@ -7349,6 +7442,7 @@ export type Extensions_Stream_Cursor_Value_Input = {
   slug?: InputMaybe<Scalars['String']>;
   storageDefinition?: InputMaybe<Scalars['jsonb']>;
   updatedAt?: InputMaybe<Scalars['timestamptz']>;
+  widgetDefinition?: InputMaybe<Scalars['jsonb']>;
 };
 
 /** update columns of table "Extensions" */
@@ -7370,7 +7464,9 @@ export enum Extensions_Update_Column {
   /** column name */
   StorageDefinition = 'storageDefinition',
   /** column name */
-  UpdatedAt = 'updatedAt'
+  UpdatedAt = 'updatedAt',
+  /** column name */
+  WidgetDefinition = 'widgetDefinition'
 }
 
 export type Extensions_Updates = {
@@ -7386,6 +7482,7 @@ export type Extensions_Updates = {
   _prepend?: InputMaybe<Extensions_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<Extensions_Set_Input>;
+  /** filter the rows which have to be updated */
   where: Extensions_Bool_Exp;
 };
 
@@ -7598,6 +7695,7 @@ export enum IdentityProviders_Update_Column {
 export type IdentityProviders_Updates = {
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<IdentityProviders_Set_Input>;
+  /** filter the rows which have to be updated */
   where: IdentityProviders_Bool_Exp;
 };
 
@@ -7816,6 +7914,7 @@ export enum Integrations_Update_Column {
 export type Integrations_Updates = {
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<Integrations_Set_Input>;
+  /** filter the rows which have to be updated */
   where: Integrations_Bool_Exp;
 };
 
@@ -7997,6 +8096,7 @@ export enum RolePermissions_Update_Column {
 export type RolePermissions_Updates = {
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<RolePermissions_Set_Input>;
+  /** filter the rows which have to be updated */
   where: RolePermissions_Bool_Exp;
 };
 
@@ -8118,6 +8218,7 @@ export enum SequelizeMeta_Update_Column {
 export type SequelizeMeta_Updates = {
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<SequelizeMeta_Set_Input>;
+  /** filter the rows which have to be updated */
   where: SequelizeMeta_Bool_Exp;
 };
 
@@ -8651,6 +8752,7 @@ export type Transactions_Updates = {
   _prepend?: InputMaybe<Transactions_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<Transactions_Set_Input>;
+  /** filter the rows which have to be updated */
   where: Transactions_Bool_Exp;
 };
 
@@ -8901,6 +9003,7 @@ export enum Transfers_Update_Column {
 export type Transfers_Updates = {
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<Transfers_Set_Input>;
+  /** filter the rows which have to be updated */
   where: Transfers_Bool_Exp;
 };
 
@@ -9004,6 +9107,10 @@ export enum UserIdentities_Constraint {
   UserIdentitiesExternalIdKey1 = 'UserIdentities_externalId_key1',
   /** unique or primary key constraint on columns "externalId" */
   UserIdentitiesExternalIdKey2 = 'UserIdentities_externalId_key2',
+  /** unique or primary key constraint on columns "externalId" */
+  UserIdentitiesExternalIdKey3 = 'UserIdentities_externalId_key3',
+  /** unique or primary key constraint on columns "externalId" */
+  UserIdentitiesExternalIdKey4 = 'UserIdentities_externalId_key4',
   /** unique or primary key constraint on columns "id" */
   UserIdentitiesPkey = 'UserIdentities_pkey'
 }
@@ -9208,6 +9315,7 @@ export type UserIdentities_Updates = {
   _prepend?: InputMaybe<UserIdentities_Prepend_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<UserIdentities_Set_Input>;
+  /** filter the rows which have to be updated */
   where: UserIdentities_Bool_Exp;
 };
 
@@ -9502,6 +9610,7 @@ export enum Users_Update_Column {
 export type Users_Updates = {
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<Users_Set_Input>;
+  /** filter the rows which have to be updated */
   where: Users_Bool_Exp;
 };
 
@@ -9752,6 +9861,7 @@ export enum WalletContractInstances_Update_Column {
 export type WalletContractInstances_Updates = {
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<WalletContractInstances_Set_Input>;
+  /** filter the rows which have to be updated */
   where: WalletContractInstances_Bool_Exp;
 };
 
@@ -10418,6 +10528,7 @@ export type Wallets_Updates = {
   _inc?: InputMaybe<Wallets_Inc_Input>;
   /** sets the columns of the filtered rows to the given values */
   _set?: InputMaybe<Wallets_Set_Input>;
+  /** filter the rows which have to be updated */
   where: Wallets_Bool_Exp;
 };
 
@@ -14551,3 +14662,10 @@ export type GetAgreementExtensionByIdQueryVariables = Exact<{
 
 
 export type GetAgreementExtensionByIdQuery = { __typename?: 'query_root', AgreementExtensions: Array<{ __typename?: 'AgreementExtensions', id: any, metadata?: any | null }> };
+
+export type GetMeQueryVariables = Exact<{
+  walletAddress?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type GetMeQuery = { __typename?: 'query_root', Users: Array<{ __typename?: 'Users', id: any, profilePicUrl?: string | null, displayName?: string | null, DefaultWallet?: { __typename?: 'Wallets', address: string, ens?: string | null } | null, UserIdentities: Array<{ __typename?: 'UserIdentities', id: any, metadata: any, visibility: string, IdentityProviderId?: any | null, IdentityProvider?: { __typename?: 'IdentityProviders', id: any, description: string, icon: string, name: string, connectionName: string, connectionId: string } | null }> }> };

@@ -39,6 +39,7 @@ const CustomApolloContext = createContext(defaultState)
 
 export default CustomApolloContext
 
+// TODO: Import this from @meemproject/sdk
 function createApolloClient(options: {
 	jwt?: string
 	headers?: Record<string, string>

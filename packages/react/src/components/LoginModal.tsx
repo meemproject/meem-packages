@@ -1,12 +1,7 @@
-import { useQuery } from '@apollo/client'
-import { useAuth0 } from '@auth0/auth0-react'
-import { Text, Space, Modal, Image, Divider, Grid, Center } from '@mantine/core'
+import { Text, Space, Modal, Image, Center } from '@mantine/core'
 import React from 'react'
-import { GetIdentityProvidersQuery } from '../../generated/graphql'
-import { useMeemApollo } from '../contexts/apolloContext'
 import { useAuth } from '../contexts/authContext'
-import { IDENTITY_PROVIDERS_QUERY } from '../gql/auth'
-import { useClubsTheme } from '../themes/ClubsTheme'
+import { useMeemTheme } from '../themes/MeemTheme'
 
 export interface ILoginModalProps {
 	/** Whether the modal is open */
@@ -19,25 +14,121 @@ export interface ILoginModalProps {
 	isLoginForced?: boolean
 }
 
+export interface ILoginFormProps {
+	/** Called when the modal is requesting that it be closed */
+	onRequestClose?: () => any
+}
+
+export const LoginForm: React.FC<ILoginFormProps> = ({ onRequestClose }) => {
+	const { connectWallet } = useAuth()
+	const { classes: meemTheme } = useMeemTheme()
+
+	return (
+		<>
+			<div>
+				<Center>
+					<div className={meemTheme.rowResponsive}>
+						<div
+							className={meemTheme.connectMethodGridItem}
+							style={{
+								position: 'relative'
+							}}
+							onClick={() => {
+								connectWallet('injected')
+								if (onRequestClose) {
+									onRequestClose()
+								}
+							}}
+						>
+							<div className={meemTheme.connectMethodGridItemContent}>
+								<Center>
+									<Image
+										src={`/connect-metamask.svg`}
+										height={24}
+										fit={'contain'}
+									/>
+								</Center>
+
+								<Space h={16} />
+
+								<Center>
+									<Text className={meemTheme.tSmallBold}>Metamask</Text>
+								</Center>
+							</div>
+						</div>
+						<Space w={24} />
+						<Space h={16} />
+						<div
+							className={meemTheme.connectMethodGridItem}
+							style={{
+								position: 'relative'
+							}}
+							onClick={() => {
+								connectWallet('walletconnect')
+								if (onRequestClose) {
+									onRequestClose()
+								}
+							}}
+						>
+							<div className={meemTheme.connectMethodGridItemContent}>
+								<Center>
+									<Image
+										src={`/connect-walletconnect.png`}
+										height={24}
+										width={24}
+										fit={'contain'}
+									/>
+								</Center>
+
+								<Space h={16} />
+								<Center>
+									<Text className={meemTheme.tSmallBold}>WalletConnect</Text>
+								</Center>
+							</div>
+						</div>
+						<Space w={24} />
+						<Space h={16} />
+						<div
+							className={meemTheme.connectMethodGridItem}
+							style={{
+								position: 'relative'
+							}}
+							onClick={() => {
+								connectWallet('magic')
+								if (onRequestClose) {
+									onRequestClose()
+								}
+							}}
+						>
+							<div className={meemTheme.connectMethodGridItemContent}>
+								<Center>
+									<Image
+										src={`/connect-email.png`}
+										height={24}
+										width={24}
+										fit={'contain'}
+									/>
+								</Center>
+
+								<Space h={16} />
+								<Center>
+									<Text className={meemTheme.tSmallBold}>Email / Google</Text>
+								</Center>
+							</div>
+						</div>
+					</div>
+				</Center>
+			</div>
+		</>
+	)
+}
+
 export const LoginModal: React.FC<ILoginModalProps> = ({
 	isOpen,
 	onRequestClose,
 	isLoginForced
 }) => {
-	const { classes: clubsTheme } = useClubsTheme()
-
-	const { loginWithRedirect } = useAuth0()
-
-	const { anonClient } = useMeemApollo()
-
-	const { connectWallet } = useAuth()
-
-	const { data: identityProvidersData } = useQuery<GetIdentityProvidersQuery>(
-		IDENTITY_PROVIDERS_QUERY,
-		{
-			client: anonClient
-		}
-	)
+	const { classes: meemTheme } = useMeemTheme()
 
 	return (
 		<>
@@ -48,103 +139,36 @@ export const LoginModal: React.FC<ILoginModalProps> = ({
 				withCloseButton={!isLoginForced}
 				closeOnClickOutside={!isLoginForced}
 				padding={'lg'}
-				size={'47%'}
+				size={'60%'}
 				opened={isOpen}
+				className={meemTheme.visibleDesktopOnly}
 				title={
-					<Text className={clubsTheme.tMediumBold}>{'Connect to Clubs'}</Text>
+					<Text className={meemTheme.tMediumBold}>{'Connect to Meem'}</Text>
 				}
 				onClose={async () => {
 					onRequestClose()
 				}}
 			>
-				<div>
-					<Divider />
-					<Space h={24} />
-
-					<Grid>
-						<Grid.Col md={6} lg={6} xl={4} key={'wallet'}>
-							<div
-								className={clubsTheme.connectMethodGridItem}
-								style={{
-									position: 'relative'
-								}}
-								onClick={() => {
-									connectWallet('injected')
-									onRequestClose()
-								}}
-							>
-								<Center>
-									<div className={clubsTheme.connectMethodGridItemContent}>
-										<Image
-											// src={`/connect-walletconnect.png`}
-											height={50}
-											fit={'contain'}
-										/>
-										<Space h={16} />
-										<Text className={clubsTheme.tSmallBold}>
-											Metamask / Browser
-										</Text>
-									</div>
-								</Center>
-							</div>
-						</Grid.Col>
-						<Grid.Col md={6} lg={6} xl={4} key={'wallet'}>
-							<div
-								className={clubsTheme.connectMethodGridItem}
-								style={{
-									position: 'relative'
-								}}
-								onClick={() => {
-									connectWallet('walletconnect')
-									onRequestClose()
-								}}
-							>
-								<Center>
-									<div className={clubsTheme.connectMethodGridItemContent}>
-										<Image
-											src={`/connect-walletconnect.png`}
-											height={50}
-											fit={'contain'}
-										/>
-										<Space h={16} />
-										<Text className={clubsTheme.tSmallBold}>WalletConnect</Text>
-									</div>
-								</Center>
-							</div>
-						</Grid.Col>
-						{identityProvidersData?.IdentityProviders.map(identityProvider => (
-							<Grid.Col md={6} lg={6} xl={4} key={identityProvider.id}>
-								<div
-									className={clubsTheme.connectMethodGridItem}
-									style={{
-										position: 'relative'
-									}}
-									onClick={() => {
-										loginWithRedirect({
-											connection: identityProvider.connectionName
-										})
-									}}
-								>
-									<Center>
-										<div className={clubsTheme.connectMethodGridItemContent}>
-											<Image
-												src={identityProvider.icon}
-												height={50}
-												fit={'contain'}
-											/>
-											<Space h={16} />
-											<Text className={clubsTheme.tSmallBold}>
-												{identityProvider.name}
-											</Text>
-										</div>
-									</Center>
-								</div>
-							</Grid.Col>
-						))}
-					</Grid>
-
-					<Space h={24} />
-				</div>
+				<LoginForm />
+			</Modal>
+			<Modal
+				centered
+				radius={16}
+				overlayBlur={8}
+				withCloseButton={!isLoginForced}
+				closeOnClickOutside={!isLoginForced}
+				padding={'lg'}
+				fullScreen={true}
+				opened={isOpen}
+				className={meemTheme.visibleMobileOnly}
+				title={
+					<Text className={meemTheme.tMediumBold}>{'Connect to Meem'}</Text>
+				}
+				onClose={async () => {
+					onRequestClose()
+				}}
+			>
+				<LoginForm />
 			</Modal>
 		</>
 	)

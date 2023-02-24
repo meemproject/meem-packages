@@ -18,7 +18,7 @@ import { MeemAPI } from '../generated/api.generated'
 import { GetBundleByIdQuery, GetContractQuery } from '../generated/graphql'
 import { GET_BUNDLE_BY_ID, GET_CONTRACT_QUERY } from '../gql/agreement.gql'
 import { makeRequest } from '../lib/fetcher'
-import { apolloClient } from '../lib/GQLClient'
+import { createApolloClient, QueryRole } from '../lib/GQLClient'
 import log from '../lib/log'
 
 export interface ICreateAgreementBaseOptions {
@@ -63,13 +63,44 @@ export const getAgreementContract = (options: {
 export class Agreement {
 	private jwt?: string
 
-	public constructor(options: { jwt?: string }) {
-		this.jwt = options.jwt
+	private gqlHttpUrl?: string
+
+	private gqlWsUri?: string
+
+	private apiUrl?: string
+
+	public constructor(options: {
+		jwt?: string
+		apiUrl?: string
+		gqlHttpUrl?: string
+		gqlWsUri?: string
+	}) {
+		const { jwt, apiUrl, gqlHttpUrl, gqlWsUri } = options
+		this.jwt = jwt
+		this.gqlHttpUrl = gqlHttpUrl
+		this.gqlWsUri = gqlWsUri
+		this.apiUrl = apiUrl
 	}
 
 	/** Sets the JWT used in api calls */
 	public setJwt(jwt?: string) {
 		this.jwt = jwt
+	}
+
+	public async isAdmin(options: { agreementId: string }) {
+		const { agreementId } = options
+
+		const result =
+			await makeRequest<MeemAPI.v1.CheckIsAgreementAdmin.IDefinition>(
+				MeemAPI.v1.CheckIsAgreementAdmin.path({ agreementId }),
+				{
+					jwt: this.jwt,
+					baseUrl: this.apiUrl,
+					method: MeemAPI.v1.CheckIsAgreementAdmin.method
+				}
+			)
+
+		return result.isAdmin
 	}
 
 	/** Create a new agreement */
@@ -101,11 +132,19 @@ export class Agreement {
 		} = options
 		const useMeemAPI = options.useMeemAPI !== false
 
+		const apolloClient = createApolloClient({
+			jwt: this.jwt,
+			role: QueryRole.Anonymous,
+			httpUrl: this.gqlHttpUrl,
+			wsUri: this.gqlWsUri
+		})
+
 		if (useMeemAPI) {
 			const result = await makeRequest<MeemAPI.v1.CreateAgreement.IDefinition>(
 				MeemAPI.v1.CreateAgreement.path(),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.CreateAgreement.method,
 					body: {
 						name,
@@ -284,6 +323,7 @@ export class Agreement {
 				MeemAPI.v1.ReInitializeAgreement.path({ agreementId }),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.ReInitializeAgreement.method,
 					body: {
 						name,
@@ -320,9 +360,59 @@ export class Agreement {
 				MeemAPI.v1.BulkMintAgreementTokens.path({ agreementId }),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.BulkMintAgreementTokens.method,
 					body: {
 						tokens
+					}
+				}
+			)
+
+		return result
+	}
+
+	/** Bulk burn tokens */
+	public async bulkBurn(options: { agreementId: string; tokenIds: string[] }) {
+		const { agreementId, tokenIds } = options
+
+		const result =
+			await makeRequest<MeemAPI.v1.BulkBurnAgreementTokens.IDefinition>(
+				MeemAPI.v1.BulkBurnAgreementTokens.path({ agreementId }),
+				{
+					jwt: this.jwt,
+					baseUrl: this.apiUrl,
+					method: MeemAPI.v1.BulkBurnAgreementTokens.method,
+					body: {
+						tokenIds
+					}
+				}
+			)
+
+		return result
+	}
+
+	/** Bulk burn agreement role tokens */
+	public async bulkBurnAgreementRoleTokens(options: {
+		/** The id of the agreement */
+		agreementId: string
+		/** The id of the agreement role */
+		agreementRoleId: string
+		tokenIds: string[]
+	}) {
+		const { agreementId, agreementRoleId, tokenIds } = options
+
+		const result =
+			await makeRequest<MeemAPI.v1.BulkBurnAgreementRoleTokens.IDefinition>(
+				MeemAPI.v1.BulkBurnAgreementRoleTokens.path({
+					agreementId,
+					agreementRoleId
+				}),
+				{
+					jwt: this.jwt,
+					baseUrl: this.apiUrl,
+					method: MeemAPI.v1.BulkBurnAgreementRoleTokens.method,
+					body: {
+						tokenIds
 					}
 				}
 			)
@@ -393,6 +483,28 @@ export class Agreement {
 		return tx
 	}
 
+	/** Update off-chain agreement data */
+	public async updateAgreement(
+		options: MeemAPI.v1.UpdateAgreement.IRequestBody & {
+			/** The agreement */
+			agreementId: string
+		}
+	) {
+		const { agreementId, ...updateProperties } = options
+		const result = await makeRequest<MeemAPI.v1.UpdateAgreement.IDefinition>(
+			MeemAPI.v1.UpdateAgreement.path({ agreementId }),
+			{
+				jwt: this.jwt,
+				method: MeemAPI.v1.UpdateAgreement.method,
+				body: {
+					...updateProperties
+				}
+			}
+		)
+
+		return result
+	}
+
 	/** Fetch the merkle proof required for this user to mint. */
 	public async getMintingProof(options: {
 		/** The agreement */
@@ -407,6 +519,7 @@ export class Agreement {
 			MeemAPI.v1.GetMintingProof.path({ agreementId }),
 			{
 				jwt: this.jwt,
+				baseUrl: this.apiUrl,
 				method: MeemAPI.v1.GetMintingProof.method
 			}
 		)
@@ -428,6 +541,7 @@ export class Agreement {
 			MeemAPI.v1.UpgradeAgreement.path({ agreementId }),
 			{
 				jwt: this.jwt,
+				baseUrl: this.apiUrl,
 				method: MeemAPI.v1.UpgradeAgreement.method,
 				body: {
 					bundleId
@@ -458,6 +572,7 @@ export class Agreement {
 				MeemAPI.v1.CreateAgreementSafe.path({ agreementId }),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.CreateAgreementSafe.method,
 					body: {
 						safeOwners,
@@ -484,6 +599,7 @@ export class Agreement {
 				MeemAPI.v1.SetAgreementSafeAddress.path({ agreementId }),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.SetAgreementSafeAddress.method,
 					body: {
 						address
@@ -508,6 +624,7 @@ export class Agreement {
 				MeemAPI.v1.SetAgreementAdminRole.path({ agreementId }),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.SetAgreementAdminRole.method,
 					body: {
 						adminAgreementRoleId
@@ -554,6 +671,7 @@ export class Agreement {
 					}),
 					{
 						jwt: this.jwt,
+						baseUrl: this.apiUrl,
 						method: MeemAPI.v1.CreateAgreementRole.method,
 						body: {
 							name,
@@ -715,6 +833,7 @@ export class Agreement {
 				}),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.ReInitializeAgreement.method,
 					body: {
 						name,
@@ -748,6 +867,7 @@ export class Agreement {
 				MeemAPI.v1.UpgradeAgreementRole.path({ agreementId, agreementRoleId }),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.UpgradeAgreement.method,
 					body: {
 						bundleId
@@ -782,6 +902,7 @@ export class Agreement {
 				}),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.BulkMintAgreementRoleTokens.method,
 					body: {
 						tokens
@@ -807,14 +928,14 @@ export class Agreement {
 			/** The link label */
 			label?: string
 			/** Visibility of the link extension */
-			visibility?: MeemAPI.IAgreementExtensionVisibility
+			visibility?: MeemAPI.AgreementExtensionVisibility
 		}
 		/** Optional widget data associated with this extension */
 		widget?: {
 			/** Metadata associated with the extension widget */
 			metadata?: MeemAPI.IMeemMetadataLike
 			/** Visibility of the extension widget */
-			visibility?: MeemAPI.IAgreementExtensionVisibility
+			visibility?: MeemAPI.AgreementExtensionVisibility
 		}
 	}) {
 		const { agreementId, extensionId, metadata, externalLink, widget } = options
@@ -824,6 +945,7 @@ export class Agreement {
 				MeemAPI.v1.CreateAgreementExtension.path({ agreementId }),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.CreateAgreementExtension.method,
 					body: {
 						extensionId,
@@ -852,7 +974,7 @@ export class Agreement {
 			/** The link label */
 			label?: string
 			/** Visibility of the link extension */
-			visibility?: MeemAPI.IAgreementExtensionVisibility
+			visibility?: MeemAPI.AgreementExtensionVisibility
 		}
 		/** Optional widget data associated with this extension */
 		widget?: {
@@ -878,6 +1000,7 @@ export class Agreement {
 				}),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.UpdateAgreementExtension.method,
 					body: {
 						metadata,

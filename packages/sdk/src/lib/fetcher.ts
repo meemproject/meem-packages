@@ -18,7 +18,7 @@ export function makeFetcher<U, V extends IBody | undefined, X>({
 	cleaner
 }: IMakeFetcher): (path: string, queryParams?: U, body?: V) => Promise<X> {
 	return (path: string, queryParams?: U, body?: V) => {
-		const uri = process.env.NEXT_PUBLIC_API_URL
+		const uri = /^http/.test(path) ? '' : process.env.NEXT_PUBLIC_API_URL
 		// @ts-ignore
 		const req = superagent[method.toLowerCase()](`${uri}${path}`)
 		const jwt = Cookies.get('meemJwtToken')
@@ -83,6 +83,9 @@ export async function makeRequest<TDefinition extends IEndpoint = IEndpoint>(
 		/** The Meem JWT. If not set will try to fetch from cookies */
 		jwt?: string
 
+		/** The base URL to use in the request */
+		baseUrl?: string
+
 		/** The HTTP method. GET by default */
 		method?: MeemAPI.HttpMethod
 
@@ -98,7 +101,11 @@ export async function makeRequest<TDefinition extends IEndpoint = IEndpoint>(
 ): Promise<TDefinition['responseBody']> {
 	const uri = /^http/.test(url)
 		? url
-		: `${process.env.NEXT_PUBLIC_API_URL}${url}`
+		: `${
+				options?.baseUrl ??
+				process.env.NEXT_PUBLIC_API_URL ??
+				'https://api.meem.wtf'
+		  }${url}`
 
 	const method = options?.method ?? MeemAPI.HttpMethod.Get
 	// @ts-ignore

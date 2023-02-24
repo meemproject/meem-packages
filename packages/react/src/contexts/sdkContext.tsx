@@ -61,7 +61,13 @@ export const SDKProvider: React.FC<ISDKProps> = ({ ...props }: ISDKProps) => {
 
 	const [hasSetJWT, setHasSetJWT] = useState(false)
 
-	const sdk = new MeemSDK({ jwt })
+	const sdk = new MeemSDK({
+		jwt,
+		isGunEnabled: typeof window !== 'undefined',
+		gunOptions: {
+			localStorage: false
+		}
+	})
 
 	const login = useCallback(
 		async (options: {

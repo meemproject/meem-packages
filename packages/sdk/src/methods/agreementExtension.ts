@@ -20,8 +20,11 @@ export interface IUpdateAgreementExtensionOptions
 export class AgreementExtension {
 	private jwt?: string
 
-	public constructor(options: { jwt?: string }) {
+	private apiUrl?: string
+
+	public constructor(options: { jwt?: string; apiUrl?: string }) {
 		this.jwt = options.jwt
+		this.apiUrl = options.apiUrl
 	}
 
 	/** Sets the JWT used in api calls */
@@ -33,7 +36,7 @@ export class AgreementExtension {
 	public async createAgreementExtension(
 		options: ICreateAgreementExtensionOptions
 	) {
-		const { extensionId, metadata, agreementId } = options
+		const { agreementId } = options
 
 		log.debug('Creating agreement Extension', options)
 
@@ -44,10 +47,10 @@ export class AgreementExtension {
 				}),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.CreateAgreement.method,
 					body: {
-						extensionId,
-						metadata
+						...options
 					}
 				}
 			)
@@ -59,7 +62,7 @@ export class AgreementExtension {
 	public async updateAgreementExtension(
 		options: IUpdateAgreementExtensionOptions
 	) {
-		const { agreementExtensionId, metadata, agreementId } = options
+		const { agreementExtensionId, agreementId } = options
 
 		log.debug('Creating agreement Extension', options)
 
@@ -71,9 +74,10 @@ export class AgreementExtension {
 				}),
 				{
 					jwt: this.jwt,
+					baseUrl: this.apiUrl,
 					method: MeemAPI.v1.UpdateAgreementExtension.method,
 					body: {
-						metadata
+						...options
 					}
 				}
 			)

@@ -3,6 +3,195 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.7](https://github.com/meemproject/meem-packages/compare/v0.19.6...v0.19.7) (2023-02-13)
+
+
+### Bug Fixes
+
+* auth options ([625df19](https://github.com/meemproject/meem-packages/commit/625df19))
+
+
+
+
+
+## [0.19.6](https://github.com/meemproject/meem-packages/compare/v0.19.5...v0.19.6) (2023-02-12)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.19.5](https://github.com/meemproject/meem-packages/compare/v0.19.4...v0.19.5) (2023-02-09)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.19.4](https://github.com/meemproject/meem-packages/compare/v0.19.3...v0.19.4) (2023-02-03)
+
+
+### Bug Fixes
+
+* connect wallet if we have a cached provider ([60e57d6](https://github.com/meemproject/meem-packages/commit/60e57d6))
+
+
+
+
+
+## [0.19.3](https://github.com/meemproject/meem-packages/compare/v0.19.2...v0.19.3) (2023-02-02)
+
+
+### Bug Fixes
+
+* mumbai symbol too long to add ([770db51](https://github.com/meemproject/meem-packages/commit/770db51))
+
+
+
+
+
+## [0.19.2](https://github.com/meemproject/meem-packages/compare/v0.19.1...v0.19.2) (2023-02-02)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.19.1](https://github.com/meemproject/meem-packages/compare/v0.19.0...v0.19.1) (2023-02-02)
+
+
+### Bug Fixes
+
+* workaround magic logout issue w/ hybrid w3modal / magic solution ([6c806c4](https://github.com/meemproject/meem-packages/commit/6c806c4))
+
+
+
+
+
+# [0.19.0](https://github.com/meemproject/meem-packages/compare/v0.18.0...v0.19.0) (2023-01-26)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+# [0.18.0](https://github.com/meemproject/meem-packages/compare/v0.17.1...v0.18.0) (2023-01-25)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.17.1](https://github.com/meemproject/meem-packages/compare/v0.17.0...v0.17.1) (2023-01-25)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+# [0.17.0](https://github.com/meemproject/meem-packages/compare/v0.16.0...v0.17.0) (2023-01-17)
+
+
+### Features
+
+* bulk burn tokens ([33922fd](https://github.com/meemproject/meem-packages/commit/33922fd))
+
+
+
+
+
+# [0.16.0](https://github.com/meemproject/meem-packages/compare/v0.15.2...v0.16.0) (2023-01-12)
+
+
+### Features
+
+* support for magic link ([d8ab827](https://github.com/meemproject/meem-packages/commit/d8ab827))
+
+
+
+
+
+## [0.15.2](https://github.com/meemproject/meem-packages/compare/v0.15.1...v0.15.2) (2023-01-11)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.15.1](https://github.com/meemproject/meem-packages/compare/v0.15.0...v0.15.1) (2023-01-09)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+# [0.15.0](https://github.com/meemproject/meem-packages/compare/v0.14.6...v0.15.0) (2023-01-09)
+
+
+### Features
+
+* improved sign in design ([fa6d41f](https://github.com/meemproject/meem-packages/commit/fa6d41f))
+
+
+
+
+
+## [0.14.6](https://github.com/meemproject/meem-packages/compare/v0.14.5...v0.14.6) (2023-01-06)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.14.5](https://github.com/meemproject/meem-packages/compare/v0.14.4...v0.14.5) (2023-01-05)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.14.4](https://github.com/meemproject/meem-packages/compare/v0.14.3...v0.14.4) (2023-01-05)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.14.3](https://github.com/meemproject/meem-packages/compare/v0.14.2...v0.14.3) (2023-01-05)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.14.2](https://github.com/meemproject/meem-packages/compare/v0.14.1...v0.14.2) (2023-01-05)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
+## [0.14.1](https://github.com/meemproject/meem-packages/compare/v0.14.0...v0.14.1) (2023-01-05)
+
+**Note:** Version bump only for package @meemproject/react
+
+
+
+
+
 # [0.14.0](https://github.com/meemproject/meem-packages/compare/v0.13.5...v0.14.0) (2023-01-05)
 
 **Note:** Version bump only for package @meemproject/react

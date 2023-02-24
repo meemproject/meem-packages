@@ -477,7 +477,7 @@ export interface IAgreementRoleExtensionMetadata {
 	[key: string]: any
 }
 
-export enum IAgreementExtensionVisibility {
+export enum AgreementExtensionVisibility {
 	/** Anyone can view the integration */
 	Anyone = 'anyone',
 
@@ -697,6 +697,24 @@ export enum StorageType {
 	Tableland = 'tableland'
 }
 
+export enum ExtensionCategory {
+	Basics = 'basics',
+	Communications = 'communications',
+	Commerce = 'commerce',
+	Finance = 'finance',
+	Organization = 'organization',
+	Publishing = 'publishing',
+	RoleManagement = 'roleManagement',
+	SocialMedia = 'socialMedia'
+}
+
+export enum ExtensionCapability {
+	Link = 'link',
+	DApp = 'dapp',
+	Auth = 'auth',
+	Widget = 'widget'
+}
+
 export interface IExtensionStorageDefinition {
 	tableland?: {
 		tables?: [
@@ -718,6 +736,13 @@ export interface IExtensionStorageDefinition {
 			}
 		]
 	}
+}
+
+export interface IExtensionWidgetDefinition {
+	widgets: {
+		metadata: Record<string, any>
+		visibility: AgreementExtensionVisibility
+	}[]
 }
 
 export interface IAgreementExtensionMetadata {
@@ -901,25 +926,29 @@ export namespace Login {
 
 
 
-export namespace AuthenticateWithDiscord {
-	export interface IPathParams {}
+/** Bulk mint agreement role tokens */
+export namespace BulkBurnAgreementRoleTokens {
+	export interface IPathParams {
+		/** The id of the agreement */
+		agreementId: string
+		/** The id of the agreement role */
+		agreementRoleId: string
+	}
 
-	export const path = (options: IPathParams) => `/api/1.0/discord/authenticate`
+	export const path = (options: IPathParams) =>
+		`/api/1.0/agreements/${options.agreementId}/roles/${options.agreementRoleId}/bulkBurn`
 
 	export const method = HttpMethod.Post
 
 	export interface IQueryParams {}
 
 	export interface IRequestBody {
-		/** The Discord authentication code */
-		authCode: string
-		/** The Discord authentication callback url */
-		redirectUri: string
+		tokenIds: string[]
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		user: { [key: string]: any }
-		accessToken: string
+		/** The Transaction id */
+		txId: string
 	}
 
 	export interface IDefinition {
@@ -934,26 +963,28 @@ export namespace AuthenticateWithDiscord {
 
 
 
-export namespace GetDiscordServers {
-	export interface IPathParams {}
 
-	export const path = (options: IPathParams) => `/api/1.0/discord/servers`
-
-	export const method = HttpMethod.Get
-
-	export interface IQueryParams {
-		accessToken: string
+/** Bulk mint agreement tokens */
+export namespace BulkBurnAgreementTokens {
+	export interface IPathParams {
+		/** The id of the agreement */
+		agreementId: string
 	}
+
+	export const path = (options: IPathParams) =>
+		`/api/1.0/agreements/${options.agreementId}/bulkBurn`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
 
 	export interface IRequestBody {
-		/** The Discord authentication code */
-		authCode: string
-		/** The Discord authentication callback url */
-		redirectUri: string
+		tokenIds: string[]
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		discordServers: IDiscordServer[]
+		/** The Transaction id */
+		txId: string
 	}
 
 	export interface IDefinition {
@@ -965,6 +996,7 @@ export namespace GetDiscordServers {
 
 	export type Response = IResponseBody | IError
 }
+
 
 
 
@@ -1051,6 +1083,38 @@ export namespace BulkMintAgreementTokens {
 	export type Response = IResponseBody | IError
 }
 
+
+
+
+/** Checks if the current user is an Agreement admin either by holding the Admin token or having the admin role on the contract */
+export namespace CheckIsAgreementAdmin {
+	export interface IPathParams {
+		/** The id of the agreement */
+		agreementId: string
+	}
+
+	export const path = (options: IPathParams) =>
+		`/api/1.0/agreements/${options.agreementId}/isAdmin`
+
+	export const method = HttpMethod.Get
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {}
+
+	export interface IResponseBody extends IApiResponseBody {
+		isAdmin: boolean
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
 
 
 
@@ -1168,6 +1232,9 @@ export namespace CreateAgreementExtension {
 		/** Whether the extension initialization is complete */
 		isInitialized?: boolean
 
+		/** Whether the extension setup is complete */
+		isSetupComplete?: boolean
+
 		/** Optional metadata associated with this extension */
 		metadata?: {
 			[key: string]: any
@@ -1180,7 +1247,7 @@ export namespace CreateAgreementExtension {
 			/** The link label */
 			label?: string
 			/** Visibility of the link extension */
-			visibility?: IAgreementExtensionVisibility
+			visibility?: AgreementExtensionVisibility
 		}
 
 		/** Optional widget data associated with this extension */
@@ -1188,7 +1255,7 @@ export namespace CreateAgreementExtension {
 			/** Metadata associated with the extension widget */
 			metadata?: IMeemMetadataLike
 			/** Visibility of the widget extension */
-			visibility?: IAgreementExtensionVisibility
+			visibility?: AgreementExtensionVisibility
 		}
 	}
 
@@ -1683,6 +1750,42 @@ export namespace SetAgreementSafeAddress {
 
 
 
+/** Update off-chain agreement data */
+export namespace UpdateAgreement {
+	export interface IPathParams {
+		/** The id of the agreement */
+		agreementId: string
+	}
+
+	export const path = (options: IPathParams) =>
+		`/api/1.0/agreements/${options.agreementId}`
+
+	export const method = HttpMethod.Patch
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** Whether the agreement is launched and visible to members */
+		isLaunched: boolean
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		status: 'success'
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
+
 /** Update an agreement extension */
 export namespace UpdateAgreementExtension {
 	export interface IPathParams {
@@ -1703,10 +1806,12 @@ export namespace UpdateAgreementExtension {
 	export interface IRequestBody {
 		/** Whether the extension initialization is complete */
 		isInitialized?: boolean
+		/** Whether the extension setup is complete */
+		isSetupComplete?: boolean
 		/** Optional metadata associated with this extension */
 		metadata?: {
 			[key: string]: any
-		}
+		} | null
 		/** Optional external link associated with this extension */
 		externalLink?: {
 			/** Url for the link */
@@ -1716,8 +1821,8 @@ export namespace UpdateAgreementExtension {
 			/** Whether link should be enabled */
 			isEnabled?: boolean
 			/** Visibility of the extension link */
-			visibility?: IAgreementExtensionVisibility
-		}
+			visibility?: AgreementExtensionVisibility
+		} | null
 		/** Optional widget data associated with this extension */
 		widget?: {
 			/** Metadata associated with the extension widget */
@@ -1725,8 +1830,8 @@ export namespace UpdateAgreementExtension {
 			/** Whether widget should be enabled */
 			isEnabled?: boolean
 			/** Visibility of the extension widget */
-			visibility?: IAgreementExtensionVisibility
-		}
+			visibility?: AgreementExtensionVisibility
+		} | null
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
@@ -1743,60 +1848,6 @@ export namespace UpdateAgreementExtension {
 	export type Response = IResponseBody | IError
 }
 
-
-
-
-/** Update an agreement role */
-export namespace UpdateAgreementRole {
-	export interface DiscordRoleIntegrationData {
-		discordServerId: string
-		discordGatedChannels: string[]
-		discordAccessToken: string
-	}
-	export interface IPathParams {
-		/** The id of the agreement */
-		agreementId: string
-		/** The id of the agreement role */
-		agreementRoleId: string
-	}
-
-	export const path = (options: IPathParams) =>
-		`/api/1.0/agreements/${options.agreementId}/roles/${options.agreementRoleId}`
-
-	export const method = HttpMethod.Post
-
-	export interface IQueryParams {}
-
-	export interface IRequestBody {
-		/** Name of the role */
-		name?: string
-		/** Array of ids for permissions */
-		permissions?: string[]
-		/** Wallet addresses of members */
-		members?: string[]
-		/** If the role is token-based, is the token transferrable to other wallets */
-		isTokenTransferrable?: boolean
-		/** Role integration data */
-		roleIntegrationsData?: (
-			| DiscordRoleIntegrationData
-			| { [key: string]: any }
-		)[]
-	}
-
-	export interface IResponseBody extends IApiResponseBody {
-		/** The Transaction id for updating the contract */
-		txId: string
-	}
-
-	export interface IDefinition {
-		pathParams: IPathParams
-		queryParams: IQueryParams
-		requestBody: IRequestBody
-		responseBody: IResponseBody
-	}
-
-	export type Response = IResponseBody | IError
-}
 
 
 
@@ -1872,6 +1923,73 @@ export namespace UpgradeAgreementRole {
 	export type Response = IResponseBody | IError
 }
 
+
+
+
+export namespace AuthenticateWithDiscord {
+	export interface IPathParams {}
+
+	export const path = (options: IPathParams) => `/api/1.0/discord/authenticate`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** The Discord authentication code */
+		authCode: string
+		/** The Discord authentication callback url */
+		redirectUri: string
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		user: { [key: string]: any }
+		accessToken: string
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
+export namespace GetDiscordServers {
+	export interface IPathParams {}
+
+	export const path = (options: IPathParams) => `/api/1.0/discord/servers`
+
+	export const method = HttpMethod.Get
+
+	export interface IQueryParams {
+		accessToken: string
+	}
+
+	export interface IRequestBody {
+		/** The Discord authentication code */
+		authCode: string
+		/** The Discord authentication callback url */
+		redirectUri: string
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		discordServers: IDiscordServer[]
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
 
 
 
@@ -2161,6 +2279,44 @@ export namespace JoinGuild {
 
 
 
+/** Save some data to IPFS */
+export namespace SaveToIPFS {
+	export interface IPathParams {}
+
+	export const path = () => `/api/1.0/ipfs`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** The data to save. Only one of "data" or "json" should be sent */
+		data?: string
+
+		/** The JSON to save. Only one of "data" or "json" should be sent */
+		json?: Record<string, any>
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		/** The IPFS hash for the saved data */
+		ipfsHash: string
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+// TODO: How to specify json in OpenAPI definition
+
+
+
+
 /** Create or update the current user */
 export namespace CreateOrUpdateUser {
 	export interface IPathParams {}
@@ -2356,44 +2512,6 @@ export namespace UpdateUserIdentity {
 
 	export type Response = IResponseBody | IError
 }
-
-
-
-
-/** Save some data to IPFS */
-export namespace SaveToIPFS {
-	export interface IPathParams {}
-
-	export const path = () => `/api/1.0/ipfs`
-
-	export const method = HttpMethod.Post
-
-	export interface IQueryParams {}
-
-	export interface IRequestBody {
-		/** The data to save. Only one of "data" or "json" should be sent */
-		data?: string
-
-		/** The JSON to save. Only one of "data" or "json" should be sent */
-		json?: Record<string, any>
-	}
-
-	export interface IResponseBody extends IApiResponseBody {
-		/** The IPFS hash for the saved data */
-		ipfsHash: string
-	}
-
-	export interface IDefinition {
-		pathParams: IPathParams
-		queryParams: IQueryParams
-		requestBody: IRequestBody
-		responseBody: IResponseBody
-	}
-
-	export type Response = IResponseBody | IError
-}
-
-// TODO: How to specify json in OpenAPI definition
 
 
 }
