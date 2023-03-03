@@ -4,7 +4,7 @@ import React from 'react'
 import { CustomApolloProvider } from './apolloContext'
 import { AuthProvider } from './authContext'
 import { MeemUserProvider } from './meemUserContext'
-import { SDKProvider } from './sdkContext'
+import { ISDKProps, SDKProvider } from './sdkContext'
 import { SocketProvider } from './socketContext'
 
 // export const MeemProvider = combineComponents(
@@ -19,8 +19,9 @@ import { SocketProvider } from './socketContext'
 // )
 
 export const MeemProvider: React.FC<{
-	chainId: number
+	chainId?: number
 	magicApiKey: string
+	sdk?: ISDKProps
 	children?: React.ReactNode
 }> = ({ chainId, magicApiKey, children }) => {
 	return (
