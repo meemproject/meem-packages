@@ -54,16 +54,23 @@ MeemSDKContext.displayName = 'MeemSDKContext'
 
 export interface ISDKProps {
 	children?: ReactNode
+	isGunEnabled?: boolean
 }
 
-export const SDKProvider: React.FC<ISDKProps> = ({ ...props }: ISDKProps) => {
+export const SDKProvider: React.FC<ISDKProps> = ({
+	isGunEnabled,
+	...props
+}: ISDKProps) => {
 	const { jwt, setJwt } = useAuth()
 
 	const [hasSetJWT, setHasSetJWT] = useState(false)
 
 	const sdk = new MeemSDK({
 		jwt,
-		isGunEnabled: typeof window !== 'undefined',
+		isGunEnabled:
+			typeof isGunEnabled === 'boolean'
+				? isGunEnabled
+				: typeof window !== 'undefined',
 		gunOptions: {
 			localStorage: false
 		}

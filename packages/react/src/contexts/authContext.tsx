@@ -123,7 +123,7 @@ AuthContext.displayName = 'AuthContext'
 export interface IAuthContextProps {
 	children?: ReactNode
 
-	chainId: number
+	chainId?: number
 
 	magicApiKey: string
 
@@ -162,7 +162,7 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 	const [magic, setMagic] = useState<Magic<ConnectExtension[]>>()
 	const [web3Modal, setWeb3Modal] = useState<Web3Modal | undefined>(undefined)
 	const [walletType, setWalletType] = useState<WalletType>()
-	const [chainId, setChainId] = useState<number>(initialChainId)
+	const [chainId, setChainId] = useState<number | undefined>(initialChainId)
 	const [loginState, setLoginState] = useState<LoginState>(LoginState.Unknown)
 	const [isConnected, setIsConnected] = useState<boolean>(false)
 	const [provider, setProvider] = useState<any | undefined>(undefined)
