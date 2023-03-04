@@ -193,12 +193,18 @@ export async function upgrade(options: {
 		signer
 	) as IDiamondCut
 
-	const tx = await diamondCut.diamondCut(
-		cuts,
-		ethers.constants.AddressZero,
-		'0x',
-		overrides
-	)
+	let tx: ethers.ContractTransaction
+
+	if (overrides) {
+		tx = await diamondCut.diamondCut(
+			cuts,
+			ethers.constants.AddressZero,
+			'0x',
+			overrides
+		)
+	} else {
+		tx = await diamondCut.diamondCut(cuts, ethers.constants.AddressZero, '0x')
+	}
 
 	await tx.wait()
 
