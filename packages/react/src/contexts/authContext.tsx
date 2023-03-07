@@ -1,7 +1,7 @@
 import { ApolloError } from '@apollo/client'
 import { ConnectExtension } from '@magic-ext/connect'
 import { MeemAPI, makeFetcher } from '@meemproject/sdk'
-import WalletConnectProvider from '@walletconnect/web3-provider'
+import { EthereumProvider } from '@walletconnect/ethereum-provider'
 import { providers, ethers } from 'ethers'
 import Cookies from 'js-cookie'
 import JWT from 'jsonwebtoken'
@@ -342,7 +342,7 @@ export const AuthProvider: React.FC<IAuthContextProps> = ({
 				cacheProvider: true,
 				providerOptions: {
 					walletconnect: {
-						package: WalletConnectProvider, // required
+						package: EthereumProvider, // required
 						options: {
 							rpc: rpcUrls
 						}
