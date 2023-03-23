@@ -1,7 +1,7 @@
 import { Agreement } from './methods/agreement'
 import { AgreementExtension } from './methods/agreementExtension'
 import { Id } from './methods/id'
-import { GunOptions, Storage } from './methods/storage'
+import { Storage } from './methods/storage'
 
 export * from './generated/api.generated'
 export * from './abis'
@@ -28,13 +28,10 @@ export class MeemSDK {
 	public constructor(options: {
 		jwt?: string
 		apiUrl?: string
-		isGunEnabled?: boolean
-		gunOptions?: GunOptions
 		gqlHttpUrl?: string
 		gqlWsUri?: string
 	}) {
-		const { jwt, apiUrl, gunOptions, gqlHttpUrl, gqlWsUri, isGunEnabled } =
-			options
+		const { jwt, apiUrl, gqlHttpUrl, gqlWsUri } = options
 		this.jwt = jwt
 		this.id = new Id({ jwt: this.jwt, gqlHttpUrl, gqlWsUri, apiUrl })
 		this.agreement = new Agreement({
@@ -46,8 +43,6 @@ export class MeemSDK {
 		this.agreementExtension = new AgreementExtension({ jwt: this.jwt, apiUrl })
 
 		this.storage = new Storage({
-			gunOptions,
-			isGunEnabled: typeof isGunEnabled === 'boolean' ? isGunEnabled : true,
 			id: this.id,
 			jwt: this.jwt,
 			apiUrl

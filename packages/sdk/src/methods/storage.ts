@@ -12,18 +12,12 @@ import {
 } from '@meemproject/utils'
 import { connect } from '@tableland/sdk'
 import type { Connection } from '@tableland/sdk'
-import type { IGun } from 'gun/types'
-import type { IGunUserInstance } from 'gun/types/sea'
 import request from 'superagent'
 import type TypedEmitter from 'typed-emitter'
-import { v4 as uuidv4 } from 'uuid'
 import { MeemAPI } from '../generated/api.generated'
 import { makeRequest } from '../lib/fetcher'
 import log from '../lib/log'
 import { Id } from './id'
-
-let Gun: IGun
-let SEA: any
 
 export interface IPartialAccessControlCondition
 	extends Partial<AccsDefaultParams> {
@@ -38,41 +32,6 @@ export type EmitterEvents = {
 	[path: string]: (items: { [id: string]: any }) => void
 }
 
-export type GunOptions = Partial<{
-	/** Undocumented but mentioned. Write data to a JSON. */
-	file: string
-
-	/** Undocumented but mentioned. Create a websocket server */
-	web: any
-
-	/** Undocumented but mentioned. Amazon S3 */
-	s3: {
-		key: string
-		secret: string
-		bucket: string
-		region?: string
-		fakes3?: any
-	}
-
-	/** The URLs are properties, and the value is an empty object. */
-	peers: string[]
-
-	/** Default: true, creates and persists local (nodejs) data using Radisk. */
-	radisk: boolean
-
-	/** Default: true, persists local (browser) data to localStorage. */
-	localStorage: boolean
-
-	/** Uuid allows you to override the default 24 random alphanumeric soul generator with your own function. */
-	uuid(): string
-
-	/**
-	 * Allows you to pass options to a 3rd party module. Their project README will likely list the exposed options
-	 * @see https://github.com/amark/gun/wiki/Modules
-	 */
-	[key: string]: any
-}>
-
 export class Storage {
 	private id: Id
 
@@ -84,69 +43,22 @@ export class Storage {
 	/** The LIT protocol client */
 	private lit?: Lit.LitNodeClient
 
-	private gun?: IGunUserInstance<any>
-
 	private emitter: TypedEmitter<EmitterEvents>
 
 	private apiUrl?: string
 
-	public constructor(options: {
-		id: Id
-		jwt?: string
-		isGunEnabled: boolean
-		gunOptions?: GunOptions
-		apiUrl?: string
-	}) {
-		const { id, jwt, isGunEnabled, gunOptions, apiUrl } = options
+	public constructor(options: { id: Id; jwt?: string; apiUrl?: string }) {
+		const { id, jwt, apiUrl } = options
 		this.id = id
 		this.jwt = jwt
 		this.apiUrl = apiUrl
 
-		if (isGunEnabled) {
-			if (typeof window !== 'undefined') {
-				Gun = require('gun/gun')
-				SEA = require('gun/sea')
-				require('gun/lib/unset')
-				require('gun/lib/load')
-			} else {
-				Gun = require('gun')
-				SEA = require('gun/sea')
-				require('gun/lib/unset')
-				require('gun/lib/load')
-				Gun.SEA = SEA
-				global.crypto = require('crypto').webcrypto
-			}
-			let peers = gunOptions?.peers
-
-			if (!peers && process.env.NEXT_PUBLIC_GUN_DB_PEERS) {
-				peers = process.env.NEXT_PUBLIC_GUN_DB_PEERS.split(',').map(p =>
-					p.trim()
-				)
-			}
-
-			if (!peers) {
-				peers = ['https://api-indexer.meem.wtf/gun']
-			}
-
-			// @ts-ignore
-			this.gun = Gun({
-				...gunOptions,
-				peers
-			})
-			// @ts-ignore
-			this.gun.SEA = SEA
-			this.importGunExtensions()
-		}
 		this.emitter = new EventEmitter() as TypedEmitter<EmitterEvents>
 	}
 
 	/** Sets the JWT used in api calls */
 	public setJwt(jwt?: string) {
 		this.jwt = jwt
-	}
-
-	public getGunInstance() {
-		return this.gun
 	}
 
 	/** Get an instance of the Tableland SDK */
@@ -469,318 +381,6 @@ export class Storage {
 		}
 
 		return { decryptedString, data }
-	}
-
-	/** Decrypt an item stored in GunDB using a private key */
-	public async decryptItem(options: {
-		item: Record<string, any>
-		privateKey: JsonWebKey
-	}) {
-		const { item, privateKey } = options
-
-		try {
-			const itemKeys = Object.keys(item)
-
-			let decryptedItem: Record<string, any> = {}
-
-			for (let i = 0; i < itemKeys.length; i++) {
-				const itemKey = itemKeys[i]
-				const itemVal = item[itemKey]
-
-				if (/^#/.test(itemKey)) {
-					const parsedData = JSON.parse(itemVal)
-					// decrypt
-					const { data: decryptedData } = await this.decrypt({
-						strToDecrypt: parsedData.data,
-						privateKey
-					})
-					decryptedItem = { ...parsedData }
-					decryptedItem.data = decryptedData
-					decryptedItem.id = itemKey
-					decryptedItem.encryptedSymmetricKey = parsedData.encryptedSymmetricKey
-				} else if (typeof itemVal === 'object') {
-					// Recursively decrypt
-					decryptedItem[itemKey] = await this.decryptItem({
-						item: itemVal,
-						privateKey
-					})
-				} else {
-					// Leave it
-					decryptedItem[itemKey] = itemVal
-				}
-			}
-
-			return decryptedItem
-		} catch (e) {
-			log.debug('Unable to decrypt item', { item })
-			log.debug(e)
-		}
-
-		return item
-	}
-
-	/** Decrypt an item stored in GunDB using LIT */
-	public async decryptItemWithLit(options: {
-		item: Record<string, any>
-		chainId: number
-	}) {
-		const { item, chainId } = options
-
-		try {
-			const authSig = this.id.getLitAuthSig()
-			const itemKeys = Object.keys(item)
-
-			let decryptedItem: Record<string, any> = {}
-
-			for (let i = 0; i < itemKeys.length; i++) {
-				const itemKey = itemKeys[i]
-				const itemVal = item[itemKey]
-
-				if (/^#/.test(itemKey)) {
-					const parsedData = JSON.parse(itemVal)
-					// decrypt
-					const accessControlConditions = JSON.parse(
-						parsedData.accessControlConditions
-					)
-					const params = {
-						authSig,
-						chainId,
-						strToDecrypt: this.base64URIToBlob(parsedData.data),
-						accessControlConditions,
-						encryptedSymmetricKey: parsedData.encryptedSymmetricKey
-					}
-
-					const { data: decryptedData } = await this.decryptWithLit(params)
-					decryptedItem = { ...parsedData }
-					decryptedItem.data = decryptedData
-					decryptedItem.accessControlConditions = accessControlConditions
-					decryptedItem.id = itemKey
-					decryptedItem.encryptedSymmetricKey = parsedData.encryptedSymmetricKey
-				} else if (typeof itemVal === 'object') {
-					// Recursively decrypt
-					decryptedItem[itemKey] = await this.decryptItemWithLit({
-						chainId,
-						item: decryptedItem[itemKey]
-					})
-				} else {
-					// Leave it
-					decryptedItem[itemKey] = itemVal
-				}
-			}
-
-			return decryptedItem
-		} catch (e) {
-			log.debug('Unable to decrypt item', { item })
-			log.debug(e)
-		}
-
-		return item
-	}
-
-	/** Subscribe to data changes on a path */
-	public async on(options: {
-		/** The path to listen for */
-		path: string
-
-		/** The callback invoked when data changes */
-		cb: (data: any) => void
-
-		/** The chain id */
-		chainId?: number
-
-		/** Will decrypt the data using the JSON web key. If omitted, will decrypt using LIT */
-		privateKey?: JsonWebKey
-	}) {
-		const { path, cb, chainId, privateKey } = options
-
-		this.emitter.addListener(path, cb)
-
-		// @ts-ignore
-		this.gun.get(path).open(async (data: any /*, key: string */) => {
-			try {
-				const keys = Object.keys(data)
-				const items: Record<string, any> = {}
-				const promises: Promise<any>[] = []
-				for (let i = 0; i < keys.length; i++) {
-					const key = keys[i]
-					let item = data[key]
-					if (/^#/.test(key)) {
-						item = {
-							[key]: item
-						}
-					}
-
-					if (privateKey) {
-						promises.push(
-							this.decryptItem({
-								item,
-								privateKey
-							})
-						)
-					} else if (chainId) {
-						promises.push(
-							this.decryptItemWithLit({
-								item,
-								chainId
-							})
-						)
-					}
-				}
-
-				const result = await Promise.allSettled(promises)
-				keys.forEach((k, i) => {
-					const r = result[i]
-					if (r.status === 'fulfilled') {
-						items[k] = r.value
-					} else {
-						log.warn(`Unable to parse data for key ${k}`)
-					}
-				})
-
-				this.emitter.emit(path, items)
-			} catch (e) {
-				log.warn('Unable to parse data as JSON')
-				log.warn(e)
-			}
-		})
-	}
-
-	/** Unsubscribe to events */
-	public async off(path: string, cb: (data: any) => void) {
-		this.emitter.removeListener(path, cb)
-	}
-
-	/** Encrypt the "data" field and then write to GunDB */
-	public async encryptAndWrite(options: {
-		/** The path to write the data */
-		path: string
-
-		/** The values to be written to the db in the form of columnName:value */
-		writeColumns?: {
-			[columnName: string]: any
-		}
-
-		/** The values to be encrypted and written to the db "data" column in the form of columnName:value */
-		data: {
-			[columnName: string]: any
-		}
-
-		/**
-		 * The key that will be used to encrypt the data
-		 */
-		key: JsonWebKey
-	}) {
-		const { path, key, writeColumns, data } = options
-
-		const encryptedStr = await this.encrypt({
-			data,
-			key
-		})
-
-		const newWriteColumns = {
-			...writeColumns,
-			data: encryptedStr
-		}
-
-		const hash = await Gun.SEA.work(
-			JSON.stringify(newWriteColumns),
-			null,
-			null,
-			{
-				name: 'SHA-256'
-			}
-		)
-
-		if (!hash) {
-			throw new Error('SEA_WORK_FAILED')
-		}
-
-		const id = uuidv4()
-
-		const item = this.gun
-			?.get(path)
-			// @ts-ignore
-			.get(id)
-			// @ts-ignore
-			.get(`#${hash}`)
-			.put(JSON.stringify(newWriteColumns), (ack: any) => log.debug({ ack }))
-
-		return { id, hash, item }
-	}
-
-	/** Encrypt the "data" field and then write to GunDB */
-	public async encryptWithLitAndWrite(options: {
-		/** The chain */
-		chainId: number
-
-		/** The path to write the data */
-		path: string
-
-		/** The values to be written to the db in the form of columnName:value */
-		writeColumns?: {
-			[columnName: string]: any
-		}
-
-		/** The values to be encrypted and written to the db "data" column in the form of columnName:value */
-		data: {
-			[columnName: string]: any
-		}
-
-		/**
-		 * The token(s) that may be held in order to decrypt the string
-		 *
-		 * For advanced customization options see: https://developer.litprotocol.com/SDK/Explanation/encryption
-		 */
-		accessControlConditions: IPartialAccessControlCondition[]
-	}) {
-		const {
-			chainId,
-			path,
-			accessControlConditions: partialAccessControlConditions,
-			writeColumns,
-			data
-		} = options
-
-		const { accessControlConditions, encryptedStr, encryptedSymmetricKey } =
-			await this.encryptWithLit({
-				accessControlConditions: partialAccessControlConditions,
-				chainId,
-				data
-			})
-
-		const base64EncryptedStr = await this.blobToBase64(encryptedStr)
-
-		const newWriteColumns = {
-			...writeColumns,
-			accessControlConditions: JSON.stringify(accessControlConditions),
-			data: base64EncryptedStr,
-			encryptedSymmetricKey
-		}
-
-		const hash = await Gun.SEA.work(
-			JSON.stringify(newWriteColumns),
-			null,
-			null,
-			{
-				name: 'SHA-256'
-			}
-		)
-
-		if (!hash) {
-			throw new Error('SEA_WORK_FAILED')
-		}
-
-		const id = uuidv4()
-
-		this.gun
-			?.get(path)
-			// @ts-ignore
-			.get(id)
-			// @ts-ignore
-			.get(`#${hash}`)
-			.put(JSON.stringify(newWriteColumns), (ack: any) => log.debug({ ack }))
-
-		return { id, hash }
 	}
 
 	/** Encrypt the "data" field and then write to tableland */
@@ -1120,95 +720,6 @@ export class Storage {
 			return new Blob([ab], { type: 'image/jpeg' })
 		} catch (e) {
 			return new Blob()
-		}
-	}
-
-	/**
-	 * Converts nested arrays in an object to objects
-	 *
-	 * GunDB doesn't allow arrays so this is a necessary step before saving data
-	 */
-	public sanitizeGunData(obj: any) {
-		const data = this.convertArraysToObjects(obj)
-		const cleanData: Record<string, any> = {}
-		Object.keys(data).forEach(key => {
-			if (
-				typeof data[key] !== 'object' ||
-				(typeof data[key] === 'object' && Object.keys(data[key]).length > 0)
-			) {
-				cleanData[key] = data[key]
-			}
-		})
-
-		return cleanData
-	}
-
-	/**
-	 * Converts objects back to regular after using sanitizeForGun
-	 *
-	 * GunDB doesn't allow arrays so this is a necessary step before saving data
-	 */
-	public desanitizeGunData(obj: any) {
-		let result: any = {}
-		if (typeof obj === 'object') {
-			const keys = Object.keys(obj)
-			let isArray = true
-			keys.forEach((k, i) => {
-				if (+k !== i) {
-					isArray = false
-					return
-				}
-			})
-			if (isArray) {
-				result = Object.values(obj).map(v => this.desanitizeGunData(v))
-			} else {
-				Object.keys(obj).forEach(k => {
-					result[k] = this.desanitizeGunData(obj[k])
-				})
-			}
-		} else {
-			result = obj
-		}
-
-		return result
-	}
-
-	private convertArraysToObjects(obj: any) {
-		let result: any = {}
-		if (Array.isArray(obj)) {
-			obj.forEach((item, i) => {
-				result[i.toString()] = this.convertArraysToObjects(item)
-			})
-		} else if (typeof obj === 'object') {
-			Object.keys(obj).forEach(key => {
-				if (typeof obj[key] === 'object') {
-					result[key] = this.convertArraysToObjects(obj[key])
-				} else {
-					result[key] = obj[key]
-				}
-			})
-		} else {
-			result = obj
-		}
-
-		return result
-	}
-
-	private async importGunExtensions() {
-		// try {
-		// 	console.log('importing gun/sea')
-		// 	// await import('gun/sea')
-		// 	console.log('Imported gun/sea')
-		// } catch (e) {
-		// 	console.log(e)
-		// 	log.debug('Failed to import gun/sea', e)
-		// }
-
-		try {
-			await import('gun/lib/open')
-			log.trace('Imported gun/lib/open')
-		} catch (e) {
-			log.debug('Failed to import gun/lib/open', e)
 		}
 	}
 }
