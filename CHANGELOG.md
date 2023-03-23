@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.20.0](https://github.com/meemproject/meem-packages/compare/v0.19.10...v0.20.0) (2023-03-23)
+
+
+### Features
+
+* add symphony to sdk ([9b42525](https://github.com/meemproject/meem-packages/commit/9b42525))
+* add symphony types ([6dead5e](https://github.com/meemproject/meem-packages/commit/6dead5e))
+* remove gundb because it is super buggy ([e78de01](https://github.com/meemproject/meem-packages/commit/e78de01))
+
+
+
+
+
 ## [0.19.10](https://github.com/meemproject/meem-packages/compare/v0.19.9...v0.19.10) (2023-03-08)
 
 **Note:** Version bump only for package meem-packages

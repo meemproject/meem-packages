@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.20.0](https://github.com/meemproject/meem-packages/compare/v0.19.10...v0.20.0) (2023-03-23)
+
+**Note:** Version bump only for package @meemproject/meem-contracts
+
+
+
+
+
 ## [0.19.10](https://github.com/meemproject/meem-packages/compare/v0.19.9...v0.19.10) (2023-03-08)
 
 **Note:** Version bump only for package @meemproject/meem-contracts
