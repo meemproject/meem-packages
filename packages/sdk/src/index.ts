@@ -2,6 +2,7 @@ import { Agreement } from './methods/agreement'
 import { AgreementExtension } from './methods/agreementExtension'
 import { Id } from './methods/id'
 import { Storage } from './methods/storage'
+import { Symphony } from './methods/symphony'
 
 export * from './generated/api.generated'
 export * from './abis'
@@ -13,6 +14,7 @@ export * from './methods/id'
 export * from './methods/agreement'
 export * from './methods/agreementExtension'
 export * from './methods/storage'
+export * from './methods/symphony'
 
 export class MeemSDK {
 	public id: Id
@@ -22,6 +24,8 @@ export class MeemSDK {
 	public agreementExtension: AgreementExtension
 
 	public storage: Storage
+
+	public symphony: Symphony
 
 	private jwt?: string
 
@@ -47,6 +51,10 @@ export class MeemSDK {
 			jwt: this.jwt,
 			apiUrl
 		})
+		this.symphony = new Symphony({
+			jwt: this.jwt,
+			apiUrl
+		})
 	}
 
 	/** Sets the JWT used in api calls */
@@ -56,5 +64,6 @@ export class MeemSDK {
 		this.agreement.setJwt(jwt)
 		this.agreementExtension.setJwt(jwt)
 		this.storage.setJwt(jwt)
+		this.symphony.setJwt(jwt)
 	}
 }
