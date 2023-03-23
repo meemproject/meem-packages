@@ -1,7 +1,8 @@
 import { Agreement } from './methods/agreement'
 import { AgreementExtension } from './methods/agreementExtension'
 import { Id } from './methods/id'
-import { GunOptions, Storage } from './methods/storage'
+import { Storage } from './methods/storage'
+import { Symphony } from './methods/symphony'
 
 export * from './generated/api.generated'
 export * from './abis'
@@ -13,6 +14,7 @@ export * from './methods/id'
 export * from './methods/agreement'
 export * from './methods/agreementExtension'
 export * from './methods/storage'
+export * from './methods/symphony'
 
 export class MeemSDK {
 	public id: Id
@@ -23,18 +25,17 @@ export class MeemSDK {
 
 	public storage: Storage
 
+	public symphony: Symphony
+
 	private jwt?: string
 
 	public constructor(options: {
 		jwt?: string
 		apiUrl?: string
-		isGunEnabled?: boolean
-		gunOptions?: GunOptions
 		gqlHttpUrl?: string
 		gqlWsUri?: string
 	}) {
-		const { jwt, apiUrl, gunOptions, gqlHttpUrl, gqlWsUri, isGunEnabled } =
-			options
+		const { jwt, apiUrl, gqlHttpUrl, gqlWsUri } = options
 		this.jwt = jwt
 		this.id = new Id({ jwt: this.jwt, gqlHttpUrl, gqlWsUri, apiUrl })
 		this.agreement = new Agreement({
@@ -46,9 +47,11 @@ export class MeemSDK {
 		this.agreementExtension = new AgreementExtension({ jwt: this.jwt, apiUrl })
 
 		this.storage = new Storage({
-			gunOptions,
-			isGunEnabled: typeof isGunEnabled === 'boolean' ? isGunEnabled : true,
 			id: this.id,
+			jwt: this.jwt,
+			apiUrl
+		})
+		this.symphony = new Symphony({
 			jwt: this.jwt,
 			apiUrl
 		})
@@ -61,5 +64,6 @@ export class MeemSDK {
 		this.agreement.setJwt(jwt)
 		this.agreementExtension.setJwt(jwt)
 		this.storage.setJwt(jwt)
+		this.symphony.setJwt(jwt)
 	}
 }
