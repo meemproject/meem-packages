@@ -1075,8 +1075,8 @@ export namespace BulkBurnAgreementRoleTokens {
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		/** The Transaction id */
-		txId: string
+		/** The Transaction id. Only if the agreement is on-chain */
+		txId?: string
 	}
 
 	export interface IDefinition {
@@ -1111,8 +1111,8 @@ export namespace BulkBurnAgreementTokens {
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		/** The Transaction id */
-		txId: string
+		/** The Transaction id. Only if the agreement is on-chain */
+		txId?: string
 	}
 
 	export interface IDefinition {
@@ -1155,8 +1155,8 @@ export namespace BulkMintAgreementRoleTokens {
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		/** The Transaction id */
-		txId: string
+		/** The Transaction id. Only if the agreement is on-chain */
+		txId?: string
 	}
 
 	export interface IDefinition {
@@ -1197,8 +1197,8 @@ export namespace BulkMintAgreementTokens {
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		/** The Transaction id */
-		txId: string
+		/** The Transaction id. Only if the agreement is on-chain */
+		txId?: string
 	}
 
 	export interface IDefinition {
@@ -1331,9 +1331,14 @@ export namespace CreateAgreement {
 		/** The Transaction id for minting admin role tokens. Transaction #7 */
 		adminRoleMintTxId?: string
 
+		/** The agreement id. Available only if isOnChain=false */
 		agreementId?: string
 
+		/** The admin agreement id. Available only if isOnChain=false */
 		adminAgreementId?: string
+
+		/** The slug for the agreement. Available only if isOnChain=false */
+		slug?: string
 	}
 
 	export interface IDefinition {
