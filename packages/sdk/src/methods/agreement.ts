@@ -211,7 +211,7 @@ export class Agreement {
 				name,
 				contractURI,
 				roles: roles ?? [],
-				maxSupply,
+				maxSupply: maxSupply ?? 0,
 				mintPermissions: builtMintPermissions,
 				splits: splits ?? [],
 				isTransferLocked: isTransferLocked ?? false
