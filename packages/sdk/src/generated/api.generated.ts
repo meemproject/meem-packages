@@ -776,7 +776,9 @@ export enum RuleIo {
 
 export enum PublishType {
 	Proposal = 'proposal',
-	PublishImmediately = 'publishImmediately'
+	PublishImmediately = 'publishImmediately',
+	PublishAfterApproval = 'publishAfterApproval',
+	PublishImmediatelyOrEditorApproval = 'publishImmediatelyOrEditorApproval'
 }
 
 export interface IRule {
@@ -787,11 +789,14 @@ export interface IRule {
 	approverEmojis: string[]
 	vetoerRoles: string[]
 	vetoerEmojis: string[]
+	editorRoles?: string[]
+	editorEmojis?: string[]
 	proposalChannels: string[]
 	proposalShareChannel: string
 	canVeto: boolean
 	votes: number
 	vetoVotes: number
+	editorVotes?: number
 	proposeVotes: number
 	shouldReply: boolean
 	ruleId?: string
@@ -805,26 +810,6 @@ export interface IRuleToSave extends IRule {
 	outputRef?: string | null
 	webhookUrl?: string
 	webhookSecret?: string
-}
-
-export interface ISavedRule
-	extends Omit<
-		IRule,
-		| 'proposerRoles'
-		| 'proposerEmojis'
-		| 'approverRoles'
-		| 'approverEmojis'
-		| 'vetoerRoles'
-		| 'vetoerEmojis'
-		| 'proposalChannels'
-	> {
-	proposerRoles: string
-	proposerEmojis: string
-	approverRoles: string
-	approverEmojis: string
-	vetoerRoles: string
-	vetoerEmojis: string
-	proposalChannels: string
 }
 
 export interface IDiscordRole {
@@ -1817,8 +1802,8 @@ export namespace ReInitializeAgreement {
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		/** The Transaction id for updating the contract */
-		txId: string
+		/** The Transaction id for updating the contract. Only available if agreement is on chain */
+		txId?: string
 	}
 
 	export interface IDefinition {
@@ -1871,8 +1856,8 @@ export namespace ReInitializeAgreementRole {
 	}
 
 	export interface IResponseBody extends IApiResponseBody {
-		/** The Transaction id for updating the contract */
-		txId: string
+		/** The Transaction id for updating the contract. Only available if agreement is on chain */
+		txId?: string
 	}
 
 	export interface IDefinition {
