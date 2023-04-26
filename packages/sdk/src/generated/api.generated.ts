@@ -781,16 +781,29 @@ export enum PublishType {
 	PublishImmediatelyOrEditorApproval = 'publishImmediatelyOrEditorApproval'
 }
 
+export enum EmojiType {
+	Unified = 'unified',
+	Discord = 'discord'
+}
+
+export interface IEmoji {
+	id: string
+	name: string
+	type: EmojiType
+	unified?: string
+	url?: string
+}
+
 export interface IRule {
 	publishType: PublishType
 	proposerRoles: string[]
-	proposerEmojis: string[]
+	proposerEmojis: string[] | IEmoji[]
 	approverRoles: string[]
-	approverEmojis: string[]
+	approverEmojis: string[] | IEmoji[]
 	vetoerRoles: string[]
-	vetoerEmojis: string[]
+	vetoerEmojis: string[] | IEmoji[]
 	editorRoles?: string[]
-	editorEmojis?: string[]
+	editorEmojis?: string[] | IEmoji[]
 	proposalChannels: string[]
 	proposalShareChannel: string
 	canVeto: boolean
@@ -859,6 +872,7 @@ export interface IWebhookReaction {
 export interface IWebhookBody {
 	secret: string
 	channelId: string
+	channelName?: string
 	messageId: string
 	rule: Omit<IRuleToSave, 'webhookUrl' | 'webhookSecret'>
 	content: string
@@ -2408,6 +2422,44 @@ export namespace JoinGuild {
 
 
 
+/** Save some data to IPFS */
+export namespace SaveToIPFS {
+	export interface IPathParams {}
+
+	export const path = () => `/api/1.0/ipfs`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** The data to save. Only one of "data" or "json" should be sent */
+		data?: string
+
+		/** The JSON to save. Only one of "data" or "json" should be sent */
+		json?: Record<string, any>
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		/** The IPFS hash for the saved data */
+		ipfsHash: string
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+// TODO: How to specify json in OpenAPI definition
+
+
+
+
 /** Create or update the current user */
 export namespace CreateOrUpdateUser {
 	export interface IPathParams {}
@@ -2603,44 +2655,6 @@ export namespace UpdateUserIdentity {
 
 	export type Response = IResponseBody | IError
 }
-
-
-
-
-/** Save some data to IPFS */
-export namespace SaveToIPFS {
-	export interface IPathParams {}
-
-	export const path = () => `/api/1.0/ipfs`
-
-	export const method = HttpMethod.Post
-
-	export interface IQueryParams {}
-
-	export interface IRequestBody {
-		/** The data to save. Only one of "data" or "json" should be sent */
-		data?: string
-
-		/** The JSON to save. Only one of "data" or "json" should be sent */
-		json?: Record<string, any>
-	}
-
-	export interface IResponseBody extends IApiResponseBody {
-		/** The IPFS hash for the saved data */
-		ipfsHash: string
-	}
-
-	export interface IDefinition {
-		pathParams: IPathParams
-		queryParams: IQueryParams
-		requestBody: IRequestBody
-		responseBody: IResponseBody
-	}
-
-	export type Response = IResponseBody | IError
-}
-
-// TODO: How to specify json in OpenAPI definition
 
 
 
