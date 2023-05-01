@@ -1055,6 +1055,73 @@ export namespace Login {
 
 
 
+export namespace AuthenticateWithDiscord {
+	export interface IPathParams {}
+
+	export const path = (options: IPathParams) => `/api/1.0/discord/authenticate`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		/** The Discord authentication code */
+		authCode: string
+		/** The Discord authentication callback url */
+		redirectUri: string
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		user: { [key: string]: any }
+		accessToken: string
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
+export namespace GetDiscordServers {
+	export interface IPathParams {}
+
+	export const path = (options: IPathParams) => `/api/1.0/discord/servers`
+
+	export const method = HttpMethod.Get
+
+	export interface IQueryParams {
+		accessToken: string
+	}
+
+	export interface IRequestBody {
+		/** The Discord authentication code */
+		authCode: string
+		/** The Discord authentication callback url */
+		redirectUri: string
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		discordServers: IDiscordServer[]
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
 export namespace CreateBundle {
 	export interface IPathParams {}
 
@@ -1243,73 +1310,6 @@ export namespace UpdateWalletContractInstance {
 
 	export interface IResponseBody extends IApiResponseBody {
 		status: 'success'
-	}
-
-	export interface IDefinition {
-		pathParams: IPathParams
-		queryParams: IQueryParams
-		requestBody: IRequestBody
-		responseBody: IResponseBody
-	}
-
-	export type Response = IResponseBody | IError
-}
-
-
-
-export namespace AuthenticateWithDiscord {
-	export interface IPathParams {}
-
-	export const path = (options: IPathParams) => `/api/1.0/discord/authenticate`
-
-	export const method = HttpMethod.Post
-
-	export interface IQueryParams {}
-
-	export interface IRequestBody {
-		/** The Discord authentication code */
-		authCode: string
-		/** The Discord authentication callback url */
-		redirectUri: string
-	}
-
-	export interface IResponseBody extends IApiResponseBody {
-		user: { [key: string]: any }
-		accessToken: string
-	}
-
-	export interface IDefinition {
-		pathParams: IPathParams
-		queryParams: IQueryParams
-		requestBody: IRequestBody
-		responseBody: IResponseBody
-	}
-
-	export type Response = IResponseBody | IError
-}
-
-
-
-export namespace GetDiscordServers {
-	export interface IPathParams {}
-
-	export const path = (options: IPathParams) => `/api/1.0/discord/servers`
-
-	export const method = HttpMethod.Get
-
-	export interface IQueryParams {
-		accessToken: string
-	}
-
-	export interface IRequestBody {
-		/** The Discord authentication code */
-		authCode: string
-		/** The Discord authentication callback url */
-		redirectUri: string
-	}
-
-	export interface IResponseBody extends IApiResponseBody {
-		discordServers: IDiscordServer[]
 	}
 
 	export interface IDefinition {
@@ -2339,90 +2339,6 @@ export namespace UpgradeAgreementRole {
 
 
 
-export namespace GetJoinGuildMessage {
-	export interface IPathParams {
-		/** The Agreement id */
-		agreementId: string
-	}
-
-	export const path = (options: IPathParams) =>
-		`/api/1.0/agreements/${options.agreementId}/getJoinGuildMessage`
-
-	export const method = HttpMethod.Get
-
-	export interface IQueryParams {}
-
-	export interface IRequestBody {}
-
-	export interface IResponseBody extends IApiResponseBody {
-		message: string
-		params: {
-			chainId?: string
-			msg: string
-			method: number
-			addr: string
-			nonce: string
-			hash?: string
-			ts: string
-		}
-	}
-
-	export interface IDefinition {
-		pathParams: IPathParams
-		queryParams: IQueryParams
-		requestBody: IRequestBody
-		responseBody: IResponseBody
-	}
-
-	export type Response = IResponseBody | IError
-}
-
-
-
-export namespace JoinGuild {
-	export interface IPathParams {
-		/** The Agreement id */
-		agreementId: string
-	}
-
-	export const path = (options: IPathParams) =>
-		`/api/1.0/agreements/${options.agreementId}/joinGuild`
-
-	export const method = HttpMethod.Post
-
-	export interface IQueryParams {}
-
-	export interface IRequestBody {
-		message: string
-		params: {
-			chainId?: string
-			msg: string
-			method: number
-			addr: string
-			nonce: string
-			hash?: string
-			ts: string
-		}
-		sig: string
-		mintToken?: boolean
-	}
-
-	export interface IResponseBody extends IApiResponseBody {
-		status: 'success'
-	}
-
-	export interface IDefinition {
-		pathParams: IPathParams
-		queryParams: IQueryParams
-		requestBody: IRequestBody
-		responseBody: IResponseBody
-	}
-
-	export type Response = IResponseBody | IError
-}
-
-
-
 /** Create or update the current user */
 export namespace CreateOrUpdateUser {
 	export interface IPathParams {}
@@ -2619,6 +2535,90 @@ export namespace UpdateUserIdentity {
 	export type Response = IResponseBody | IError
 }
 
+
+
+
+export namespace GetJoinGuildMessage {
+	export interface IPathParams {
+		/** The Agreement id */
+		agreementId: string
+	}
+
+	export const path = (options: IPathParams) =>
+		`/api/1.0/agreements/${options.agreementId}/getJoinGuildMessage`
+
+	export const method = HttpMethod.Get
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {}
+
+	export interface IResponseBody extends IApiResponseBody {
+		message: string
+		params: {
+			chainId?: string
+			msg: string
+			method: number
+			addr: string
+			nonce: string
+			hash?: string
+			ts: string
+		}
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
+
+
+
+export namespace JoinGuild {
+	export interface IPathParams {
+		/** The Agreement id */
+		agreementId: string
+	}
+
+	export const path = (options: IPathParams) =>
+		`/api/1.0/agreements/${options.agreementId}/joinGuild`
+
+	export const method = HttpMethod.Post
+
+	export interface IQueryParams {}
+
+	export interface IRequestBody {
+		message: string
+		params: {
+			chainId?: string
+			msg: string
+			method: number
+			addr: string
+			nonce: string
+			hash?: string
+			ts: string
+		}
+		sig: string
+		mintToken?: boolean
+	}
+
+	export interface IResponseBody extends IApiResponseBody {
+		status: 'success'
+	}
+
+	export interface IDefinition {
+		pathParams: IPathParams
+		queryParams: IQueryParams
+		requestBody: IRequestBody
+		responseBody: IResponseBody
+	}
+
+	export type Response = IResponseBody | IError
+}
 
 
 
