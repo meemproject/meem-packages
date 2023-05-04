@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.20.8](https://github.com/meemproject/meem-packages/compare/v0.20.7...v0.20.8) (2023-05-04)
+
+**Note:** Version bump only for package @meemproject/metadata
+
+
+
+
+
 ## [0.20.7](https://github.com/meemproject/meem-packages/compare/v0.20.6...v0.20.7) (2023-05-03)
 
 **Note:** Version bump only for package @meemproject/metadata
