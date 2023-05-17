@@ -1,7 +1,6 @@
 import { Agreement } from './methods/agreement'
 import { AgreementExtension } from './methods/agreementExtension'
 import { Id } from './methods/id'
-import { Storage } from './methods/storage'
 import { Symphony } from './methods/symphony'
 
 export * from './generated/api.generated'
@@ -13,7 +12,6 @@ export * from './lib/GQLClient'
 export * from './methods/id'
 export * from './methods/agreement'
 export * from './methods/agreementExtension'
-export * from './methods/storage'
 export * from './methods/symphony'
 
 export class MeemSDK {
@@ -22,8 +20,6 @@ export class MeemSDK {
 	public agreement: Agreement
 
 	public agreementExtension: AgreementExtension
-
-	public storage: Storage
 
 	public symphony: Symphony
 
@@ -45,12 +41,6 @@ export class MeemSDK {
 			apiUrl
 		})
 		this.agreementExtension = new AgreementExtension({ jwt: this.jwt, apiUrl })
-
-		this.storage = new Storage({
-			id: this.id,
-			jwt: this.jwt,
-			apiUrl
-		})
 		this.symphony = new Symphony({
 			jwt: this.jwt,
 			apiUrl
@@ -63,7 +53,6 @@ export class MeemSDK {
 		this.id.setJwt(jwt)
 		this.agreement.setJwt(jwt)
 		this.agreementExtension.setJwt(jwt)
-		this.storage.setJwt(jwt)
 		this.symphony.setJwt(jwt)
 	}
 }

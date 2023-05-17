@@ -527,64 +527,6 @@ export class Agreement {
 		return result
 	}
 
-	/** Upgrade an agreement */
-	public async upgradeAgreement(options: {
-		/** The agreement to upgrade */
-		agreementId: string
-
-		/** Specify the bundle id to upgrade to. Defaults to latest Agreements bundle */
-		bundleId?: string
-	}) {
-		const { agreementId, bundleId } = options
-
-		const result = await makeRequest<MeemAPI.v1.UpgradeAgreement.IDefinition>(
-			MeemAPI.v1.UpgradeAgreement.path({ agreementId }),
-			{
-				jwt: this.jwt,
-				baseUrl: this.apiUrl,
-				method: MeemAPI.v1.UpgradeAgreement.method,
-				body: {
-					bundleId
-				}
-			}
-		)
-
-		return result
-	}
-
-	/** Create a new agreement */
-	public async createSafe(options: {
-		/** The agreement to create the club safe for */
-		agreementId: string
-
-		/** Addresses of the safe owners */
-		safeOwners: string[]
-
-		/** Set the chain where the safe should be created. Defaults to the chain where the agreement lives. */
-		chainId?: number
-
-		/** The number of signatures required */
-		threshold?: number
-	}) {
-		const { agreementId, safeOwners, chainId, threshold } = options
-		const result =
-			await makeRequest<MeemAPI.v1.CreateAgreementSafe.IDefinition>(
-				MeemAPI.v1.CreateAgreementSafe.path({ agreementId }),
-				{
-					jwt: this.jwt,
-					baseUrl: this.apiUrl,
-					method: MeemAPI.v1.CreateAgreementSafe.method,
-					body: {
-						safeOwners,
-						chainId,
-						threshold
-					}
-				}
-			)
-
-		return result
-	}
-
 	/** Sets the address of the Agreement safe */
 	public async setSafeAddress(options: {
 		/** The agreement */
@@ -603,31 +545,6 @@ export class Agreement {
 					method: MeemAPI.v1.SetAgreementSafeAddress.method,
 					body: {
 						address
-					}
-				}
-			)
-
-		return result
-	}
-
-	/** Set the agreement admin role */
-	public async setAgreementAdminRole(options: {
-		/** The agreement */
-		agreementId: string
-
-		/** The id of the agreement role to set as agreement admin role */
-		adminAgreementRoleId: string
-	}) {
-		const { agreementId, adminAgreementRoleId } = options
-		const result =
-			await makeRequest<MeemAPI.v1.SetAgreementAdminRole.IDefinition>(
-				MeemAPI.v1.SetAgreementAdminRole.path({ agreementId }),
-				{
-					jwt: this.jwt,
-					baseUrl: this.apiUrl,
-					method: MeemAPI.v1.SetAgreementAdminRole.method,
-					body: {
-						adminAgreementRoleId
 					}
 				}
 			)
@@ -842,35 +759,6 @@ export class Agreement {
 						symbol,
 						splits,
 						isTransferLocked
-					}
-				}
-			)
-
-		return result
-	}
-
-	/** Upgrade an agreement role */
-	public async upgradeAgreementRole(options: {
-		/** The id of the agreement */
-		agreementId: string
-
-		/** The agreement role to upgrade */
-		agreementRoleId: string
-
-		/** Specify the bundle id to upgrade to. Defaults to latest Agreements bundle */
-		bundleId?: string
-	}) {
-		const { agreementId, agreementRoleId, bundleId } = options
-
-		const result =
-			await makeRequest<MeemAPI.v1.UpgradeAgreementRole.IDefinition>(
-				MeemAPI.v1.UpgradeAgreementRole.path({ agreementId, agreementRoleId }),
-				{
-					jwt: this.jwt,
-					baseUrl: this.apiUrl,
-					method: MeemAPI.v1.UpgradeAgreement.method,
-					body: {
-						bundleId
 					}
 				}
 			)
